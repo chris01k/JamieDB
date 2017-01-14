@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JamieDB.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,11 @@ namespace JamieDB
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MaintainanceRecipesViewModel ViewModel = new MaintainanceRecipesViewModel();
         public MainWindow()
         {
             InitializeComponent();
+            this.Loaded += (s, e) => { this.DataContext = this.ViewModel; };
         }
     }
 }
