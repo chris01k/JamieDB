@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="JamieDB" Class="JamieDBLinqDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=FOLLETT\SQLEXPRESS;Initial Catalog=JamieDB;Integrated Security=True" SettingsObjectName="JamieDB.Properties.Settings" SettingsPropertyName="JamieDBConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.RecipeIngredients" Member="RecipeIngredients">
+    <Type Name="RecipeIngredient">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Ingredient" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(18,2) NOT NULL" CanBeNull="false" />
+      <Column Name="Unit" Type="System.String" DbType="NChar(10) NOT NULL" CanBeNull="false" />
+      <Association Name="Recipe_RecipeIngredient" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Recipes" Member="Recipes">
+    <Type Name="Recipe">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="PortionQuantity" Type="System.Decimal" DbType="Decimal(18,2) NOT NULL" CanBeNull="false" />
+      <Column Name="Source" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="SourcePage" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="SourceISBN" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Association Name="Recipe_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="RecipeID" Type="RecipeIngredient" />
+    </Type>
+  </Table>
+</Database>
