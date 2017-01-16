@@ -11,7 +11,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ComboBox Margin="5" ItemsSource="{Binding Path=Recipes}" DisplayMemberPath="Name"/>
+        <ComboBox Margin="5" ItemsSource="{Binding Path=Recipes}" DisplayMemberPath="Name"
+            SelectedItem="{Binding Path=SelectedRecipe}"/>
+        <DataGrid Grid.Row="1" Margin="5"  AutoGenerateColumns="True" ItemsSource="{Binding Path=RecipeIngredients}"/>
+
 
     </Grid>
 </Window>

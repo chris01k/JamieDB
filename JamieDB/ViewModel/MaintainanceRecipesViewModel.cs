@@ -18,11 +18,10 @@ namespace JamieDB.ViewModel
         //Constructors
         public MaintainanceRecipesViewModel()
         {
-            _Recipes = GetRecipes();
-            if (_Recipes.Count() != 0)
+            Recipes = GetRecipes();
+            if (Recipes.Count() != 0)
             {
-                SelectedRecipe = _Recipes.First();
-                _RecipeIngredients = GetRecipeIngredients(_SelectedRecipe.Id);
+                SelectedRecipe = Recipes.First();
             }
         }
 
@@ -62,15 +61,21 @@ namespace JamieDB.ViewModel
             set
             {
                 _SelectedRecipe = value;
+                this.OnPropertyChanged("SelectedRecipe");
+                RefreshRecipeIngredients();
             }
         }
+
+        //Events
+        public event PropertyChangedEventHandler PropertyChanged;
+
 
         //Methods
         private IEnumerable<RecipeIngredient> GetRecipeIngredients(long RecipeID)
         {
             using (var context = new JamieDBLinqDataContext())
             {
-                var result = context.RecipeIngredients.Where(ri => ri.RecipeID == RecipeID);
+                var result = context.RecipeIngredients.Where(ri => ri.RecipeID == RecipeID).ToList();
                 return result;
             }
 
@@ -92,14 +97,10 @@ namespace JamieDB.ViewModel
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-
-        
-
-
-
-
+        private void RefreshRecipeIngredients()
+        {
+            RecipeIngredients = GetRecipeIngredients(SelectedRecipe.Id);
+        }
 
     }
 }
