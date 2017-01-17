@@ -14,10 +14,12 @@ namespace JamieDB.ViewModel
         private IEnumerable<Recipe> _Recipes;
         private IEnumerable<RecipeIngredient> _RecipeIngredients;
         private Recipe _SelectedRecipe;
+        private JamieDBLinqDataContext _context;
 
         //Constructors
         public MaintainanceRecipesViewModel()
         {
+            _context = new JamieDBLinqDataContext();
             Recipes = GetRecipes();
             if (Recipes.Count() != 0)
             {
@@ -73,20 +75,14 @@ namespace JamieDB.ViewModel
         //Methods
         private IEnumerable<RecipeIngredient> GetRecipeIngredients(long RecipeID)
         {
-            using (var context = new JamieDBLinqDataContext())
-            {
-                var result = context.RecipeIngredients.Where(ri => ri.RecipeID == RecipeID).ToList();
-                return result;
-            }
+             var result = _context.RecipeIngredients.Where(ri => ri.RecipeID == RecipeID).ToList();
+             return result;
 
         }
         private IEnumerable<Recipe> GetRecipes()
         {
-            using (var context = new JamieDBLinqDataContext())
-            {
-                var result = context.Recipes.ToList();
-                return result;
-            }
+            var result = _context.Recipes.ToList();
+            return result;
 
         }
         private void OnPropertyChanged(string PropertyName)
