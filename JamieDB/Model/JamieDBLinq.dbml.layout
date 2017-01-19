@@ -1,24 +1,56 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="JamieDBLinq">
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 9.625" name="JamieDBLinq">
   <DataContextMoniker Name="/JamieDBLinqDataContext" />
   <nestedChildShapes>
-    <classShape Id="7a38bd7a-578d-4f65-9c7b-2426d4757b91" absoluteBounds="3.5, 1, 2, 1.7708968098958331">
+    <classShape Id="6e28cc58-f5fe-4f51-b233-ed000db96376" absoluteBounds="3.5, 3.75, 2, 1.7708968098958327">
+      <DataClassMoniker Name="/JamieDBLinqDataContext/Ingredient" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1f913878-265a-447c-a4c3-e31e29e0baae" absoluteBounds="3.515, 4.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="4ebd6414-0735-431c-9365-5ed519b323f9" absoluteBounds="3.75, 7.25, 2, 2.1554996744791675">
+      <DataClassMoniker Name="/JamieDBLinqDataContext/UnitTranslation" />
+      <nestedChildShapes>
+        <elementListCompartment Id="975bae16-a3fb-4a51-88fe-1417a158c17a" absoluteBounds="3.765, 7.71, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="1a8b71cb-c03f-479a-b7df-5e1d7b79245f" absoluteBounds="3.5, 0.75, 2, 1.7708968098958331">
       <DataClassMoniker Name="/JamieDBLinqDataContext/RecipeIngredient" />
       <nestedChildShapes>
-        <elementListCompartment Id="201c1141-7abd-49c3-81fb-233271688ebf" absoluteBounds="3.515, 1.46, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="2bbc8598-b5b6-46cb-b918-160761e633fe" absoluteBounds="3.515, 1.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="f881531a-8fa3-4874-a690-0a10543add02" absoluteBounds="0.75, 0.875, 2, 1.9631982421875">
+    <classShape Id="5d62dce0-12ba-4e39-88ff-9b2c865b9f3a" absoluteBounds="0.75, 6.5, 2, 2.1554996744791675">
       <DataClassMoniker Name="/JamieDBLinqDataContext/Recipe" />
       <nestedChildShapes>
-        <elementListCompartment Id="d89a9723-3a84-43c4-a852-28734edd276c" absoluteBounds="0.765, 1.335, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="ab18e967-096b-4e2b-940b-021127fafacb" absoluteBounds="0.765, 6.96, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(2.75 : 1.88544840494792); (3.5 : 1.88544840494792)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <classShape Id="fe06d672-b82f-460e-8875-fd0f8af05ea8" absoluteBounds="0.75, 3.875, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/JamieDBLinqDataContext/Unit" />
+      <nestedChildShapes>
+        <elementListCompartment Id="cbce80dd-05d6-45a3-bdf2-79ff00ad85f9" absoluteBounds="0.765, 4.335, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(2.75 : 6.50153746153846); (3.125 : 6.12653746153846); (3.125 : 1.63544840494792); (3.5 : 1.63544840494792)]" fixedFrom="NotFixed" fixedTo="Algorithm">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Recipe/Recipe_RecipeIngredient" />
       <nodes>
-        <classShapeMoniker Id="f881531a-8fa3-4874-a690-0a10543add02" />
-        <classShapeMoniker Id="7a38bd7a-578d-4f65-9c7b-2426d4757b91" />
+        <classShapeMoniker Id="5d62dce0-12ba-4e39-88ff-9b2c865b9f3a" />
+        <classShapeMoniker Id="1a8b71cb-c03f-479a-b7df-5e1d7b79245f" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 4.66429768880208); (3.04166666666667 : 4.66429768880208 : JumpStart); (3.20833333333333 : 4.66429768880208 : JumpEnd); (3.5 : 4.66429768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/JamieDBLinqDataContext/Unit/Unit_Ingredient" />
+      <nodes>
+        <classShapeMoniker Id="fe06d672-b82f-460e-8875-fd0f8af05ea8" />
+        <classShapeMoniker Id="6e28cc58-f5fe-4f51-b233-ed000db96376" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(1.75 : 3.875); (1.75 : 2.10942510742187); (3.04166666666667 : 2.10942510742187 : JumpStart); (3.20833333333333 : 2.10942510742187 : JumpEnd); (3.5 : 2.10942510742187)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/JamieDBLinqDataContext/Unit/Unit_RecipeIngredient" />
+      <nodes>
+        <classShapeMoniker Id="fe06d672-b82f-460e-8875-fd0f8af05ea8" />
+        <classShapeMoniker Id="1a8b71cb-c03f-479a-b7df-5e1d7b79245f" />
       </nodes>
     </associationConnector>
   </nestedChildShapes>

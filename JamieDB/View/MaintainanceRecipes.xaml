@@ -13,8 +13,13 @@
         </Grid.RowDefinitions>
         <ComboBox Margin="5" ItemsSource="{Binding Path=Recipes}" DisplayMemberPath="Name"
             SelectedItem="{Binding Path=SelectedRecipe}"/>
-        <DataGrid Grid.Row="1" Margin="5"  AutoGenerateColumns="True" ItemsSource="{Binding Path=RecipeIngredients}"/>
-
+        <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding Path=RecipeIngredients}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Recipe" Width="175" Binding= "{Binding Path=Recipe.Name}" ></DataGridTextColumn>
+                <DataGridTextColumn Header="Ingredient" Width="175" Binding= "{Binding Path=Ingredient}" ></DataGridTextColumn>
+                <DataGridTextColumn Header="Quantity" Width="175" Binding= "{Binding Path=Quantity}" ></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
     </Grid>
 </Window>
