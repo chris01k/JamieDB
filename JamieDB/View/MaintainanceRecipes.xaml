@@ -4,22 +4,79 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JamieDB"
+        xmlns:viewmodel="clr-namespace:JamieDB.ViewModel"
         mc:Ignorable="d"
         Title="Recipe List" Height="350" Width="525">
-    <Grid>
+
+    <Window.Resources>
+        <viewmodel:MaintainanceRecipesViewModel x:Key="viewModel"/>
+    </Window.Resources>
+
+    <Grid ShowGridLines="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ComboBox Margin="5" ItemsSource="{Binding Path=Recipes}" DisplayMemberPath="Name"
-            SelectedItem="{Binding Path=SelectedRecipe}"/>
-        <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding Path=RecipeIngredients}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Menu Grid.Row="0" Grid.ColumnSpan="3">
+            <MenuItem Header="Recipe">
+                
+            </MenuItem>
+        </Menu>
+        
+        <ComboBox Grid.Row="1" Grid.ColumnSpan="3" Margin="5" ItemsSource="{Binding Recipes, Source={StaticResource viewModel}}" DisplayMemberPath="Name"
+            SelectedItem="{Binding SelectedRecipe, Source={StaticResource viewModel}}"/>
+        
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Vertical" Margin="5">
+            <Label>Name</Label>
+            <Label>Source</Label>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" Margin="5">
+            <TextBox Text="{Binding SelectedRecipe.Name, Source={StaticResource viewModel}}" Margin="5"></TextBox>
+            <TextBox Text="{Binding SelectedRecipe.Source, Source={StaticResource viewModel}}" Margin="5" IsReadOnly="True"></TextBox>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Vertical">
+            <Button Content="New" Width="80" Margin="5" Command="{Binding NewRecipeCommand, Mode=OneWay, Source={StaticResource viewModel}}" />
+            <Button Content="Delete" Width="80" Margin="5"/>
+        </StackPanel>
+
+        <DataGrid Grid.Row="3" Grid.ColumnSpan="2" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}}"
+                  AlternationCount="2"
+                  RowBackground="White"
+                  AlternatingRowBackground="LightCyan"
+                  SelectedItem="{Binding Path=SelectedRecipeIngredient, Mode=TwoWay}">
+                 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Recipe" Width="175" Binding= "{Binding Path=Recipe.Name}" ></DataGridTextColumn>
-                <DataGridTextColumn Header="Ingredient" Width="175" Binding= "{Binding Path=Ingredient}" ></DataGridTextColumn>
-                <DataGridTextColumn Header="Quantity" Width="175" Binding= "{Binding Path=Quantity}" ></DataGridTextColumn>
+                <DataGridTextColumn Header="Recipe" Width="*" Binding= "{Binding Path=Recipe.Name, Mode=TwoWay}" ></DataGridTextColumn>
+                <DataGridTextColumn Header="Quantity" Width="Auto" Binding= "{Binding Path=Quantity, Mode=TwoWay}"></DataGridTextColumn>
+                <DataGridComboBoxColumn Header="Unit" Width="Auto" 
+                                        ItemsSource="{Binding Units, Source={StaticResource viewModel}}"
+                                        DisplayMemberPath="Symbol"
+                                        SelectedValuePath="Id"
+                                        SelectedValueBinding="{Binding Path=Unit}"/>
+                <DataGridComboBoxColumn Header="Ingredient 2" Width="*" 
+                                        ItemsSource="{Binding Ingredients, Source={StaticResource viewModel}}"
+                                        DisplayMemberPath="Name"
+                                        SelectedValuePath="Id"
+                                        SelectedValueBinding="{Binding Path=Ingredient}"/>
             </DataGrid.Columns>
         </DataGrid>
-
+        
+        <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Vertical">
+            <Button Content="New" Width="80" Margin="5" Command="{Binding NewRecipeIngredientCommand, Mode=OneWay, Source={StaticResource viewModel}}" />
+            <Button Content="Delete" Width="80" Margin="5"/>
+        </StackPanel>
+        <Button Grid.Row="4" Grid.Column="3" Content="Save" Width="80" Margin="5" Command="{Binding SaveRecipeCommand, Mode=OneWay, Source={StaticResource viewModel}}" />
     </Grid>
+    
 </Window>
+

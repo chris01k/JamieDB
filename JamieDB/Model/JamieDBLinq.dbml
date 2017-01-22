@@ -21,17 +21,6 @@
       <Column Name="Status" Type="System.Int32" DbType="Int" CanBeNull="true" />
     </Type>
   </Table>
-  <Table Name="dbo.RecipeIngredients" Member="RecipeIngredients">
-    <Type Name="RecipeIngredient">
-      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Column Name="Ingredient" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
-      <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(18,2) NOT NULL" CanBeNull="false" />
-      <Column Name="Unit" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Association Name="Recipe_RecipeIngredient" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
-      <Association Name="Unit_RecipeIngredient" Member="Unit1" ThisKey="Unit" OtherKey="Id" Type="Unit" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Recipes" Member="Recipes">
     <Type Name="Recipe">
       <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -52,6 +41,17 @@
       <Column Name="Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Association Name="Unit_Ingredient" Member="Ingredients" ThisKey="Id" OtherKey="TargetUnit" Type="Ingredient" />
       <Association Name="Unit_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="Unit" Type="RecipeIngredient" />
+    </Type>
+  </Table>
+  <Table Name="dbo.RecipeIngredients" Member="RecipeIngredients">
+    <Type Name="RecipeIngredient">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Ingredient" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(18,2) NOT NULL" CanBeNull="false" />
+      <Column Name="Unit" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Association Name="Recipe_RecipeIngredient" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
+      <Association Name="Unit_RecipeIngredient" Member="Unit1" ThisKey="Unit" OtherKey="Id" Type="Unit" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

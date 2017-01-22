@@ -70,6 +70,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>JamieDBLinq.dbml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\Command\MaintenanceRecipeCommand.cs" />
     <Compile Include="ViewModel\MaintainanceRecipesViewModel.cs" />
     <Compile Include="View\MaintainanceRecipes.xaml.cs">
       <DependentUpon>MaintainanceRecipes.xaml</DependentUpon>
@@ -90,6 +91,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="JamieDBClassDiagram.cd" />
     <None Include="Model\JamieDBLinq.dbml.layout">
       <DependentUpon>JamieDBLinq.dbml</DependentUpon>
     </None>

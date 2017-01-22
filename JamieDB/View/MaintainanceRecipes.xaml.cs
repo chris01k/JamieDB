@@ -28,5 +28,6 @@ namespace JamieDB
             InitializeComponent();
             this.Loaded += (s, e) => { this.DataContext = this.ViewModel; };
         }
+
     }
 }

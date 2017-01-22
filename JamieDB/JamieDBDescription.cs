@@ -4,13 +4,17 @@
  * Autor: Klaus Christochowitz  11-2017
  * Version 0.01 - 2017-01-17: Erste WPF-Testversion in der MVVM-Architektur: 
  *                            - auf geht's
+ * Version 0.02 - 2017-01-19: WPF Tests
  */
 
-/* Version 0.02 - 2017-01-19: WPF Tests
- *                            - 
+/* Version 0.03 - 2017-01-22: Schreibenden Zugriff auf die Datenban implementiert
+ *                            - Bindings Etabliert
+ *                            - Command: SaveRecipe in MaintenanceRecipes hinzu
+ *                            - Unit in View für Rezeptzutat hinzugefügt
+ *                            - Command "Rezept zufügen" hinzu
  *                            
- *                     offen: -
- *                            -
+ *                     offen: - Command: Rezeptzutat hinzufügen
+ *                            - Command: Zutat hinzufügen
  *                             
  * 
  *             Offene Fragen: -

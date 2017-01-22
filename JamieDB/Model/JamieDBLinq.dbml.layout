@@ -14,12 +14,6 @@
         <elementListCompartment Id="975bae16-a3fb-4a51-88fe-1417a158c17a" absoluteBounds="3.765, 7.71, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="1a8b71cb-c03f-479a-b7df-5e1d7b79245f" absoluteBounds="3.5, 0.75, 2, 1.7708968098958331">
-      <DataClassMoniker Name="/JamieDBLinqDataContext/RecipeIngredient" />
-      <nestedChildShapes>
-        <elementListCompartment Id="2bbc8598-b5b6-46cb-b918-160761e633fe" absoluteBounds="3.515, 1.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
     <classShape Id="5d62dce0-12ba-4e39-88ff-9b2c865b9f3a" absoluteBounds="0.75, 6.5, 2, 2.1554996744791675">
       <DataClassMoniker Name="/JamieDBLinqDataContext/Recipe" />
       <nestedChildShapes>
@@ -32,25 +26,31 @@
         <elementListCompartment Id="cbce80dd-05d6-45a3-bdf2-79ff00ad85f9" absoluteBounds="0.765, 4.335, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(2.75 : 6.50153746153846); (3.125 : 6.12653746153846); (3.125 : 1.63544840494792); (3.5 : 1.63544840494792)]" fixedFrom="NotFixed" fixedTo="Algorithm">
-      <AssociationMoniker Name="/JamieDBLinqDataContext/Recipe/Recipe_RecipeIngredient" />
-      <nodes>
-        <classShapeMoniker Id="5d62dce0-12ba-4e39-88ff-9b2c865b9f3a" />
-        <classShapeMoniker Id="1a8b71cb-c03f-479a-b7df-5e1d7b79245f" />
-      </nodes>
-    </associationConnector>
-    <associationConnector edgePoints="[(2.75 : 4.66429768880208); (3.04166666666667 : 4.66429768880208 : JumpStart); (3.20833333333333 : 4.66429768880208 : JumpEnd); (3.5 : 4.66429768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(2.75 : 4.66429768880208); (3.04166666666667 : 4.66429768880208 : JumpStart); (3.20833333333333 : 4.66429768880208 : JumpEnd); (3.5 : 4.66429768880208)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Unit/Unit_Ingredient" />
       <nodes>
         <classShapeMoniker Id="fe06d672-b82f-460e-8875-fd0f8af05ea8" />
         <classShapeMoniker Id="6e28cc58-f5fe-4f51-b233-ed000db96376" />
       </nodes>
     </associationConnector>
+    <classShape Id="cd47530e-4303-468d-8fad-7399adf2ab43" absoluteBounds="3.5, 0.75, 2, 1.7708968098958331">
+      <DataClassMoniker Name="/JamieDBLinqDataContext/RecipeIngredient" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ef227757-c35b-4f89-bfe9-2f8544af62e4" absoluteBounds="3.515, 1.21, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(2.75 : 6.50153746153846); (3.125 : 6.12653746153846); (3.125 : 1.63544840494792); (3.5 : 1.63544840494792)]" fixedFrom="NotFixed" fixedTo="Algorithm">
+      <AssociationMoniker Name="/JamieDBLinqDataContext/Recipe/Recipe_RecipeIngredient" />
+      <nodes>
+        <classShapeMoniker Id="5d62dce0-12ba-4e39-88ff-9b2c865b9f3a" />
+        <classShapeMoniker Id="cd47530e-4303-468d-8fad-7399adf2ab43" />
+      </nodes>
+    </associationConnector>
     <associationConnector edgePoints="[(1.75 : 3.875); (1.75 : 2.10942510742187); (3.04166666666667 : 2.10942510742187 : JumpStart); (3.20833333333333 : 2.10942510742187 : JumpEnd); (3.5 : 2.10942510742187)]" fixedFrom="Algorithm" fixedTo="Algorithm">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Unit/Unit_RecipeIngredient" />
       <nodes>
         <classShapeMoniker Id="fe06d672-b82f-460e-8875-fd0f8af05ea8" />
-        <classShapeMoniker Id="1a8b71cb-c03f-479a-b7df-5e1d7b79245f" />
+        <classShapeMoniker Id="cd47530e-4303-468d-8fad-7399adf2ab43" />
       </nodes>
     </associationConnector>
   </nestedChildShapes>

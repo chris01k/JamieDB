@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="JamieDB.ViewModel.MaintainanceRecipesViewModel">
+    <Position X="11.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAACCEABAAAIAIAIAAAgAABAAAAgAAAAIQAAAA=</HashCode>
+      <FileName>ViewModel\MaintainanceRecipesViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="JamieDB.Model.Ingredient" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="1.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAiBAABAgABAABA4AEAIAWBjCACQABAAQBAAAAUBAE=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JamieDB.Model.UnitTranslation" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAiAABFAxAECARAQAEAAAEBjCACAIDAAQGgQAAUBAE=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JamieDB.Model.RecipeIngredient" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="1.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAiBABBAgCAAAQA4AEIAGABjCSAAAAAQAAIgABVAAE=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JamieDB.Model.Recipe" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BADiCAABigAQgQAAQAMAIMQBjGAAQghAgABIAASUIAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="JamieDB.Model.Unit" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="3" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAiAAABAgAQAABAQAMAICQBjCYAQAAAoQBAAAAULAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
