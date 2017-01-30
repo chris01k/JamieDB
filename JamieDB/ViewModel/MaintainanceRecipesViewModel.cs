@@ -2,6 +2,7 @@
 using JamieDB.ViewModel.Command;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -20,12 +21,13 @@ namespace JamieDB.ViewModel
         private IEnumerable<Ingredient> _Ingredients;
         private IEnumerable<Unit> _Units;
         private Recipe _SelectedRecipe;
+
         //private RecipeIngredient _SelectedRecipeIngredient;
         private JamieDBLinqDataContext _context;
 
-        //Commands
-        private SaveRecipeCommand _SaveRecipeCommand;
-        private NewRecipeCommand _NewRecipeCommand;
+        //Attributes: Commands
+        private JamieDBViewModelCommand _SaveRecipeCommand;
+        private JamieDBViewModelCommand _NewRecipeCommand;
         private NewRecipeIngredientCommand _NewRecipeIngredientCommand;
 
         //Constructors
@@ -33,8 +35,8 @@ namespace JamieDB.ViewModel
         {
             _context = new JamieDBLinqDataContext();
 
-            _SaveRecipeCommand = new SaveRecipeCommand(this);
-            _NewRecipeCommand = new NewRecipeCommand(this);
+            SaveRecipeCommand = new JamieDBViewModelCommand(CanExecuteSaveRecipe, ExecuteSaveRecipe);
+            NewRecipeCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewRecipe);
             _NewRecipeIngredientCommand = new NewRecipeIngredientCommand(this);
 
             Recipes = GetRecipes();
@@ -100,7 +102,6 @@ namespace JamieDB.ViewModel
 
             }
         }
-
         public Recipe SelectedRecipe
         {
             get
@@ -111,10 +112,38 @@ namespace JamieDB.ViewModel
             set
             {
                 _SelectedRecipe = value;
-                this.OnPropertyChanged("SelectedRecipe");
+                OnPropertyChanged("SelectedRecipe");
                 RefreshRecipeIngredients();
             }
         }
+
+        //Properties: Commands
+        public JamieDBViewModelCommand NewRecipeCommand
+        {
+            get
+            {
+                return _NewRecipeCommand;
+            }
+
+            set
+            {
+                _NewRecipeCommand = value;
+            }
+        }
+        public JamieDBViewModelCommand SaveRecipeCommand
+        {
+            get
+            {
+                return _SaveRecipeCommand;
+            }
+
+            set
+            {
+                _SaveRecipeCommand = value;
+            }
+        }
+
+
 
         //Events
         public event PropertyChangedEventHandler PropertyChanged;
@@ -122,13 +151,13 @@ namespace JamieDB.ViewModel
         //Methods
         private IEnumerable<RecipeIngredient> GetRecipeIngredients(long RecipeID)
         {
-             var result = _context.RecipeIngredients.Where(ri => ri.RecipeID == RecipeID); //ToList()
+            var result = _context.RecipeIngredients.Where(ri => ri.RecipeID == RecipeID); //.ToList()
             return result;
 
         }
         private IEnumerable<Recipe> GetRecipes()
         {
-            var result = _context.Recipes; //.ToList();
+            var result = _context.Recipes;//.ToList();
             return result;
         }
         private IEnumerable<Unit> GetUnits()
@@ -141,8 +170,6 @@ namespace JamieDB.ViewModel
             var result = _context.Ingredients; //.ToList();
             return result;
         }
-
-
         private void OnPropertyChanged(string PropertyName)
         {
             if (this.PropertyChanged != null)
@@ -155,33 +182,31 @@ namespace JamieDB.ViewModel
             RecipeIngredients = GetRecipeIngredients(SelectedRecipe.Id);
         }
 
+        //Command Methods
 
-        //Commands
-        public SaveRecipeCommand SaveRecipeCommand
+        //Command Methods: Generic
+        public bool CanAlwaysExecute(object o)
         {
-            get
-            {
-                return _SaveRecipeCommand;
-            }
-        }
-        public NewRecipeCommand NewRecipeCommand
-        {
-            get
-            {
-                return _NewRecipeCommand;
-            }
-        }
-        public NewRecipeIngredientCommand NewRecipeIngredientCommand
-        {
-            get
-            {
-                return _NewRecipeIngredientCommand;
-            }
+            return true;
         }
 
+        /*      public bool CanExecute<NewCommand>(object o)
+                {
 
+                }
 
-        public void ExecuteSaveRecipe()
+                public void Execute<NewCommand>(object o)
+                {
+
+                }
+        */
+
+        //Command Methods: SaveRecipe
+        public bool CanExecuteSaveRecipe(object o)
+        {
+            return true;
+        }
+        public void ExecuteSaveRecipe(object o)
         {
             try
             {
@@ -196,7 +221,14 @@ namespace JamieDB.ViewModel
                 //_context.SubmitChanges();
             }
         }
-        public void ExecuteNewRecipe()
+
+        //Command Methods: NewRecipe
+        /*public bool CanExecuteNewRecipe(object o)
+        {
+
+        }
+        */
+        public void ExecuteNewRecipe(object o)
         {
             Recipe NewRecipe = new Recipe();
 
@@ -207,8 +239,8 @@ namespace JamieDB.ViewModel
             try
             {
                 _context.SubmitChanges();
-                SelectedRecipe = NewRecipe;
                 Recipes = GetRecipes();
+                SelectedRecipe = NewRecipe;
             }
             catch (Exception e)
             {
@@ -219,6 +251,18 @@ namespace JamieDB.ViewModel
                 //_context.SubmitChanges();
             }
         }
+
+        //Command Methods: NewRecipeIngredient
+
+        public NewRecipeIngredientCommand NewRecipeIngredientCommand
+        {
+            get
+            {
+                return _NewRecipeIngredientCommand;
+            }
+        }
+
+
         public void ExecuteNewRecipeIngredient()
         {
             RecipeIngredient NewRecipeIngredient = new RecipeIngredient();
