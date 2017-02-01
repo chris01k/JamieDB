@@ -10,13 +10,16 @@
  *                            - Command: SaveRecipe in MaintenanceRecipes hinzu
  *                            - Unit in View für Rezeptzutat hinzugefügt
  *                            - Command "Rezept zufügen" hinzu
- */
-
-/* Version 0.04 - 2017-01-29: Command Klasse für das ViewModel implementiert: JamieDBViewModelCommand
+ * Version 0.04 - 2017-01-29: Command Klasse für das ViewModel implementiert: JamieDBViewModelCommand
  *                            - SaveRecipeCommand umgestellt 
  *                              von  JamieDB.ViewModel.Command.SaveRecipeCommand 
  *                              nach JamieDB.ViewModel.JamieDBViewModelCommand;
- *                            - NewRecipeCommand umgestellt
+ *                            - NewRecipeCommand umgestellt 
+ */
+
+/* Version 0.05 - 2017-01-29: Alte Command Klassen beseitigt und durch JamieDBViewModelCommand ersetzt.
+ *                            - NewRecipeIngredientCommand umgestellt
+ *                            - Implementierung Ingredient - Reiter begonnen
  *
  *                     offen: - Command: Rezeptzutat hinzufügen
  *                            - Command: Zutat hinzufügen

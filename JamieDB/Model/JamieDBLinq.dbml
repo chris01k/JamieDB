@@ -1,15 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="JamieDB" Class="JamieDBLinqDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Connection Mode="AppSettings" ConnectionString="Data Source=FOLLETT\SQLEXPRESS;Initial Catalog=JamieDB;Integrated Security=True" SettingsObjectName="JamieDB.Properties.Settings" SettingsPropertyName="JamieDBConnectionString" Provider="System.Data.SqlClient" />
-  <Table Name="dbo.Ingredients" Member="Ingredients">
-    <Type Name="Ingredient">
-      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Flags" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="TargetUnit" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Association Name="Unit_Ingredient" Member="Unit" ThisKey="TargetUnit" OtherKey="Id" Type="Unit" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.UnitTranslations" Member="UnitTranslations">
     <Type Name="UnitTranslation">
       <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -39,8 +29,8 @@
       <Column Name="Symbol" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
       <Column Name="Name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="Type" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Association Name="Unit_Ingredient" Member="Ingredients" ThisKey="Id" OtherKey="TargetUnit" Type="Ingredient" />
       <Association Name="Unit_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="Unit" Type="RecipeIngredient" />
+      <Association Name="Unit_Ingredient" Member="Ingredients" ThisKey="Id" OtherKey="TargetUnit" Type="Ingredient" />
     </Type>
   </Table>
   <Table Name="dbo.RecipeIngredients" Member="RecipeIngredients">
@@ -52,6 +42,30 @@
       <Column Name="Unit" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
       <Association Name="Recipe_RecipeIngredient" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
       <Association Name="Unit_RecipeIngredient" Member="Unit1" ThisKey="Unit" OtherKey="Id" Type="Unit" IsForeignKey="true" />
+      <Association Name="Ingredient_RecipeIngredient" Member="Ingredient1" ThisKey="Ingredient" OtherKey="Id" Type="Ingredient" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.IngredientType" Member="IngredientTypes">
+    <Type Name="IngredientType">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="TargetUnitType" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Association Name="IngredientType_Ingredient" Member="Ingredients" ThisKey="Id" OtherKey="Type" Type="Ingredient" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Ingredients" Member="Ingredients">
+    <Type Name="Ingredient">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Type" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="TargetUnit" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="IsVegan" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="IsVegetarian" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="IsLowCarb" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="IsLowFat" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Association Name="Ingredient_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="Ingredient" Type="RecipeIngredient" />
+      <Association Name="IngredientType_Ingredient" Member="IngredientType" ThisKey="Type" OtherKey="Id" Type="IngredientType" IsForeignKey="true" />
+      <Association Name="Unit_Ingredient" Member="Unit" ThisKey="TargetUnit" OtherKey="Id" Type="Unit" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

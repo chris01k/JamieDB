@@ -70,7 +70,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>JamieDBLinq.dbml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModel\Command\MaintenanceRecipeCommand.cs" />
     <Compile Include="ViewModel\JamieDBViewModelCommand.cs" />
     <Compile Include="ViewModel\MaintainanceRecipesViewModel.cs" />
     <Compile Include="View\MaintainanceRecipes.xaml.cs">
