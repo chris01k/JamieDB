@@ -11,21 +11,25 @@
  *                            - Unit in View für Rezeptzutat hinzugefügt
  *                            - Command "Rezept zufügen" hinzu
  * Version 0.04 - 2017-01-29: Command Klasse für das ViewModel implementiert: JamieDBViewModelCommand
- *                            - SaveRecipeCommand umgestellt 
- *                              von  JamieDB.ViewModel.Command.SaveRecipeCommand 
+ *                            - SaveCommand umgestellt 
+ *                              von  JamieDB.ViewModel.Command.SaveCommand 
  *                              nach JamieDB.ViewModel.JamieDBViewModelCommand;
  *                            - NewRecipeCommand umgestellt 
- */
-
-/* Version 0.05 - 2017-01-29: Alte Command Klassen beseitigt und durch JamieDBViewModelCommand ersetzt.
+ * Version 0.05 - 2017-01-29: Alte Command Klassen beseitigt und durch JamieDBViewModelCommand ersetzt.
  *                            - NewRecipeIngredientCommand umgestellt
  *                            - Implementierung Ingredient - Reiter begonnen
+ * Version 0.06 - 2017-02-06: Properties im ViewModel: Listen umgestellt von IEnumerable auf ObservableCollection
+ *                            - Implementierung Ingredient.
+ */
+
+/* Version 0.07 - 2017-02-xx: xx
+ *                            - xx
  *
- *                     offen: - Command: Rezeptzutat hinzufügen
+ *                     offen: - Command: Rezeptzutat hinzufügen: Foreing Keys befüllen....
  *                            - Command: Zutat hinzufügen
  *                             
  * 
- *             Offene Fragen: - Refresh der Drop-downliste bei NewRecipe funktioniert nicht: kein Event-Abonent
+ *             Offene Fragen: - TargetUnit Combobox, wie wird Selected Item gehandhabt?
  *                            -
  *
  * 
