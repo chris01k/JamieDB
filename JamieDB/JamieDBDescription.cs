@@ -22,15 +22,14 @@
  *                            - Implementierung Ingredient.
  */
 
-/* Version 0.07 - 2017-02-xx: xx
- *                            - xx
+/* Version 0.07 - 2017-02-13: - NewIngredient Command hinzu
+ *                            - NewUnit Command hinzu
+ *                            - Eventhandler für RecipeIngredients hinzu
  *
- *                     offen: - Command: Rezeptzutat hinzufügen: Foreing Keys befüllen....
- *                            - Command: Zutat hinzufügen
- *                             
- * 
- *             Offene Fragen: - TargetUnit Combobox, wie wird Selected Item gehandhabt?
- *                            -
+ *                     offen: 
+ *                            
+ *             Offene Fragen: - Konkurenz Eventhandler zu Command
+ *                            - Zusammenspiel Viewmodel-Properties und Model Entities unklar.-
  *
  * 
  *              Checklisten : 1. <Name Programmiercheckliste>

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Collections.Specialized;
 
 namespace JamieDB.ViewModel
 {
@@ -26,6 +27,8 @@ namespace JamieDB.ViewModel
         private RecipeIngredient _SelectedRecipeIngredient;
         private Unit _SelectedUnit;
 
+        private string _StatusBarText;
+
         //private RecipeIngredient _SelectedRecipeIngredient;
         #endregion
 
@@ -37,6 +40,7 @@ namespace JamieDB.ViewModel
         private JamieDBViewModelCommand _NewIngredientCommand;
         private JamieDBViewModelCommand _NewRecipeCommand;
         private JamieDBViewModelCommand _NewRecipeIngredientCommand;
+        private JamieDBViewModelCommand _NewUnitCommand;
         private JamieDBViewModelCommand _SaveCommand;
         #endregion
 
@@ -48,6 +52,7 @@ namespace JamieDB.ViewModel
             NewIngredientCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewIngredient);
             NewRecipeCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewRecipe);
             NewRecipeIngredientCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewRecipeIngredient);
+            NewUnitCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewUnit);
             SaveCommand = new JamieDBViewModelCommand(CanExecuteSaveRecipe, ExecuteSaveRecipe);
 
             Recipes = GetRecipes();
@@ -135,7 +140,7 @@ namespace JamieDB.ViewModel
             {
                 _SelectedRecipe = value;
                 OnPropertyChanged("SelectedRecipe");
-                RefreshRecipeIngredients();
+                GetSelectedRecipeIngredients();
             }
         }
         public RecipeIngredient SelectedRecipeIngredient
@@ -147,14 +152,8 @@ namespace JamieDB.ViewModel
 
             set
             {
-                if ((value !=null) && (value.Recipe == null))
-                { value.RecipeID = SelectedRecipe.Id;
-                    value.Recipe = SelectedRecipe;
-                }
-
                 _SelectedRecipeIngredient = value;
                 OnPropertyChanged("SelectedRecipeIngredient");
-
             }
         }
         public Unit SelectedUnit
@@ -197,6 +196,20 @@ namespace JamieDB.ViewModel
                 OnPropertyChanged("UnitTypes");
             }
         }
+        public string StatusBarText
+        {
+            get
+            {
+                return _StatusBarText;
+            }
+
+            set
+            {
+                _StatusBarText = value;
+                OnPropertyChanged("StatusBarText");
+
+            }
+        }
         #endregion
 
         #region Properties: Commands
@@ -236,6 +249,18 @@ namespace JamieDB.ViewModel
                 _NewRecipeIngredientCommand = value;
             }
         }
+        public JamieDBViewModelCommand NewUnitCommand
+        {
+            get
+            {
+                return _NewUnitCommand;
+            }
+
+            set
+            {
+                _NewUnitCommand = value;
+            }
+        }
         public JamieDBViewModelCommand SaveCommand
         {
             get
@@ -254,7 +279,68 @@ namespace JamieDB.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
+        #region EventHandler
+        public void RecipeIngredientChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems != null)
+                {
+                    var NewIngredientChange = (RecipeIngredient)e.NewItems[0];
+
+                    //Fill Foreign Keys
+
+                    NewIngredientChange.RecipeID = SelectedRecipe.Id;
+                    NewIngredientChange.Recipe = SelectedRecipe;
+
+                    NewIngredientChange.IngredientID = SelectedIngredient.Id;
+                    NewIngredientChange.Ingredient = SelectedIngredient;
+
+                    NewIngredientChange.UnitID = SelectedUnit.Id;
+                    NewIngredientChange.Unit = SelectedUnit;
+                    StatusBarText = "RecipeIngredient Added";
+
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    foreach (RecipeIngredient RI in e.OldItems)
+                    {
+                        _context.RecipeIngredients.DeleteOnSubmit(RI);
+                        StatusBarText = "RecipeIngredient Deleted";
+                    }
+                }
+            }
+       }
+        #endregion
+
         #region Methods
+        private Unit DefaultUnit()
+        {
+            Unit result;
+
+            if (SelectedUnit == null)
+            {
+                result = Units.FirstOrDefault();
+            }
+            else result = SelectedUnit;
+
+            return result;
+        }
+        private Ingredient DefaultIngredient()
+        {
+            Ingredient result;
+
+            if (SelectedIngredient == null)
+            {
+                result = Ingredients.FirstOrDefault();
+            }
+            else result = SelectedIngredient;
+
+            return result;
+        }
         private ObservableCollection<Ingredient> GetIngredients()
         {
             var result = _context.Ingredients.OrderBy(i => i.Name);
@@ -283,10 +369,22 @@ namespace JamieDB.ViewModel
             var result = _context.Recipes.OrderBy(r=>r.Name);
             var ReturnList = new ObservableCollection<Recipe>(result);
 
-            SelectedRecipe = result.FirstOrDefault();
-
+            if (SelectedRecipe ==null) SelectedRecipe = result.FirstOrDefault();
 
             return ReturnList;
+        }
+        private void GetSelectedRecipeIngredients()
+        {
+            if (SelectedRecipe != null)
+            {
+                RecipeIngredients = new ObservableCollection<RecipeIngredient>
+                                         (_context.RecipeIngredients.Where(s => (s.RecipeID == SelectedRecipe.Id)));
+                if (RecipeIngredients.Count() == 0) SelectedRecipeIngredient = RecipeIngredients.FirstOrDefault();
+
+                if (RecipeIngredients != null) RecipeIngredients.CollectionChanged += 
+                                               new System.Collections.Specialized.NotifyCollectionChangedEventHandler(RecipeIngredientChanged);
+            }
+
         }
         private ObservableCollection<Unit> GetUnits()
         {
@@ -311,12 +409,23 @@ namespace JamieDB.ViewModel
                 this.PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
             }
         }
+        private void RefreshIngredients()
+        {
+            Ingredients = GetIngredients();
+        }
         private void RefreshRecipeIngredients()
         {
             RecipeIngredients = GetRecipeIngredients(SelectedRecipe.Id);
         }
+        private void RefreshRecipes()
+        {
+            Recipes = GetRecipes();
+        }
+        private void RefreshUnits()
+        {
+            Units = GetUnits();
+        }
         #endregion
-
         #region Command Methods
 
         #region Command Methods: Generic
@@ -336,29 +445,80 @@ namespace JamieDB.ViewModel
         */
         #endregion
 
-        #region Command Methods: SaveRecipe
+        public bool CanExecuteDeleteRecipeIngredient(object o)
+        {
+            return (SelectedRecipeIngredient != null);
+        }
         public bool CanExecuteSaveRecipe(object o)
         {
             return true;
+        }
+        public void ExecuteDeleteRecipe(object o)
+        {
+/*
+
+            var rIndex = Recipes.IndexOf(SelectedRecipe);
+            if (rIndex == Recipes.Count() - 1) rIndex -= 1;
+
+            foreach (var RI in RecipeIngredients) _context.RecipeIngredients.DeleteOnSubmit(RI);
+            _context.Recipes.DeleteOnSubmit(SelectedRecipe);
+
+            ExecuteSaveRecipe(o);
+
+            SelectedRecipe = Recipes[rIndex];
+
+            Recipes = GetRecipes();
+
+            _context.Recipes
+
+    */
+
+        }
+        public void ExecuteDeleteRecipeIngredient(object o)
+        {
+            if (SelectedRecipeIngredient != null)
+            {
+                var rIndex = RecipeIngredients.IndexOf(SelectedRecipeIngredient);
+                if (rIndex == RecipeIngredients.Count() - 1) rIndex -= 1;
+
+                _context.RecipeIngredients.DeleteOnSubmit(SelectedRecipeIngredient);
+
+            try
+            {
+                _context.SubmitChanges();
+                RefreshRecipeIngredients();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Exception Handling");
+                // Make some adjustments.
+                // ...
+                // Try again.
+                //_context.SubmitChanges();
+            }
+
+            }
+
         }
         public void ExecuteSaveRecipe(object o)
         {
             try
             {
                 _context.SubmitChanges();
+                RefreshRecipes();
+                StatusBarText = "All Saved";
+
+
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                MessageBox.Show(e.ToString(), "Exception Handling");
                 // Make some adjustments.
                 // ...
                 // Try again.
                 //_context.SubmitChanges();
             }
         }
-        #endregion
-
-        #region Command Methods: NewRecipe
         public void ExecuteNewIngredient(object o)
         {
             Ingredient NewIngredient = new Ingredient();
@@ -377,7 +537,7 @@ namespace JamieDB.ViewModel
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                MessageBox.Show(e.ToString(), "Exception Handling");
                 // Make some adjustments.
                 // ...
                 // Try again.
@@ -387,55 +547,77 @@ namespace JamieDB.ViewModel
         public void ExecuteNewRecipe(object o)
         {
             Recipe NewRecipe = new Recipe();
-
-            NewRecipe.Name = "<Recipe>";
-
+            NewRecipe.Name = "<Recipe>: New " + DateTime.Now.ToString();
             _context.Recipes.InsertOnSubmit(NewRecipe);
-
+            
             try
             {
                 _context.SubmitChanges();
                 Recipes = GetRecipes();
                 SelectedRecipe = NewRecipe;
+                StatusBarText = "Recipe Added";
+
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                MessageBox.Show(e.ToString(), "Exception Handling");
                 // Make some adjustments.
                 // ...
                 // Try again.
                 //_context.SubmitChanges();
             }
         }
-        #endregion
-
-        #region Command Methods: NewRecipeIngredient
         public void ExecuteNewRecipeIngredient(object o)
         {
             RecipeIngredient NewRecipeIngredient = new RecipeIngredient();
 
-            NewRecipeIngredient.RecipeID = SelectedRecipe.Id;
             NewRecipeIngredient.Recipe = SelectedRecipe;
+            NewRecipeIngredient.Unit = DefaultUnit();
+            NewRecipeIngredient.Ingredient = DefaultIngredient();
 
             _context.RecipeIngredients.InsertOnSubmit(NewRecipeIngredient);
 
-//            try
+            try
             {
                 _context.SubmitChanges();
-                RefreshRecipeIngredients();
             }
-/*            catch (Exception e)
+            catch (Exception e)
             {
-                Console.WriteLine(e);
+                MessageBox.Show(e.ToString(), "Exception Handling");
                 // Make some adjustments.
                 // ...
                 // Try again.
                 //_context.SubmitChanges();
             }
-*/
-        }
-        #endregion
 
+        }
+        public void ExecuteNewUnit(object o)
+        {
+            Unit NewUnit = new Unit();
+
+            NewUnit.Name = "<Unit>: New " + DateTime.Now.ToString();
+            NewUnit.Symbol = "new";
+            NewUnit.TypeID = 1000004;
+
+            _context.Units.InsertOnSubmit(NewUnit);
+
+            try
+            {
+                _context.SubmitChanges();
+                Units = GetUnits();
+                SelectedUnit = NewUnit;
+                StatusBarText = "Unit Added";
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Exception Handling");
+                // Make some adjustments.
+                // ...
+                // Try again.
+                //_context.SubmitChanges();
+            }
+        }
         #endregion
     }
 
