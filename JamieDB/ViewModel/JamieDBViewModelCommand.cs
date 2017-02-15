@@ -37,6 +37,13 @@ namespace JamieDB.ViewModel
             //if (ExecuteMethod != null) ExecuteMethod(parameter);
 
         }
+
+        public void OnCanExecuteChanged()
+        {
+            var CanExecuteHandler = CanExecuteChanged;
+
+            if (CanExecuteHandler != null) CanExecuteHandler(this, EventArgs.Empty);
+        }
     }
 }
 

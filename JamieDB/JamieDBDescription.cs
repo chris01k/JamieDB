@@ -4,32 +4,41 @@
  * Autor: Klaus Christochowitz  11-2017
  * Version 0.01 - 2017-01-17: Erste WPF-Testversion in der MVVM-Architektur: 
  *                            - auf geht's
+ *                            
  * Version 0.02 - 2017-01-19: WPF Tests
+ * 
  * Version 0.03 - 2017-01-22: Schreibenden Zugriff auf die Datenban implementiert
  *                            - Bindings Etabliert
  *                            - Command: SaveRecipe in MaintenanceRecipes hinzu
  *                            - Unit in View für Rezeptzutat hinzugefügt
  *                            - Command "Rezept zufügen" hinzu
+ *                            
  * Version 0.04 - 2017-01-29: Command Klasse für das ViewModel implementiert: JamieDBViewModelCommand
  *                            - SaveCommand umgestellt 
  *                              von  JamieDB.ViewModel.Command.SaveCommand 
  *                              nach JamieDB.ViewModel.JamieDBViewModelCommand;
  *                            - NewRecipeCommand umgestellt 
+ *                            
  * Version 0.05 - 2017-01-29: Alte Command Klassen beseitigt und durch JamieDBViewModelCommand ersetzt.
  *                            - NewRecipeIngredientCommand umgestellt
  *                            - Implementierung Ingredient - Reiter begonnen
+ *                            
  * Version 0.06 - 2017-02-06: Properties im ViewModel: Listen umgestellt von IEnumerable auf ObservableCollection
  *                            - Implementierung Ingredient.
- */
-
-/* Version 0.07 - 2017-02-13: - NewIngredient Command hinzu
+ *                            
+ * Version 0.07 - 2017-02-13: - NewIngredient Command hinzu
  *                            - NewUnit Command hinzu
  *                            - Eventhandler für RecipeIngredients hinzu
+ */
+
+/* Version 0.08 - 2017-02-15: - DeleteRecipe / DeleteRecipeIngredient Command hinzu
+ *                            - 
  *
  *                     offen: 
  *                            
- *             Offene Fragen: - Konkurenz Eventhandler zu Command
- *                            - Zusammenspiel Viewmodel-Properties und Model Entities unklar.-
+ *             Offene Fragen: - Right Orientation DataGridComboBoxColumn
+ *                            - 
+ *                            - 
  *
  * 
  *              Checklisten : 1. <Name Programmiercheckliste>

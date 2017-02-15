@@ -42,9 +42,6 @@
                 <ComboBox Grid.Row="2" Grid.ColumnSpan="4" Margin="5" ItemsSource="{Binding Recipes, Mode=TwoWay, Source={StaticResource viewModel}}" DisplayMemberPath="Name"
                SelectedItem="{Binding SelectedRecipe, Mode=TwoWay, Source={StaticResource viewModel}}"/>
 
-                <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Vertical" Margin="5" Grid.ColumnSpan="2" >
-                    
-                </StackPanel>
                 <Label Grid.Row="3" Grid.Column="0">Name</Label>
                 <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedRecipe.Name , Source={StaticResource viewModel}, Mode=TwoWay}" Margin="5"></TextBox>
 
@@ -58,24 +55,31 @@
                 <TextBox Grid.Row="4" Grid.Column="3" Text="{Binding SelectedRecipe.SourcePage, Source={StaticResource viewModel}}" Margin="5"></TextBox>
 
 
-                <StackPanel Grid.Row="3" Grid.Column="4"  Orientation="Vertical" Grid.RowSpan="2">
+                <StackPanel Grid.Row="2" Grid.Column="4"  Orientation="Vertical" Grid.RowSpan="3">
                     <Button Content="New" Margin="5" Command="{Binding NewRecipeCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
-                    <Button Content="Delete" Margin="5" IsEnabled="False" />
+                    <Button Content="Delete" Margin="5" Command="{Binding DeleteRecipeCommand, Source={StaticResource viewModel}}" />
+                    <Button Content="Copy" Margin="5" IsEnabled="False" />
                 </StackPanel>
 
                 <DataGrid Grid.Row="5" Grid.ColumnSpan="4" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}, Mode=TwoWay}"
                       AlternationCount="2"
                       RowBackground="White"
                       AlternatingRowBackground="LightCyan"
-                      SelectedItem="{Binding SelectedRecipeIngredient, Source={StaticResource viewModel}}">
+                      SelectedItem="{Binding SelectedRecipeIngredient, Mode=TwoWay, Source={StaticResource viewModel}}">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Recipe" Width="Auto" Binding= "{Binding Path=Recipe.Name}" IsReadOnly="True" ></DataGridTextColumn>
-                        <DataGridTextColumn Header="Quantity" Width="Auto" Binding= "{Binding Path=Quantity, Mode=TwoWay}"></DataGridTextColumn>
-                        <DataGridComboBoxColumn Header="Unit" Width="Auto" 
+                        <DataGridTextColumn Header="Quantity" Width="3*" Binding= "{Binding Path=Quantity, Mode=TwoWay}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridComboBoxColumn Header="Unit" Width="2*" 
                                         ItemsSource="{Binding Units, Source={StaticResource viewModel}}"
-                                        DisplayMemberPath="Symbol" SelectedItemBinding="{Binding Unit}"/>
-                        <DataGridComboBoxColumn Header="Ingredient" Width="*" 
+                                        DisplayMemberPath="Symbol" SelectedItemBinding="{Binding Unit}">
+                        </DataGridComboBoxColumn>
+                        <DataGridComboBoxColumn Header="Ingredient" Width="8*" 
                                         ItemsSource="{Binding Ingredients, Source={StaticResource viewModel}}"
                                         DisplayMemberPath="Name" SelectedItemBinding="{Binding Ingredient}"/>
                     </DataGrid.Columns>
@@ -83,7 +87,7 @@
 
                 <StackPanel Grid.Row="5" Grid.Column="43" Orientation="Vertical">
                     <Button Content="New" Margin="5" Command="{Binding NewRecipeIngredientCommand, Mode=OneWay, Source={StaticResource viewModel}}" />
-                    <Button Content="Delete" Margin="5" IsEnabled="False"/>
+                    <Button Content="Delete" Margin="5" Command="{Binding DeleteRecipeIngredientCommand, Source={StaticResource viewModel}}" />
                 </StackPanel>
                 <Button Grid.Row="6" Grid.Column="4" Content="Save" Margin="5" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
                 <StatusBar Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" Margin="5">
@@ -169,7 +173,7 @@
             </Grid>
         </TabItem>
         <TabItem Header="Units">
-            <Grid ShowGridLines="True">
+            <Grid ShowGridLines="False">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
