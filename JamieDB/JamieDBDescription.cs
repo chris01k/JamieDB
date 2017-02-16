@@ -29,9 +29,12 @@
  * Version 0.07 - 2017-02-13: - NewIngredient Command hinzu
  *                            - NewUnit Command hinzu
  *                            - Eventhandler für RecipeIngredients hinzu
+ *                            
+ * Version 0.08 - 2017-02-15: - DeleteRecipe / DeleteRecipeIngredient Command hinzu
+ * 
  */
 
-/* Version 0.08 - 2017-02-15: - DeleteRecipe / DeleteRecipeIngredient Command hinzu
+/* Version 0.09 - 2017-02-16: - DeleteIngredient / DeleteUnit Command hinzu
  *                            - 
  *
  *                     offen: 

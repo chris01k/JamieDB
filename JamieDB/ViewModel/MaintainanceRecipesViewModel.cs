@@ -37,8 +37,10 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Attributes: Commands
+        private JamieDBViewModelCommand _DeleteIngredientCommand;
         private JamieDBViewModelCommand _DeleteRecipeCommand;
         private JamieDBViewModelCommand _DeleteRecipeIngredientCommand;
+        private JamieDBViewModelCommand _DeleteUnitCommand;
 
         private JamieDBViewModelCommand _NewIngredientCommand;
         private JamieDBViewModelCommand _NewRecipeCommand;
@@ -52,8 +54,10 @@ namespace JamieDB.ViewModel
         {
             _context = new JamieDBLinqDataContext();
 
-            DeleteRecipeCommand = new JamieDBViewModelCommand(CanExecuteDeleteRecipe, ExecuteDeleteRecipe); //
+            DeleteIngredientCommand = new JamieDBViewModelCommand(CanExecuteDeleteIngredient, ExecuteDeleteIngredient);
+            DeleteRecipeCommand = new JamieDBViewModelCommand(CanExecuteDeleteRecipe, ExecuteDeleteRecipe);
             DeleteRecipeIngredientCommand = new JamieDBViewModelCommand(CanExecuteDeleteRecipeIngredient, ExecuteDeleteRecipeIngredient);
+            DeleteUnitCommand = new JamieDBViewModelCommand(CanExecuteDeleteUnit, ExecuteDeleteUnit);
 
 
             NewIngredientCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewIngredient);
@@ -225,7 +229,18 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Properties: Commands
+        public JamieDBViewModelCommand DeleteIngredientCommand
+        {
+            get
+            {
+                return _DeleteIngredientCommand;
+            }
 
+            set
+            {
+                _DeleteIngredientCommand = value;
+            }
+        }
         public JamieDBViewModelCommand DeleteRecipeCommand
         {
             get
@@ -248,6 +263,18 @@ namespace JamieDB.ViewModel
             set
             {
                 _DeleteRecipeIngredientCommand = value;
+            }
+        }
+        public JamieDBViewModelCommand DeleteUnitCommand
+        {
+            get
+            {
+                return _DeleteUnitCommand;
+            }
+
+            set
+            {
+                _DeleteUnitCommand = value;
             }
         }
         public JamieDBViewModelCommand NewIngredientCommand
@@ -480,6 +507,10 @@ namespace JamieDB.ViewModel
                 }
         */
         #endregion
+        public bool CanExecuteDeleteIngredient(object o)
+        {
+            return (SelectedIngredient != null);
+        }
         public bool CanExecuteDeleteRecipe(object o)
         {
             return (SelectedRecipe != null);
@@ -488,19 +519,65 @@ namespace JamieDB.ViewModel
         {
             return (SelectedRecipeIngredient != null);
         }
+        public bool CanExecuteDeleteUnit(object o)
+        {
+            return (SelectedUnit != null);
+        }
         public bool CanExecuteSaveRecipe(object o)
         {
             return true;
         }
-        public void ExecuteDeleteRecipe(object o)
-        
+        public void ExecuteDeleteIngredient(object o)
         {
+            string MessageText;
+
+            if (SelectedIngredient != null)
+            {
+                var rIndex = Ingredients.IndexOf(SelectedIngredient);
+                if (rIndex == Ingredients.Count() - 1) rIndex -= 1;
+                MessageText = "Ingredient " + SelectedIngredient.Name + " deleted";
+
+
+                _context.Ingredients.DeleteOnSubmit(SelectedIngredient);
+
+                // foreach () in Detailtable --> DeleteOnSubmit DetailEntry
+
+                try
+                {
+                    _context.SubmitChanges();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.ToString(), "Exception Handling");
+                    MessageText = "Ingredient " + SelectedIngredient.Name + " NOT deleted";
+                    // Make some adjustments.
+                    // ...
+                    // Try again.
+                    //_context.SubmitChanges();
+                }
+
+                RefreshIngredients();
+                if (rIndex >= 0) SelectedIngredient = Ingredients[rIndex];
+                else SelectedIngredient = null;
+                StatusBarText = MessageText;
+            }
+
+        }
+        public void ExecuteDeleteRecipe(object o)
+
+        {
+            string MessageText;
+
             if (SelectedRecipe != null)
             {
                 var rIndex = Recipes.IndexOf(SelectedRecipe);
                 if (rIndex == Recipes.Count() - 1) rIndex -= 1;
+                MessageText = "Recipe " + SelectedRecipe.Name + " deleted";
+
+
                 _context.Recipes.DeleteOnSubmit(SelectedRecipe);
 
+                // foreach () in Detailtable --> DeleteOnSubmit DetailEntry
                 foreach (RecipeIngredient ToBeDeletedRecipeIngredient in RecipeIngredients)
                 {
                     _context.RecipeIngredients.DeleteOnSubmit(ToBeDeletedRecipeIngredient);
@@ -514,6 +591,8 @@ namespace JamieDB.ViewModel
                 catch (Exception e)
                 {
                     MessageBox.Show(e.ToString(), "Exception Handling");
+                    MessageText = "Recipe " + SelectedRecipe.Name + " deleted";
+
                     // Make some adjustments.
                     // ...
                     // Try again.
@@ -523,35 +602,23 @@ namespace JamieDB.ViewModel
                 RefreshRecipes();
                 if (rIndex >= 0) SelectedRecipe = Recipes[rIndex];
                 else SelectedRecipe = null;
+                StatusBarText = MessageText;
             }
 
         }
-
-        /*
-                    var rIndex = Recipes.IndexOf(SelectedRecipe);
-                    if (rIndex == Recipes.Count() - 1) rIndex -= 1;
-
-                    foreach (var RI in RecipeIngredients) _context.RecipeIngredients.DeleteOnSubmit(RI);
-                    _context.Recipes.DeleteOnSubmit(SelectedRecipe);
-
-                    ExecuteSaveRecipe(o);
-
-                    SelectedRecipe = Recipes[rIndex];
-
-                    Recipes = GetRecipes();
-
-                    _context.Recipes
-
-            */
-
-    
         public void ExecuteDeleteRecipeIngredient(object o)
         {
+            string MessageText;
+
             if (SelectedRecipeIngredient != null)
             {
                 var rIndex = RecipeIngredients.IndexOf(SelectedRecipeIngredient);
                 if (rIndex == RecipeIngredients.Count() - 1) rIndex -= 1;
+                MessageText = "RecipeIngredient " + SelectedRecipeIngredient.Ingredient.Name + " deleted";
+
+
                 _context.RecipeIngredients.DeleteOnSubmit(SelectedRecipeIngredient);
+
             try
             {
                 _context.SubmitChanges();
@@ -559,14 +626,53 @@ namespace JamieDB.ViewModel
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString(), "Exception Handling");
-                // Make some adjustments.
-                // ...
-                // Try again.
-                //_context.SubmitChanges();
-            }
+                MessageText = "RecipeIngredient " + SelectedRecipeIngredient.Ingredient.Name + " NOT deleted";
+
+                    // Make some adjustments.
+                    // ...
+                    // Try again.
+                    //_context.SubmitChanges();
+                }
                 RefreshRecipeIngredients();
                 if (rIndex >= 0) SelectedRecipeIngredient = RecipeIngredients[rIndex];
                 else SelectedRecipeIngredient = null;
+                StatusBarText = MessageText;
+
+            }
+
+        }
+        public void ExecuteDeleteUnit(object o)
+        {
+            string MessageText;
+
+            if (SelectedUnit != null)
+            {
+                var rIndex = Units.IndexOf(SelectedUnit);
+                if (rIndex == Units.Count() - 1) rIndex -= 1;
+                MessageText = "Unit " + SelectedUnit.Symbol + " deleted";
+
+                _context.Units.DeleteOnSubmit(SelectedUnit);
+
+                // foreach () in Detailtable --> DeleteOnSubmit DetailEntry
+
+                try
+                {
+                    _context.SubmitChanges();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.ToString(), "Exception Handling");
+                    // Make some adjustments.
+                    // ...
+                    // Try again.
+                    //_context.SubmitChanges();
+                    MessageText = "Unit " + SelectedUnit.Symbol + " NOT deleted";
+                }
+
+                RefreshUnits();
+                if (rIndex >= 0) SelectedUnit = Units[rIndex];
+                else SelectedUnit = null;
+                StatusBarText = MessageText;
             }
 
         }
@@ -575,8 +681,6 @@ namespace JamieDB.ViewModel
             try
             {
                 _context.SubmitChanges();
-                RefreshRecipes();
-                StatusBarText = "All Saved";
 
 
             }
@@ -588,6 +692,8 @@ namespace JamieDB.ViewModel
                 // Try again.
                 //_context.SubmitChanges();
             }
+            RefreshRecipes();
+            StatusBarText = "All Saved";
         }
         public void ExecuteNewIngredient(object o)
         {
@@ -602,8 +708,6 @@ namespace JamieDB.ViewModel
             try
             {
                 _context.SubmitChanges();
-                Ingredients = GetIngredients();
-                SelectedIngredient = NewIngredient;
             }
             catch (Exception e)
             {
@@ -613,6 +717,9 @@ namespace JamieDB.ViewModel
                 // Try again.
                 //_context.SubmitChanges();
             }
+            Ingredients = GetIngredients();
+            SelectedIngredient = NewIngredient;
+            StatusBarText = "Ingredient Added";
         }
         public void ExecuteNewRecipe(object o)
         {
@@ -623,9 +730,6 @@ namespace JamieDB.ViewModel
             try
             {
                 _context.SubmitChanges();
-                RefreshRecipes();
-                SelectedRecipe = NewRecipe;
-                StatusBarText = "Recipe Added";
 
             }
             catch (Exception e)
@@ -636,6 +740,9 @@ namespace JamieDB.ViewModel
                 // Try again.
                 //_context.SubmitChanges();
             }
+            RefreshRecipes();
+            SelectedRecipe = NewRecipe;
+            StatusBarText = "Recipe Added";
         }
         public void ExecuteNewRecipeIngredient(object o)
         {
@@ -659,7 +766,7 @@ namespace JamieDB.ViewModel
                 // Try again.
                 //_context.SubmitChanges();
             }
-
+            StatusBarText = "RecipeIngredient Added";
         }
         public void ExecuteNewUnit(object o)
         {
@@ -674,9 +781,6 @@ namespace JamieDB.ViewModel
             try
             {
                 _context.SubmitChanges();
-                Units = GetUnits();
-                SelectedUnit = NewUnit;
-                StatusBarText = "Unit Added";
 
             }
             catch (Exception e)
@@ -687,6 +791,9 @@ namespace JamieDB.ViewModel
                 // Try again.
                 //_context.SubmitChanges();
             }
+            Units = GetUnits();
+            SelectedUnit = NewUnit;
+            StatusBarText = "Unit Added";
         }
         #endregion
     }

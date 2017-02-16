@@ -108,6 +108,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -127,7 +128,7 @@
                 <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding Units, Source={StaticResource viewModel}}" 
                           DisplayMemberPath="Symbol" SelectedValue="{Binding SelectedIngredient.TargetUnit, Source={StaticResource viewModel}}" 
                           SelectedValuePath="Id"></ComboBox>
-                <Button Content="Delete" Grid.Row="1" Grid.Column="4" Margin="5" IsEnabled="False"/>
+                <Button Content="Delete" Grid.Row="1" Grid.Column="4" Margin="5" Command="{Binding DeleteIngredientCommand, Source={StaticResource viewModel}}" />
 
 
                 <Label Grid.Row="3" Grid.Column="0" Margin="5" FlowDirection="RightToLeft">Type</Label>
@@ -169,6 +170,11 @@
                 </DataGrid>
 
                 <Button Grid.Row="6" Grid.Column="4" Content="Save" Margin="5" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
+                <StatusBar Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" Margin="5">
+                    <StatusBarItem>
+                        <TextBlock FontSize="10" Text="{Binding StatusBarText, Source={StaticResource viewModel}}" ></TextBlock>
+                    </StatusBarItem>
+                </StatusBar>
 
             </Grid>
         </TabItem>
@@ -178,6 +184,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -219,9 +226,18 @@
                     
                 </DataGrid>
 
-                <Button Grid.Row="5" Grid.Column="4" Content="Save" Margin="5" VerticalAlignment="Bottom" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
                 <Button Content="New" Grid.Row="0" Grid.Column="4" Margin="5" Width="70" Command="{Binding NewUnitCommand, Source={StaticResource viewModel}}"  />
-                <Button Content="Delete" Grid.Row="1" Grid.Column="4" Margin="5" IsEnabled="False"/>
+                <Button Content="Delete" Grid.Row="1" Grid.Column="4" Margin="5" Command="{Binding DeleteUnitCommand, Source={StaticResource viewModel}}" />
+
+
+                <Button Grid.Row="3" Grid.Column="4" Content="Save" Margin="5" VerticalAlignment="Bottom" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
+         
+                <StatusBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" Margin="5">
+                    <StatusBarItem>
+                        <TextBlock FontSize="10" Text="{Binding StatusBarText, Source={StaticResource viewModel}}" ></TextBlock>
+                    </StatusBarItem>
+                </StatusBar>
+
 
 
             </Grid>
