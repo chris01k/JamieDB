@@ -54,6 +54,7 @@
       <Column Name="SourceISBN" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
       <Column Name="Summary" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Association Name="Recipe_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="RecipeID" Type="RecipeIngredient" />
+      <Association Name="Recipe_FoodPlanItem" Member="FoodPlanItems" ThisKey="Id" OtherKey="RecipeID" Type="FoodPlanItem" />
     </Type>
   </Table>
   <Table Name="dbo.UnitTypes" Member="UnitTypes">
@@ -61,6 +62,16 @@
       <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Association Name="UnitType_Unit" Member="Units" ThisKey="Id" OtherKey="TypeID" Type="Unit" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FoodPlanItems" Member="FoodPlanItems">
+    <Type Name="FoodPlanItem">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Date" Type="System.DateTime" DbType="Date NOT NULL" CanBeNull="false" />
+      <Column Name="Time" Type="System.TimeSpan" DbType="Time" CanBeNull="true" />
+      <Column Name="PortionCount" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Association Name="Recipe_FoodPlanItem" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

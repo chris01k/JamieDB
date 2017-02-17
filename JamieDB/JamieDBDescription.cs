@@ -32,19 +32,25 @@
  *                            
  * Version 0.08 - 2017-02-15: - DeleteRecipe / DeleteRecipeIngredient Command hinzu
  * 
+ * Version 0.09 - 2017-02-16: - DeleteIngredient / DeleteUnit Command hinzu
+ * 
  */
 
-/* Version 0.09 - 2017-02-16: - DeleteIngredient / DeleteUnit Command hinzu
+/* Version 0.10 - 2017-02-17: Start FoodPlan Implementation:
+ *                            - XML: DatePicker - Detail Datagrid added (FoodPlanItems)
+ *                            - ViewModel: SelectedFoodPlanDate added
  *                            - 
  *
- *                     offen: 
+ *                      open: - SelectedFoodPlanItem (toBeDeleted)
+ *                            - Commands: NewFoodPlanItem, DeleteFoodPlanItems
+ *                            -
  *                            
- *             Offene Fragen: - Right Orientation DataGridComboBoxColumn
+ *               open Topics: - Right Orientation DataGridComboBoxColumn
  *                            - 
  *                            - 
  *
  * 
- *              Checklisten : 1. <Name Programmiercheckliste>
+ *               Checklists : 1. <Name Programmiercheckliste>
  *                            -
  */
 

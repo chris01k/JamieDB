@@ -61,7 +61,7 @@
                     <Button Content="Copy" Margin="5" IsEnabled="False" />
                 </StackPanel>
 
-                <DataGrid Grid.Row="5" Grid.ColumnSpan="4" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}, Mode=TwoWay}"
+                <DataGrid Grid.Row="5" Grid.ColumnSpan="4" Grid.RowSpan="2" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}, Mode=TwoWay}"
                       AlternationCount="2"
                       RowBackground="White"
                       AlternatingRowBackground="LightCyan"
@@ -71,7 +71,8 @@
                         <DataGridTextColumn Header="Quantity" Width="3*" Binding= "{Binding Path=Quantity, Mode=TwoWay}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+                                    <Setter Property="HorizontalAlignment" Value="Right" ></Setter>
+                                    <Setter Property="Margin" Value="0,0,5,0"></Setter>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
@@ -149,7 +150,7 @@
 
 
                 <Label  Grid.Row="5" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">Unit Translations</Label>
-                <DataGrid Grid.Row="5"  Grid.Column="1" Grid.ColumnSpan="3" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}}"
+                <DataGrid Grid.Row="5"  Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}}"
                       AlternationCount="2"
                       RowBackground="White"
                       AlternatingRowBackground="LightCyan">
@@ -219,7 +220,7 @@
                 
 
                 <Label Grid.Row="2" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">Translations</Label>
-                <DataGrid Grid.Row="2"  Grid.Column="1" Grid.ColumnSpan="3" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}}"
+                <DataGrid Grid.Row="2"  Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}}"
                       AlternationCount="2"
                       RowBackground="White"
                       AlternatingRowBackground="LightCyan">
@@ -243,7 +244,40 @@
             </Grid>
         </TabItem>
 
-        <TabItem Header="Food Plan"></TabItem>
+        <TabItem Header="Food Plan">
+            <Grid ShowGridLines="False">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <DatePicker Grid.Row="0" Grid.Column="0" Margin="5" DisplayDate="{Binding SelectedFoodPlanDate, Source={StaticResource viewModel}}" SelectedDate="{Binding SelectedFoodPlanDate, Source={StaticResource viewModel}}" SelectedDateFormat="Long"/>
+                <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="5"
+                          ItemsSource="{Binding FoodPlanItems, Source={StaticResource viewModel}}"
+                          AlternationCount="2"
+                          RowBackground="White"
+                          AlternatingRowBackground="LightCyan">
+                    
+                </DataGrid>
+                <StackPanel Grid.Row="1" Grid.Column="2">
+                    <Button Content="New" Margin="5" Width="70" />
+                    <Button Content="Delete" Margin="5" />
+                </StackPanel>
+                <Button Grid.Row="2" Grid.Column="2" Content="Save" Margin="5" VerticalAlignment="Bottom" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
+
+                <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="5">
+                    <StatusBarItem>
+                        <TextBlock FontSize="10" Text="{Binding StatusBarText, Source={StaticResource viewModel}}" ></TextBlock>
+                    </StatusBarItem>
+                </StatusBar>
+            </Grid>
+        </TabItem>
         <TabItem Header="Shopping List"></TabItem>
         <TabItem Header="Stock"></TabItem>
 

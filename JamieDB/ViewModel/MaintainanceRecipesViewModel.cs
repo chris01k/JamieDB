@@ -16,12 +16,15 @@ namespace JamieDB.ViewModel
     class MaintainanceRecipesViewModel : INotifyPropertyChanged
     {
         #region Attributes
+        private ObservableCollection<FoodPlanItem> _FoodPlanItems;
+
         private ObservableCollection<Recipe> _Recipes;
         private ObservableCollection<RecipeIngredient> _RecipeIngredients;
         private ObservableCollection<Ingredient> _Ingredients;
         private ObservableCollection<IngredientType> _IngredientTypes;
         private ObservableCollection<Unit> _Units;
         private ObservableCollection<UnitType> _UnitTypes;
+        private DateTime _SelectedFoodPlanDate;
         private Ingredient _SelectedIngredient;
         private Recipe _SelectedRecipe;
         private RecipeIngredient _SelectedRecipeIngredient;
@@ -67,6 +70,8 @@ namespace JamieDB.ViewModel
             SaveCommand = new JamieDBViewModelCommand(CanExecuteSaveRecipe, ExecuteSaveRecipe);
 
             RefreshRecipes();
+            SelectedFoodPlanDate = DateTime.Now.Date;
+
             Ingredients = GetIngredients();
             IngredientTypes = GetIngredientTypes();
             Units = GetUnits();
@@ -75,6 +80,18 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Properties
+        public ObservableCollection<FoodPlanItem> FoodPlanItems
+        {
+            get
+            {
+                return _FoodPlanItems;
+            }
+            set
+            {
+                _FoodPlanItems = value;
+                OnPropertyChanged("FoodPlanItems");
+            }
+        }
         public ObservableCollection<Recipe> Recipes
         {
             get
@@ -138,6 +155,21 @@ namespace JamieDB.ViewModel
                 _IngredientTypes = value;
                 OnPropertyChanged("IngredientTypes");
 
+            }
+        }
+        public DateTime SelectedFoodPlanDate
+        {
+            get
+            {
+                return _SelectedFoodPlanDate;
+            }
+
+            set
+            {
+                _SelectedFoodPlanDate = value;
+                OnPropertyChanged("SelectedFoodPlanDate");
+                DeleteRecipeCommand.OnCanExecuteChanged();
+                RefreshFoodPlanItems();
             }
         }
         public Recipe SelectedRecipe
@@ -344,6 +376,45 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region EventHandler
+        public void FoodPlanItemChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems != null)
+                {
+                    var NewFoodPlanItemChange = (FoodPlanItem)e.NewItems[0];
+
+                    //Fill Foreign Keys
+
+
+
+                    NewFoodPlanItemChange.Date = SelectedFoodPlanDate.Date;
+
+/*                    NewIngredientChange.RecipeID = SelectedRecipe.Id;
+                    NewIngredientChange.Recipe = SelectedRecipe;
+
+                    NewIngredientChange.IngredientID = SelectedIngredient.Id;
+                    NewIngredientChange.Ingredient = SelectedIngredient;
+
+                    NewIngredientChange.UnitID = SelectedUnit.Id;
+                    NewIngredientChange.Unit = SelectedUnit;
+*/               
+                    StatusBarText = "FoodPlanItem Added";
+
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    foreach (FoodPlanItem FPI in e.OldItems)
+                    {
+                        _context.FoodPlanItems.DeleteOnSubmit(FPI);
+                        StatusBarText = "FoodPlanItem Deleted";
+                    }
+                }
+            }
+        }
         public void RecipeIngredientChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
@@ -378,6 +449,8 @@ namespace JamieDB.ViewModel
                 }
             }
        }
+
+      
         #endregion
 
         #region Methods
@@ -444,6 +517,44 @@ namespace JamieDB.ViewModel
                 this.PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
             }
         }
+        private void RefreshFoodPlanItems()
+        {
+            if (SelectedFoodPlanDate != null)
+            {
+                FoodPlanItems = new ObservableCollection<FoodPlanItem>(_context.FoodPlanItems.Where(fpi => fpi.Date == SelectedFoodPlanDate));
+                FoodPlanItems.CollectionChanged += new NotifyCollectionChangedEventHandler(FoodPlanItemChanged);
+            }
+
+
+
+
+
+            /*            if (SelectedRecipe != null)
+                        {
+                            RecipeIngredients = new ObservableCollection<RecipeIngredient>(_context.RecipeIngredients.Where(ri => ri.RecipeID == SelectedRecipe.Id));
+                            RecipeIngredients.CollectionChanged += new NotifyCollectionChangedEventHandler(RecipeIngredientChanged);
+
+                            if (SelectedRecipeIngredient == null)
+                            {
+                                if (RecipeIngredients != null)
+                                {
+                                    SelectedRecipeIngredient = RecipeIngredients.FirstOrDefault();
+                                }
+                            }
+                            else
+                            {
+                                if (!RecipeIngredients.Contains(SelectedRecipeIngredient)) SelectedRecipeIngredient = RecipeIngredients.FirstOrDefault();
+                            }
+
+                            StatusBarText = "RecipeIngredients refreshed: Selected RecipeIngredient = ";
+
+                            if (SelectedRecipeIngredient == null)
+                                StatusBarText += "null";
+                            else
+                                StatusBarText += SelectedRecipeIngredient.Ingredient.Name;
+                        }
+              */
+        }
         private void RefreshIngredients()
         {
             Ingredients = GetIngredients();
@@ -457,7 +568,7 @@ namespace JamieDB.ViewModel
 
                 if (SelectedRecipeIngredient == null)
                 {
-                    if (RecipeIngredients != null) 
+                    if (RecipeIngredients != null)
                     {
                         SelectedRecipeIngredient = RecipeIngredients.FirstOrDefault();
                     }

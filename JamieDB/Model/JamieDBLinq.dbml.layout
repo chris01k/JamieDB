@@ -38,39 +38,52 @@
         <elementListCompartment Id="8b6ee031-d369-45d1-8a69-8ad6894bf666" absoluteBounds="8.765, 5.71, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(2.875 : 5.81814697265625); (3.625 : 5.81814697265625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(2.875 : 5.81814697265625); (3.625 : 5.81814697265625)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/IngredientType/IngredientType_Ingredient" />
       <nodes>
         <classShapeMoniker Id="316c0d03-3956-4077-9bbd-23eff3734d5e" />
         <classShapeMoniker Id="bfd3d47c-f642-45b2-a212-ab02ed3c75d3" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(5.625 : 6.17390055338542); (7.25 : 6.17390055338542); (7.25 : 4.39589680989583)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(5.625 : 6.17390055338542); (7.25 : 6.17390055338542); (7.25 : 4.39589680989583)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Ingredient/Ingredient_RecipeIngredient" />
       <nodes>
         <classShapeMoniker Id="bfd3d47c-f642-45b2-a212-ab02ed3c75d3" />
         <classShapeMoniker Id="3e9d6312-383f-4cc3-b836-b2825b69e440" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(8.625 : 3.53929768880208); (8.25 : 3.53929768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(8.625 : 3.53929768880208); (8.25 : 3.53929768880208)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Unit/Unit_RecipeIngredient" />
       <nodes>
         <classShapeMoniker Id="12acdfae-0731-485c-b6d5-75409e4fd2c2" />
         <classShapeMoniker Id="3e9d6312-383f-4cc3-b836-b2825b69e440" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(7.1875 : 0.95); (7.1875 : 2.625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(7.1875 : 0.95); (7.1875 : 2.625)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Recipe/Recipe_RecipeIngredient" />
       <nodes>
         <classShapeMoniker Id="e6938cd0-cc43-4b41-9284-1078ecb95ce0" />
         <classShapeMoniker Id="3e9d6312-383f-4cc3-b836-b2825b69e440" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(9.6875 : 5.25); (9.6875 : 4.32859537760417)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(9.6875 : 5.25); (9.6875 : 4.32859537760417)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/UnitType/UnitType_Unit" />
       <nodes>
         <classShapeMoniker Id="777c15d2-58aa-4ea8-98bb-6576cb186138" />
         <classShapeMoniker Id="12acdfae-0731-485c-b6d5-75409e4fd2c2" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="6105774c-8738-4eff-8898-38c89b3d2525" absoluteBounds="3.25, 2.25, 2, 1.7708968098958331">
+      <DataClassMoniker Name="/JamieDBLinqDataContext/FoodPlanItem" />
+      <nestedChildShapes>
+        <elementListCompartment Id="4cfdec7b-09a2-4bf9-8fec-62cfc26d5e12" absoluteBounds="3.265, 2.71, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(6.15625 : 0.95); (6.15625 : 2.40625); (5.25 : 2.40625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/JamieDBLinqDataContext/Recipe/Recipe_FoodPlanItem" />
+      <nodes>
+        <classShapeMoniker Id="e6938cd0-cc43-4b41-9284-1078ecb95ce0" />
+        <classShapeMoniker Id="6105774c-8738-4eff-8898-38c89b3d2525" />
       </nodes>
     </associationConnector>
   </nestedChildShapes>
