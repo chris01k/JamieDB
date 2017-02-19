@@ -65,7 +65,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JamieDBDescription.cs" />
-    <Compile Include="Model\JamieDBLinq1.designer.cs">
+    <Compile Include="Model\JamieDBLinq.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>JamieDBLinq.dbml</DependentUpon>
@@ -101,8 +101,8 @@
     </EmbeddedResource>
     <None Include="Model\JamieDBLinq.dbml">
       <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>JamieDBLinq.designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-      <LastGenOutput>JamieDBLinq1.designer.cs</LastGenOutput>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

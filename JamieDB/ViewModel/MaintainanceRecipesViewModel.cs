@@ -18,21 +18,21 @@ namespace JamieDB.ViewModel
         #region Attributes
         private ObservableCollection<FoodPlanItem> _FoodPlanItems;
 
-        private ObservableCollection<Recipe> _Recipes;
-        private ObservableCollection<RecipeIngredient> _RecipeIngredients;
         private ObservableCollection<Ingredient> _Ingredients;
         private ObservableCollection<IngredientType> _IngredientTypes;
-        private ObservableCollection<Unit> _Units;
-        private ObservableCollection<UnitType> _UnitTypes;
+        private ObservableCollection<Recipe> _Recipes;
+        private ObservableCollection<RecipeIngredient> _RecipeIngredients;
         private DateTime _SelectedFoodPlanDate;
+        private FoodPlanItem _SelectedFoodPlanItem;
         private Ingredient _SelectedIngredient;
         private Recipe _SelectedRecipe;
         private RecipeIngredient _SelectedRecipeIngredient;
         private Unit _SelectedUnit;
-
+        private ObservableCollection<ShoppingListItem> _ShoppingListItems;
         private string _StatusBarText;
+        private ObservableCollection<Unit> _Units;
+        private ObservableCollection<UnitType> _UnitTypes;
 
-        //private RecipeIngredient _SelectedRecipeIngredient;
         #endregion
 
         #region Context
@@ -40,11 +40,13 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Attributes: Commands
+        private JamieDBViewModelCommand _DeleteFoodPlanItemCommand;
         private JamieDBViewModelCommand _DeleteIngredientCommand;
         private JamieDBViewModelCommand _DeleteRecipeCommand;
         private JamieDBViewModelCommand _DeleteRecipeIngredientCommand;
         private JamieDBViewModelCommand _DeleteUnitCommand;
 
+        private JamieDBViewModelCommand _NewFoodPlanItemCommand;    
         private JamieDBViewModelCommand _NewIngredientCommand;
         private JamieDBViewModelCommand _NewRecipeCommand;
         private JamieDBViewModelCommand _NewRecipeIngredientCommand;
@@ -57,12 +59,14 @@ namespace JamieDB.ViewModel
         {
             _context = new JamieDBLinqDataContext();
 
+            DeleteFoodPlanItemCommand = new JamieDBViewModelCommand(CanExecuteDeleteFoodPlanItem, ExecuteDeleteFoodPlanItem);
             DeleteIngredientCommand = new JamieDBViewModelCommand(CanExecuteDeleteIngredient, ExecuteDeleteIngredient);
             DeleteRecipeCommand = new JamieDBViewModelCommand(CanExecuteDeleteRecipe, ExecuteDeleteRecipe);
             DeleteRecipeIngredientCommand = new JamieDBViewModelCommand(CanExecuteDeleteRecipeIngredient, ExecuteDeleteRecipeIngredient);
             DeleteUnitCommand = new JamieDBViewModelCommand(CanExecuteDeleteUnit, ExecuteDeleteUnit);
 
 
+            NewFoodPlanItemCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewFoodPlanItem);
             NewIngredientCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewIngredient);
             NewRecipeCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewRecipe);
             NewRecipeIngredientCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewRecipeIngredient);
@@ -71,6 +75,8 @@ namespace JamieDB.ViewModel
 
             RefreshRecipes();
             SelectedFoodPlanDate = DateTime.Now.Date;
+            RefreshFoodPlanItems();
+            RefreshShoppingListItems();
 
             Ingredients = GetIngredients();
             IngredientTypes = GetIngredientTypes();
@@ -90,6 +96,33 @@ namespace JamieDB.ViewModel
             {
                 _FoodPlanItems = value;
                 OnPropertyChanged("FoodPlanItems");
+            }
+        }
+        public ObservableCollection<Ingredient> Ingredients
+        {
+            get
+            {
+                return _Ingredients;
+            }
+
+            set
+            {
+                _Ingredients = value;
+                OnPropertyChanged("Ingredients");
+            }
+        }
+        public ObservableCollection<IngredientType> IngredientTypes
+        {
+            get
+            {
+                return _IngredientTypes;
+            }
+
+            set
+            {
+                _IngredientTypes = value;
+                OnPropertyChanged("IngredientTypes");
+
             }
         }
         public ObservableCollection<Recipe> Recipes
@@ -117,46 +150,6 @@ namespace JamieDB.ViewModel
                 OnPropertyChanged("RecipeIngredients");
             }
         }
-        public ObservableCollection<Ingredient> Ingredients
-        {
-            get
-            {
-                return _Ingredients;
-            }
-
-            set
-            {
-                _Ingredients = value;
-                OnPropertyChanged("Ingredients");
-            }
-        }
-        public Ingredient SelectedIngredient
-        {
-            get
-            {
-                return _SelectedIngredient;
-            }
-
-            set
-            {
-                _SelectedIngredient = value;
-                OnPropertyChanged("SelectedIngredient");
-            }
-        }
-        public ObservableCollection<IngredientType> IngredientTypes
-        {
-            get
-            {
-                return _IngredientTypes;
-            }
-
-            set
-            {
-                _IngredientTypes = value;
-                OnPropertyChanged("IngredientTypes");
-
-            }
-        }
         public DateTime SelectedFoodPlanDate
         {
             get
@@ -170,6 +163,36 @@ namespace JamieDB.ViewModel
                 OnPropertyChanged("SelectedFoodPlanDate");
                 DeleteRecipeCommand.OnCanExecuteChanged();
                 RefreshFoodPlanItems();
+            }
+        }
+        public FoodPlanItem SelectedFoodPlanItem
+        {
+            get
+            {
+                return _SelectedFoodPlanItem;
+            }
+
+            set
+            {
+                _SelectedFoodPlanItem = value;
+                OnPropertyChanged("SelectedFoodPlanItem");
+                DeleteFoodPlanItemCommand.OnCanExecuteChanged();
+                StatusBarText = "SelectedFoodPlanItem changed: ";
+                if ((value != null) && (value.Recipe != null)) StatusBarText += value.Recipe.Name;
+                else StatusBarText += "null";
+            }
+        }
+        public Ingredient SelectedIngredient
+        {
+            get
+            {
+                return _SelectedIngredient;
+            }
+
+            set
+            {
+                _SelectedIngredient = value;
+                OnPropertyChanged("SelectedIngredient");
             }
         }
         public Recipe SelectedRecipe
@@ -217,6 +240,32 @@ namespace JamieDB.ViewModel
                 OnPropertyChanged("SelectedUnit");
             }
         }
+        public ObservableCollection<ShoppingListItem> ShoppingListItems
+        {
+            get
+            {
+                return _ShoppingListItems;
+            }
+            set
+            {
+                _ShoppingListItems = value;
+                OnPropertyChanged("ShoppingListItems");
+            }
+        }
+        public string StatusBarText
+        {
+            get
+            {
+                return _StatusBarText;
+            }
+
+            set
+            {
+                _StatusBarText = value;
+                OnPropertyChanged("StatusBarText");
+
+            }
+        }
         public ObservableCollection<Unit> Units
         {
             get
@@ -244,23 +293,22 @@ namespace JamieDB.ViewModel
                 OnPropertyChanged("UnitTypes");
             }
         }
-        public string StatusBarText
+        
+        #endregion
+
+        #region Properties: Commands
+        public JamieDBViewModelCommand DeleteFoodPlanItemCommand
         {
             get
             {
-                return _StatusBarText;
+                return _DeleteFoodPlanItemCommand;
             }
 
             set
             {
-                _StatusBarText = value;
-                OnPropertyChanged("StatusBarText");
-
+                _DeleteFoodPlanItemCommand = value;
             }
         }
-        #endregion
-
-        #region Properties: Commands
         public JamieDBViewModelCommand DeleteIngredientCommand
         {
             get
@@ -307,6 +355,19 @@ namespace JamieDB.ViewModel
             set
             {
                 _DeleteUnitCommand = value;
+            }
+        }
+
+        public JamieDBViewModelCommand NewFoodPlanItemCommand
+        {
+            get
+            {
+                return _NewFoodPlanItemCommand;
+            }
+
+            set
+            {
+                _NewFoodPlanItemCommand = value;
             }
         }
         public JamieDBViewModelCommand NewIngredientCommand
@@ -382,24 +443,13 @@ namespace JamieDB.ViewModel
             {
                 if (e.NewItems != null)
                 {
-                    var NewFoodPlanItemChange = (FoodPlanItem)e.NewItems[0];
+                    FoodPlanItem NewFoodPlanItem = (FoodPlanItem)e.NewItems[0];
 
-                    //Fill Foreign Keys
+                    NewFoodPlanItem.DateTime = SelectedFoodPlanDate;
 
+                    SelectedFoodPlanItem = NewFoodPlanItem;
 
-
-                    NewFoodPlanItemChange.Date = SelectedFoodPlanDate.Date;
-
-/*                    NewIngredientChange.RecipeID = SelectedRecipe.Id;
-                    NewIngredientChange.Recipe = SelectedRecipe;
-
-                    NewIngredientChange.IngredientID = SelectedIngredient.Id;
-                    NewIngredientChange.Ingredient = SelectedIngredient;
-
-                    NewIngredientChange.UnitID = SelectedUnit.Id;
-                    NewIngredientChange.Unit = SelectedUnit;
-*/               
-                    StatusBarText = "FoodPlanItem Added";
+                    StatusBarText = "FoodPlanItem Added: " + SelectedFoodPlanItem.Recipe.Name;
 
                 }
             }
@@ -521,39 +571,26 @@ namespace JamieDB.ViewModel
         {
             if (SelectedFoodPlanDate != null)
             {
-                FoodPlanItems = new ObservableCollection<FoodPlanItem>(_context.FoodPlanItems.Where(fpi => fpi.Date == SelectedFoodPlanDate));
+                FoodPlanItems = new ObservableCollection<FoodPlanItem>(_context.FoodPlanItems
+                                                                       .Where(fpi => fpi.DateTime.Date == SelectedFoodPlanDate.Date)
+                                                                       .OrderBy(fpi => fpi.DateTime));
                 FoodPlanItems.CollectionChanged += new NotifyCollectionChangedEventHandler(FoodPlanItemChanged);
+
+                if (SelectedFoodPlanDate != null)
+                {
+                    if (FoodPlanItems != null)
+                    {
+                        SelectedFoodPlanItem = FoodPlanItems.FirstOrDefault();
+                    }
+                }
+                else
+                {
+                    if (!FoodPlanItems.Contains(SelectedFoodPlanItem)) SelectedFoodPlanItem = FoodPlanItems.FirstOrDefault();
+                }
+
+                StatusBarText = "FoodPlanItems refreshed: Selected FoodPlanItem = " 
+                                + ((SelectedFoodPlanItem == null)?"null":SelectedRecipeIngredient.Ingredient.Name);
             }
-
-
-
-
-
-            /*            if (SelectedRecipe != null)
-                        {
-                            RecipeIngredients = new ObservableCollection<RecipeIngredient>(_context.RecipeIngredients.Where(ri => ri.RecipeID == SelectedRecipe.Id));
-                            RecipeIngredients.CollectionChanged += new NotifyCollectionChangedEventHandler(RecipeIngredientChanged);
-
-                            if (SelectedRecipeIngredient == null)
-                            {
-                                if (RecipeIngredients != null)
-                                {
-                                    SelectedRecipeIngredient = RecipeIngredients.FirstOrDefault();
-                                }
-                            }
-                            else
-                            {
-                                if (!RecipeIngredients.Contains(SelectedRecipeIngredient)) SelectedRecipeIngredient = RecipeIngredients.FirstOrDefault();
-                            }
-
-                            StatusBarText = "RecipeIngredients refreshed: Selected RecipeIngredient = ";
-
-                            if (SelectedRecipeIngredient == null)
-                                StatusBarText += "null";
-                            else
-                                StatusBarText += SelectedRecipeIngredient.Ingredient.Name;
-                        }
-              */
         }
         private void RefreshIngredients()
         {
@@ -577,13 +614,8 @@ namespace JamieDB.ViewModel
                 {
                     if (!RecipeIngredients.Contains(SelectedRecipeIngredient)) SelectedRecipeIngredient = RecipeIngredients.FirstOrDefault();
                 }
-
-                StatusBarText = "RecipeIngredients refreshed: Selected RecipeIngredient = ";
-
-                if (SelectedRecipeIngredient == null)
-                    StatusBarText += "null";
-                else
-                    StatusBarText += SelectedRecipeIngredient.Ingredient.Name;
+                StatusBarText = "RecipeIngredients refreshed: Selected RecipeIngredient = "
+                                + ((SelectedRecipeIngredient == null)?"null":SelectedRecipeIngredient.Ingredient.Name);
             }
         }
         private void RefreshRecipes()
@@ -595,6 +627,14 @@ namespace JamieDB.ViewModel
             if (SelectedRecipe == null) SelectedRecipe = result.FirstOrDefault();
 
         }
+        private void RefreshShoppingListItems()
+        {
+            var result = _context.ShoppingListItems.OrderBy(sli => sli.Ingredient + sli.FoodPlanDate);
+
+            ShoppingListItems = new ObservableCollection<ShoppingListItem>(result);
+
+        }
+
         private void RefreshUnits()
         {
             Units = GetUnits();
@@ -618,6 +658,10 @@ namespace JamieDB.ViewModel
                 }
         */
         #endregion
+        public bool CanExecuteDeleteFoodPlanItem(object o)
+        {
+            return (SelectedFoodPlanItem != null);
+        }
         public bool CanExecuteDeleteIngredient(object o)
         {
             return (SelectedIngredient != null);
@@ -637,6 +681,42 @@ namespace JamieDB.ViewModel
         public bool CanExecuteSaveRecipe(object o)
         {
             return true;
+        }
+
+        public void ExecuteDeleteFoodPlanItem(object o)
+        {
+            string MessageText;
+
+            if (SelectedFoodPlanItem != null)
+            {
+                var rIndex = FoodPlanItems.IndexOf(SelectedFoodPlanItem);
+                if (rIndex == FoodPlanItems.Count() - 1) rIndex -= 1;
+                MessageText = "FoodPlanItem " + SelectedFoodPlanItem.Recipe.Name + " deleted";
+
+
+                _context.FoodPlanItems.DeleteOnSubmit(SelectedFoodPlanItem);
+
+                try
+                {
+                    _context.SubmitChanges();
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.ToString(), "Exception Handling");
+                    MessageText = "FoodPlanItem " + SelectedFoodPlanItem.Recipe.Name + " NOT deleted";
+
+                    // Make some adjustments.
+                    // ...
+                    // Try again.
+                    //_context.SubmitChanges();
+                }
+                RefreshFoodPlanItems();
+                if (rIndex >= 0) SelectedFoodPlanItem = FoodPlanItems[rIndex];
+                else SelectedFoodPlanItem = null;
+                StatusBarText = MessageText;
+
+            }
+
         }
         public void ExecuteDeleteIngredient(object o)
         {
@@ -805,6 +885,58 @@ namespace JamieDB.ViewModel
             }
             RefreshRecipes();
             StatusBarText = "All Saved";
+        }
+
+
+        public void ExecuteNewFoodPlanItem(object o)
+        {
+
+            FoodPlanItem NewFoodPlanItem = new FoodPlanItem();
+
+            NewFoodPlanItem.Recipe = SelectedRecipe;
+
+            FoodPlanItem NextToSelectedFoodPlanItem;
+            int FoodPlanItemCount = FoodPlanItems.Count();
+
+            NewFoodPlanItem.DateTime = SelectedFoodPlanDate;
+
+            if ((FoodPlanItems == null) || (FoodPlanItemCount == 0)) // FoodPlanItems leer
+            {
+                NewFoodPlanItem.DateTime = NewFoodPlanItem.DateTime.AddHours(7); //FirstMealTime
+
+
+            }
+            else if (FoodPlanItemCount == 1)
+            {
+                NewFoodPlanItem.DateTime = NewFoodPlanItem.DateTime.AddHours(19); //LastMealTime
+            }
+            else
+            {
+                if (SelectedFoodPlanItem == FoodPlanItems.First()) NextToSelectedFoodPlanItem = FoodPlanItems[1];
+                else NextToSelectedFoodPlanItem = FoodPlanItems[FoodPlanItems.IndexOf(SelectedFoodPlanItem) - 1];
+
+                NewFoodPlanItem.DateTime = NewFoodPlanItem.DateTime.Add(TimeSpan.FromTicks(
+                    (SelectedFoodPlanItem.DateTime.TimeOfDay.Ticks + NextToSelectedFoodPlanItem.DateTime.TimeOfDay.Ticks) / 2));
+            }
+
+            SelectedFoodPlanItem = NewFoodPlanItem;
+
+            _context.FoodPlanItems.InsertOnSubmit(NewFoodPlanItem);
+
+            try
+            {
+                _context.SubmitChanges();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Exception Handling");
+                // Make some adjustments.
+                // ...
+                // Try again.
+                //_context.SubmitChanges();
+            }
+            RefreshFoodPlanItems();
+            StatusBarText = "FoodPlanItem Added: " + SelectedFoodPlanItem.Recipe.Name;
         }
         public void ExecuteNewIngredient(object o)
         {

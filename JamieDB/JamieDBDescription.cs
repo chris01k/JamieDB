@@ -34,20 +34,26 @@
  * 
  * Version 0.09 - 2017-02-16: - DeleteIngredient / DeleteUnit Command hinzu
  * 
- */
-
-/* Version 0.10 - 2017-02-17: Start FoodPlan Implementation:
+ * Version 0.10 - 2017-02-17: Start FoodPlan Implementation:
  *                            - XML: DatePicker - Detail Datagrid added (FoodPlanItems)
  *                            - ViewModel: SelectedFoodPlanDate added
- *                            - 
+ *                            
+ */
+
+/* Version 0.11 - 2017-02-19: FoodPlan Implementation
+ *                            - SelectedFoodPlanItem added (toBeDeleted)
+ *                            - Commands added: NewFoodPlanItem, DeleteFoodPlanItems
+ *                            Shopping List
+ *                            - ViewModel Property "ShoppingListItems" added
+ *                            - WPF XML: Tab "Shopping List" added
  *
- *                      open: - SelectedFoodPlanItem (toBeDeleted)
- *                            - Commands: NewFoodPlanItem, DeleteFoodPlanItems
- *                            -
+ *                      open: - FoodPlan: Selected Date, Selected Range, Navigate within Range
+ *                            - FoodPlan Templates: Store in Database, Load in FoodPlan
+ *                            - Shopping List: Store List in File
  *                            
  *               open Topics: - Right Orientation DataGridComboBoxColumn
- *                            - 
- *                            - 
+ *                            - NewFoodPlanItem.DateTime = NewFoodPlanItem.DateTime.AddHours(19); 
+ *                            - How to Implement SQL Functions with Linq2SQL
  *
  * 
  *               Checklists : 1. <Name Programmiercheckliste>
