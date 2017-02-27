@@ -127,16 +127,16 @@
 
                 <Label Grid.Row="2" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">TargetUnit</Label>
                 <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding Units, Source={StaticResource viewModel}}" 
-                          DisplayMemberPath="Symbol" SelectedValue="{Binding SelectedIngredient.TargetUnit, Source={StaticResource viewModel}}" 
-                          SelectedValuePath="Id"></ComboBox>
+                          DisplayMemberPath="Symbol" SelectedItem="{Binding SelectedIngredient.TargetUnit, Mode=TwoWay, Source={StaticResource viewModel}}">
+                </ComboBox>
                 <Button Content="Delete" Grid.Row="1" Grid.Column="4" Margin="5" Command="{Binding DeleteIngredientCommand, Source={StaticResource viewModel}}" />
 
 
                 <Label Grid.Row="3" Grid.Column="0" Margin="5" FlowDirection="RightToLeft">Type</Label>
                 <ComboBox Grid.Row="3" Grid.Column="1" Width="80" Margin="5" HorizontalAlignment="Center"
                           ItemsSource="{Binding IngredientTypes, Source={StaticResource viewModel}}" 
-                          DisplayMemberPath="Name" SelectedValue="{Binding SelectedIngredient.Type, Source={StaticResource viewModel}}" 
-                          SelectedValuePath="Id"></ComboBox>
+                          DisplayMemberPath="Name" SelectedItem="{Binding SelectedIngredient.Type, Source={StaticResource viewModel}}" 
+                          ></ComboBox>
 
                 <Label Grid.Row="4" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">Flags</Label>
                 <GroupBox Grid.Row="4" Grid.Column="1" Margin="5" Grid.ColumnSpan="3">
@@ -251,13 +251,16 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <DatePicker Grid.Row="0" Grid.Column="0" Margin="5" DisplayDate="{Binding SelectedFoodPlanDate, Source={StaticResource viewModel}}" SelectedDate="{Binding SelectedFoodPlanDate, Source={StaticResource viewModel}}" SelectedDateFormat="Long"/>
+                <DatePicker Grid.Row="0" Grid.Column="0" Margin="5" 
+                            DisplayDate="{Binding SelectedFoodPlanDate, Source={StaticResource viewModel}}" SelectedDate="{Binding SelectedFoodPlanDate, Source={StaticResource viewModel}}" 
+                            SelectedDateFormat="Long"/>
                 <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="5" AutoGenerateColumns="False"
                           ItemsSource="{Binding FoodPlanItems, Source={StaticResource viewModel}}"
                           AlternationCount="2"
@@ -280,8 +283,36 @@
                     <Button Content="New" Margin="5" Width="70" Command="{Binding NewFoodPlanItemCommand, Source={StaticResource viewModel}}" />
                     <Button Content="Delete" Margin="5" Command="{Binding DeleteFoodPlanItemCommand, Source={StaticResource viewModel}}" />
                 </StackPanel>
-                <Button Grid.Row="2" Grid.Column="2" Content="Save" Margin="5" VerticalAlignment="Bottom" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
-                <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="5">
+                <GroupBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Margin="5">Templates</Label>
+                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
+                                  ItemsSource="{Binding FoodPlanTemplates, Source={StaticResource viewModel}, Mode=TwoWay}"
+                                  DisplayMemberPath="Name"  
+                                  SelectedItem="{Binding SelectedFoodPlanTemplate, Source={StaticResource viewModel}}"/>
+                        <Button Grid.Row="0" Grid.Column="3" Margin="5" Command="{Binding NewFoodPlanTemplateCommand, Source={StaticResource viewModel}}" >New</Button>
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding SelectedFoodPlanTemplate.Name, Source={StaticResource viewModel}}" ></TextBox>
+                        <TextBox Grid.Row="1" Grid.Column="2" Margin="5" TextAlignment="Center"
+                                 Text="{Binding SelectedFoodPlanTemplateItemCount, Mode=OneWay, Source={StaticResource viewModel}}" ></TextBox>
+                        <Button Grid.Row="1" Grid.Column="3" Width="70" Margin="5" Command="{Binding LoadFoodPlanTemplateCommand, Source={StaticResource viewModel}}" >Load</Button>
+                        <Label Grid.Row="2" Grid.Column="0"  Margin="5" Content="End" HorizontalAlignment="Right"/>
+                        <DatePicker Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" DisplayDate="{Binding SelectedFoodPlanTemplateEndDate, Source={StaticResource viewModel}}" SelectedDateFormat="Long" SelectedDate="{Binding SelectedFoodPlanTemplateEndDate, Source={StaticResource viewModel}}"></DatePicker>
+                        <Button Grid.Row="2" Grid.Column="3" Margin="5" Command="{Binding DeleteFoodPlanTemplateCommand, Source={StaticResource viewModel}}" >Delete</Button>
+                    </Grid>
+                </GroupBox>
+                <Button Grid.Row="3" Grid.Column="2" Content="Save" Margin="5" VerticalAlignment="Bottom" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
+                <StatusBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="5">
                     <StatusBarItem>
                         <TextBlock FontSize="10" Text="{Binding StatusBarText, Source={StaticResource viewModel}}" ></TextBlock>
                     </StatusBarItem>
@@ -300,11 +331,41 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <DataGrid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="5" AutoGenerateColumns="True"
+                <DataGrid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="5" AutoGenerateColumns="False"
                           ItemsSource="{Binding ShoppingListItems, Source={StaticResource viewModel}}"
                           AlternationCount="2"
                           RowBackground="White"
                           AlternatingRowBackground="LightCyan">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Date" Binding= "{Binding FoodPlanDate, Mode=OneWay, StringFormat={}{0:dd.MM.yyyy}}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Time" Binding= "{Binding FoodPlanDate, Mode=OneWay, StringFormat={}{0:HH:mm}}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Quantity" Binding= "{Binding Quantity, Mode=OneWay, StringFormat={}{0:##.00}}" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right" ></Setter>
+                                    <Setter Property="Margin" Value="0,0,5,0"></Setter>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Unit" Binding= "{Binding Unit, Mode=OneWay}" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right" ></Setter>
+                                    <Setter Property="Margin" Value="0,0,5,0"></Setter>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Ingredient" Binding= "{Binding Ingredient, Mode=OneWay}" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center" ></Setter>
+                                    <Setter Property="Margin" Value="0,0,5,0"></Setter>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
                 </DataGrid>
 
                 <Button Grid.Row="1" Grid.Column="2" Content="Save" Margin="5" VerticalAlignment="Bottom" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
@@ -315,7 +376,11 @@
                 </StatusBar>
             </Grid>
         </TabItem>
-        <TabItem Header="Stock"></TabItem>
+        <TabItem Header="Stock">
+            <Calendar SelectionMode="SingleRange"/>
+        </TabItem>
+        
+
 
     </TabControl>
 

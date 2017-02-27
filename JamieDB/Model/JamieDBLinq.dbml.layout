@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 13.75, 9.375" name="JamieDBLinq">
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 13.75, 10.5" name="JamieDBLinq">
   <DataContextMoniker Name="/JamieDBLinqDataContext" />
   <nestedChildShapes>
     <classShape Id="9a67e0ae-d59c-412d-9f2f-1c4a9485c7da" absoluteBounds="8.875, 3.5, 2, 1.5785953776041666">
@@ -38,35 +38,35 @@
         <elementListCompartment Id="10ad8352-58ec-4c1a-a2f9-c231e69be115" absoluteBounds="6.3900000000000006, 1.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(6.375 : 8.38726382324219); (5.125 : 8.38726382324219)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(6.375 : 8.38726382324219); (5.125 : 8.38726382324219)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/IngredientType/IngredientType_Ingredient" />
       <nodes>
         <classShapeMoniker Id="65bf1667-9857-452e-8130-3c74e6cde001" />
         <classShapeMoniker Id="2cdec503-0580-414f-8906-ab76c49210cc" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(4.3125 : 6.375); (4.3125 : 2.52089680989583)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(4.3125 : 6.375); (4.3125 : 2.52089680989583)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Ingredient/Ingredient_RecipeIngredient" />
       <nodes>
         <classShapeMoniker Id="2cdec503-0580-414f-8906-ab76c49210cc" />
         <classShapeMoniker Id="c40c34d5-2e73-4ce3-bf80-f48012581573" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(7.875 : 4.28929768880208); (8.875 : 4.28929768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(7.875 : 4.28929768880208); (8.875 : 4.28929768880208)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Recipe/Recipe_FoodPlanItem" />
       <nodes>
         <classShapeMoniker Id="3f6cf134-7760-4537-a281-1b852a765efc" />
         <classShapeMoniker Id="9a67e0ae-d59c-412d-9f2f-1c4a9485c7da" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(6.09375 : 3.5); (6.09375 : 2.45599609375); (5.5 : 2.45599609375)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(6.09375 : 3.5); (6.09375 : 2.45599609375); (5.5 : 2.45599609375)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Recipe/Recipe_RecipeIngredient" />
       <nodes>
         <classShapeMoniker Id="3f6cf134-7760-4537-a281-1b852a765efc" />
         <classShapeMoniker Id="c40c34d5-2e73-4ce3-bf80-f48012581573" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(6.375 : 1.53929768880208); (5.5 : 1.53929768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(6.375 : 1.53929768880208); (5.5 : 1.53929768880208)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/Unit/Unit_RecipeIngredient" />
       <nodes>
         <classShapeMoniker Id="9015a8a4-bff4-485c-8824-f9d5d541dffe" />
@@ -85,11 +85,37 @@
         <elementListCompartment Id="2605fd2c-1911-4f71-a7c7-53883dba0fef" absoluteBounds="8.765, 1.3350000000000009, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(8.75 : 1.47199625651042); (8.375 : 1.47199625651042)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(8.75 : 1.47199625651042); (8.375 : 1.47199625651042)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/JamieDBLinqDataContext/UnitType/UnitType_Unit" />
       <nodes>
         <classShapeMoniker Id="fbba4efd-3a6e-42a9-8f08-b753c7ed1ca5" />
         <classShapeMoniker Id="9015a8a4-bff4-485c-8824-f9d5d541dffe" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="3dfe200f-2a6f-4108-a57b-963ac041edc8" absoluteBounds="10.875, 6.125, 2, 1.7708968098958331">
+      <DataClassMoniker Name="/JamieDBLinqDataContext/FoodPlanTemplateItem" />
+      <nestedChildShapes>
+        <elementListCompartment Id="4c48b441-8a1b-4838-84f7-6e9c7beb4a9c" absoluteBounds="10.89, 6.5850000000000009, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(7.875 : 5.39829752604167); (11.90625 : 5.39829752604167); (11.90625 : 6.125)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/JamieDBLinqDataContext/Recipe/Recipe_FoodPlanTemplateItem" />
+      <nodes>
+        <classShapeMoniker Id="3f6cf134-7760-4537-a281-1b852a765efc" />
+        <classShapeMoniker Id="3dfe200f-2a6f-4108-a57b-963ac041edc8" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="b63871fd-442e-4229-bf5e-68af92c7ce14" absoluteBounds="10, 8.625, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/JamieDBLinqDataContext/FoodPlanTemplate" />
+      <nestedChildShapes>
+        <elementListCompartment Id="39e39ee1-90fb-4b61-9875-12c92a703d66" absoluteBounds="10.015, 9.085, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(11.4375 : 8.625); (11.4375 : 7.89589680989583)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/JamieDBLinqDataContext/FoodPlanTemplate/FoodPlanTemplate_FoodPlanTemplateItem" />
+      <nodes>
+        <classShapeMoniker Id="b63871fd-442e-4229-bf5e-68af92c7ce14" />
+        <classShapeMoniker Id="3dfe200f-2a6f-4108-a57b-963ac041edc8" />
       </nodes>
     </associationConnector>
   </nestedChildShapes>

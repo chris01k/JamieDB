@@ -51,6 +51,12 @@ namespace JamieDB.Model
     partial void InsertUnitType(UnitType instance);
     partial void UpdateUnitType(UnitType instance);
     partial void DeleteUnitType(UnitType instance);
+    partial void InsertFoodPlanTemplateItem(FoodPlanTemplateItem instance);
+    partial void UpdateFoodPlanTemplateItem(FoodPlanTemplateItem instance);
+    partial void DeleteFoodPlanTemplateItem(FoodPlanTemplateItem instance);
+    partial void InsertFoodPlanTemplate(FoodPlanTemplate instance);
+    partial void UpdateFoodPlanTemplate(FoodPlanTemplate instance);
+    partial void DeleteFoodPlanTemplate(FoodPlanTemplate instance);
     #endregion
 		
 		public JamieDBLinqDataContext() : 
@@ -144,6 +150,22 @@ namespace JamieDB.Model
 			get
 			{
 				return this.GetTable<UnitType>();
+			}
+		}
+		
+		public System.Data.Linq.Table<FoodPlanTemplateItem> FoodPlanTemplateItems
+		{
+			get
+			{
+				return this.GetTable<FoodPlanTemplateItem>();
+			}
+		}
+		
+		public System.Data.Linq.Table<FoodPlanTemplate> FoodPlanTemplates
+		{
+			get
+			{
+				return this.GetTable<FoodPlanTemplate>();
 			}
 		}
 	}
@@ -1065,6 +1087,8 @@ namespace JamieDB.Model
 		
 		private EntitySet<RecipeIngredient> _RecipeIngredients;
 		
+		private EntitySet<FoodPlanTemplateItem> _FoodPlanTemplateItems;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -1089,6 +1113,7 @@ namespace JamieDB.Model
 		{
 			this._FoodPlanItems = new EntitySet<FoodPlanItem>(new Action<FoodPlanItem>(this.attach_FoodPlanItems), new Action<FoodPlanItem>(this.detach_FoodPlanItems));
 			this._RecipeIngredients = new EntitySet<RecipeIngredient>(new Action<RecipeIngredient>(this.attach_RecipeIngredients), new Action<RecipeIngredient>(this.detach_RecipeIngredients));
+			this._FoodPlanTemplateItems = new EntitySet<FoodPlanTemplateItem>(new Action<FoodPlanTemplateItem>(this.attach_FoodPlanTemplateItems), new Action<FoodPlanTemplateItem>(this.detach_FoodPlanTemplateItems));
 			OnCreated();
 		}
 		
@@ -1258,6 +1283,19 @@ namespace JamieDB.Model
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_FoodPlanTemplateItem", Storage="_FoodPlanTemplateItems", ThisKey="Id", OtherKey="RecipeID")]
+		public EntitySet<FoodPlanTemplateItem> FoodPlanTemplateItems
+		{
+			get
+			{
+				return this._FoodPlanTemplateItems;
+			}
+			set
+			{
+				this._FoodPlanTemplateItems.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -1297,6 +1335,18 @@ namespace JamieDB.Model
 		}
 		
 		private void detach_RecipeIngredients(RecipeIngredient entity)
+		{
+			this.SendPropertyChanging();
+			entity.Recipe = null;
+		}
+		
+		private void attach_FoodPlanTemplateItems(FoodPlanTemplateItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.Recipe = this;
+		}
+		
+		private void detach_FoodPlanTemplateItems(FoodPlanTemplateItem entity)
 		{
 			this.SendPropertyChanging();
 			entity.Recipe = null;
@@ -1716,6 +1766,408 @@ namespace JamieDB.Model
 		{
 			this.SendPropertyChanging();
 			entity.UnitType = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FoodPlanTemplateItems")]
+	public partial class FoodPlanTemplateItem : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private long _Id;
+		
+		private long _TemplateID;
+		
+		private System.DateTime _DateTime;
+		
+		private System.Nullable<decimal> _PortionCount;
+		
+		private long _RecipeID;
+		
+		private EntityRef<Recipe> _Recipe;
+		
+		private EntityRef<FoodPlanTemplate> _FoodPlanTemplate;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(long value);
+    partial void OnIdChanged();
+    partial void OnTemplateIDChanging(long value);
+    partial void OnTemplateIDChanged();
+    partial void OnDateTimeChanging(System.DateTime value);
+    partial void OnDateTimeChanged();
+    partial void OnPortionCountChanging(System.Nullable<decimal> value);
+    partial void OnPortionCountChanged();
+    partial void OnRecipeIDChanging(long value);
+    partial void OnRecipeIDChanged();
+    #endregion
+		
+		public FoodPlanTemplateItem()
+		{
+			this._Recipe = default(EntityRef<Recipe>);
+			this._FoodPlanTemplate = default(EntityRef<FoodPlanTemplate>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public long Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TemplateID", DbType="BigInt NOT NULL")]
+		public long TemplateID
+		{
+			get
+			{
+				return this._TemplateID;
+			}
+			set
+			{
+				if ((this._TemplateID != value))
+				{
+					if (this._FoodPlanTemplate.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnTemplateIDChanging(value);
+					this.SendPropertyChanging();
+					this._TemplateID = value;
+					this.SendPropertyChanged("TemplateID");
+					this.OnTemplateIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime DateTime
+		{
+			get
+			{
+				return this._DateTime;
+			}
+			set
+			{
+				if ((this._DateTime != value))
+				{
+					this.OnDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._DateTime = value;
+					this.SendPropertyChanged("DateTime");
+					this.OnDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PortionCount", DbType="Decimal(18,2)")]
+		public System.Nullable<decimal> PortionCount
+		{
+			get
+			{
+				return this._PortionCount;
+			}
+			set
+			{
+				if ((this._PortionCount != value))
+				{
+					this.OnPortionCountChanging(value);
+					this.SendPropertyChanging();
+					this._PortionCount = value;
+					this.SendPropertyChanged("PortionCount");
+					this.OnPortionCountChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RecipeID", DbType="BigInt NOT NULL")]
+		public long RecipeID
+		{
+			get
+			{
+				return this._RecipeID;
+			}
+			set
+			{
+				if ((this._RecipeID != value))
+				{
+					if (this._Recipe.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnRecipeIDChanging(value);
+					this.SendPropertyChanging();
+					this._RecipeID = value;
+					this.SendPropertyChanged("RecipeID");
+					this.OnRecipeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_FoodPlanTemplateItem", Storage="_Recipe", ThisKey="RecipeID", OtherKey="Id", IsForeignKey=true)]
+		public Recipe Recipe
+		{
+			get
+			{
+				return this._Recipe.Entity;
+			}
+			set
+			{
+				Recipe previousValue = this._Recipe.Entity;
+				if (((previousValue != value) 
+							|| (this._Recipe.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Recipe.Entity = null;
+						previousValue.FoodPlanTemplateItems.Remove(this);
+					}
+					this._Recipe.Entity = value;
+					if ((value != null))
+					{
+						value.FoodPlanTemplateItems.Add(this);
+						this._RecipeID = value.Id;
+					}
+					else
+					{
+						this._RecipeID = default(long);
+					}
+					this.SendPropertyChanged("Recipe");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FoodPlanTemplate_FoodPlanTemplateItem", Storage="_FoodPlanTemplate", ThisKey="TemplateID", OtherKey="Id", IsForeignKey=true)]
+		public FoodPlanTemplate FoodPlanTemplate
+		{
+			get
+			{
+				return this._FoodPlanTemplate.Entity;
+			}
+			set
+			{
+				FoodPlanTemplate previousValue = this._FoodPlanTemplate.Entity;
+				if (((previousValue != value) 
+							|| (this._FoodPlanTemplate.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._FoodPlanTemplate.Entity = null;
+						previousValue.FoodPlanTemplateItems.Remove(this);
+					}
+					this._FoodPlanTemplate.Entity = value;
+					if ((value != null))
+					{
+						value.FoodPlanTemplateItems.Add(this);
+						this._TemplateID = value.Id;
+					}
+					else
+					{
+						this._TemplateID = default(long);
+					}
+					this.SendPropertyChanged("FoodPlanTemplate");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FoodPlanTemplates")]
+	public partial class FoodPlanTemplate : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private long _Id;
+		
+		private string _Name;
+		
+		private string _Description;
+		
+		private System.DateTime _StartDate;
+		
+		private EntitySet<FoodPlanTemplateItem> _FoodPlanTemplateItems;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(long value);
+    partial void OnIdChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnDescriptionChanging(string value);
+    partial void OnDescriptionChanged();
+    partial void OnStartDateChanging(System.DateTime value);
+    partial void OnStartDateChanged();
+    #endregion
+		
+		public FoodPlanTemplate()
+		{
+			this._FoodPlanTemplateItems = new EntitySet<FoodPlanTemplateItem>(new Action<FoodPlanTemplateItem>(this.attach_FoodPlanTemplateItems), new Action<FoodPlanTemplateItem>(this.detach_FoodPlanTemplateItems));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public long Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(50)")]
+		public string Description
+		{
+			get
+			{
+				return this._Description;
+			}
+			set
+			{
+				if ((this._Description != value))
+				{
+					this.OnDescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._Description = value;
+					this.SendPropertyChanged("Description");
+					this.OnDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StartDate", DbType="DateTime NOT NULL")]
+		public System.DateTime StartDate
+		{
+			get
+			{
+				return this._StartDate;
+			}
+			set
+			{
+				if ((this._StartDate != value))
+				{
+					this.OnStartDateChanging(value);
+					this.SendPropertyChanging();
+					this._StartDate = value;
+					this.SendPropertyChanged("StartDate");
+					this.OnStartDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FoodPlanTemplate_FoodPlanTemplateItem", Storage="_FoodPlanTemplateItems", ThisKey="Id", OtherKey="TemplateID")]
+		public EntitySet<FoodPlanTemplateItem> FoodPlanTemplateItems
+		{
+			get
+			{
+				return this._FoodPlanTemplateItems;
+			}
+			set
+			{
+				this._FoodPlanTemplateItems.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_FoodPlanTemplateItems(FoodPlanTemplateItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.FoodPlanTemplate = this;
+		}
+		
+		private void detach_FoodPlanTemplateItems(FoodPlanTemplateItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.FoodPlanTemplate = null;
 		}
 	}
 }

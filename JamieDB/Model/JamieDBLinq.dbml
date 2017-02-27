@@ -54,6 +54,7 @@
       <Column Name="Summary" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Association Name="Recipe_FoodPlanItem" Member="FoodPlanItems" ThisKey="Id" OtherKey="RecipeID" Type="FoodPlanItem" />
       <Association Name="Recipe_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="RecipeID" Type="RecipeIngredient" />
+      <Association Name="Recipe_FoodPlanTemplateItem" Member="FoodPlanTemplateItems" ThisKey="Id" OtherKey="RecipeID" Type="FoodPlanTemplateItem" />
     </Type>
   </Table>
   <Table Name="dbo.Units" Member="Units">
@@ -80,6 +81,26 @@
       <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Association Name="UnitType_Unit" Member="Units" ThisKey="Id" OtherKey="TypeID" Type="Unit" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FoodPlanTemplateItems" Member="FoodPlanTemplateItems">
+    <Type Name="FoodPlanTemplateItem">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="TemplateID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="PortionCount" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="Recipe_FoodPlanTemplateItem" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
+      <Association Name="FoodPlanTemplate_FoodPlanTemplateItem" Member="FoodPlanTemplate" ThisKey="TemplateID" OtherKey="Id" Type="FoodPlanTemplate" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FoodPlanTemplates" Member="FoodPlanTemplates">
+    <Type Name="FoodPlanTemplate">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="StartDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="FoodPlanTemplate_FoodPlanTemplateItem" Member="FoodPlanTemplateItems" ThisKey="Id" OtherKey="TemplateID" Type="FoodPlanTemplateItem" />
     </Type>
   </Table>
 </Database>

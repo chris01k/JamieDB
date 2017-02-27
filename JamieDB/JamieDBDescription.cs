@@ -1,7 +1,7 @@
 ﻿/* JamieDB: Testprogramm zur Vorarbeit im Projekt "Jamie". Die zweite Version ist eine
  * WPF-Anwendung mit rudimentärem Userinterface. Die Architektur folgt dem Model-View-ViewModel Prinzip.
- * möglicher Algoritmen zur Umrechnung von Units
- * Autor: Klaus Christochowitz  11-2017
+ * 
+ * Autor: Klaus Christochowitz  01-2017
  * Version 0.01 - 2017-01-17: Erste WPF-Testversion in der MVVM-Architektur: 
  *                            - auf geht's
  *                            
@@ -37,23 +37,26 @@
  * Version 0.10 - 2017-02-17: Start FoodPlan Implementation:
  *                            - XML: DatePicker - Detail Datagrid added (FoodPlanItems)
  *                            - ViewModel: SelectedFoodPlanDate added
- *                            
- */
-
-/* Version 0.11 - 2017-02-19: FoodPlan Implementation
+ *
+ * Version 0.11 - 2017-02-19: FoodPlan Implementation
  *                            - SelectedFoodPlanItem added (toBeDeleted)
  *                            - Commands added: NewFoodPlanItem, DeleteFoodPlanItems
  *                            Shopping List
  *                            - ViewModel Property "ShoppingListItems" added
  *                            - WPF XML: Tab "Shopping List" added
+ */
+
+/* Version 0.12 - 2017-02-27: FoodPlan Template Implementation
+ *                            - SelectedFoodPlanTemplateEndDate added
+ *                            - NewFoodPlanTemplateCommand implemented
+ *                            - DeleteFoodPlanTemplateCommand implemented
+ *                            - LoadFoodPlanTemplateCommand implemented
  *
- *                      open: - FoodPlan: Selected Date, Selected Range, Navigate within Range
- *                            - FoodPlan Templates: Store in Database, Load in FoodPlan
- *                            - Shopping List: Store List in File
+ *                      open: - Unit Translations
  *                            
- *               open Topics: - Right Orientation DataGridComboBoxColumn
- *                            - NewFoodPlanItem.DateTime = NewFoodPlanItem.DateTime.AddHours(19); 
- *                            - How to Implement SQL Functions with Linq2SQL
+ *            open Questions: - Right Orientation DataGridComboBoxColumn
+ *                            - 
+ *                            - 
  *
  * 
  *               Checklists : 1. <Name Programmiercheckliste>
