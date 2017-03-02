@@ -1,7 +1,8 @@
 ﻿/* JamieDB: Testprogramm zur Vorarbeit im Projekt "Jamie". Die zweite Version ist eine
  * WPF-Anwendung mit rudimentärem Userinterface. Die Architektur folgt dem Model-View-ViewModel Prinzip.
  * 
- * Autor: Klaus Christochowitz  01-2017
+ * Author: Klaus Christochowitz  01-2017
+ * 
  * Version 0.01 - 2017-01-17: Erste WPF-Testversion in der MVVM-Architektur: 
  *                            - auf geht's
  *                            
@@ -44,18 +45,30 @@
  *                            Shopping List
  *                            - ViewModel Property "ShoppingListItems" added
  *                            - WPF XML: Tab "Shopping List" added
- */
-
-/* Version 0.12 - 2017-02-27: FoodPlan Template Implementation
+ *                            
+ * Version 0.12 - 2017-02-27: FoodPlan Template Implementation
  *                            - SelectedFoodPlanTemplateEndDate added
  *                            - NewFoodPlanTemplateCommand implemented
  *                            - DeleteFoodPlanTemplateCommand implemented
  *                            - LoadFoodPlanTemplateCommand implemented
+ */
+
+/* Version 0.13 - 2017-03-02: Unit Translations
+ *                            - Command NewUnitTranslation added
+ *                            - UnitTranslation bound to XML
+ *                            
+ *                            Bugfixes
+ *                            - XML-TabItem Units: UnitType Combobox
+ *                            - XML-TabItem Ingredients: TargetUnit & Type Combobox
  *
- *                      open: - Unit Translations
+ *                      open: - Add Inverse UnitTranslations to Table (l-->ml) => (ml -->l)
+ *                            - Edit Inverse UnitTranslations
+ *                            - Enter Test Data to Unit Translations
+ *                            - Implement Unit Translation Calculation
+ *                            - 
  *                            
  *            open Questions: - Right Orientation DataGridComboBoxColumn
- *                            - 
+ *                            - Umstellung auf SQL Authentication
  *                            - 
  *
  * 
@@ -120,7 +133,7 @@
 /* GetTranslation - Versions
 * -------------------------
 * 
-* GetTranslation (BaseUnit, TargetUnit, Ingredient) - done
+* GetTranslation (BaseUnit, TargetUnit, Ingredient)
 * - Calculates Translation Base->Target for Ingredient 
 * - if possible - otherwise Create Suggestion and return null
 * 
@@ -128,7 +141,7 @@
 * - Calculates Translation Base->Target for Ingredient.Type (if possible - otherwise null)
 * - if possible - otherwise Create Suggestion and return null
 * 
-* GetTranslation (BaseUnit, TargetUnit) - done
+* GetTranslation (BaseUnit, TargetUnit)
 * - Calculates Translation Base->Target, if Base and Target have same Unit.Type 
 * - if possible - otherwise Calculate missing entry and return null
 * 

@@ -124,18 +124,21 @@
                 <Button Content="New" Grid.Row="0" Grid.Column="4" Margin="5" Width="70" Command="{Binding NewIngredientCommand, Mode=OneWay, Source={StaticResource viewModel}}" />
 
                 <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" Text="{Binding SelectedIngredient.Name, Source={StaticResource viewModel}}"></TextBox>
+                <Button Content="Delete" Grid.Row="1" Grid.Column="4" Margin="5" Command="{Binding DeleteIngredientCommand, Source={StaticResource viewModel}}" />
 
                 <Label Grid.Row="2" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">TargetUnit</Label>
-                <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding Units, Source={StaticResource viewModel}}" 
-                          DisplayMemberPath="Symbol" SelectedItem="{Binding SelectedIngredient.TargetUnit, Mode=TwoWay, Source={StaticResource viewModel}}">
+                <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" 
+                          ItemsSource="{Binding Units, Source={StaticResource viewModel}}" 
+                          DisplayMemberPath="Symbol" 
+                          SelectedItem="{Binding SelectedIngredient.Unit, Source={StaticResource viewModel}}">
                 </ComboBox>
-                <Button Content="Delete" Grid.Row="1" Grid.Column="4" Margin="5" Command="{Binding DeleteIngredientCommand, Source={StaticResource viewModel}}" />
 
 
                 <Label Grid.Row="3" Grid.Column="0" Margin="5" FlowDirection="RightToLeft">Type</Label>
                 <ComboBox Grid.Row="3" Grid.Column="1" Width="80" Margin="5" HorizontalAlignment="Center"
                           ItemsSource="{Binding IngredientTypes, Source={StaticResource viewModel}}" 
-                          DisplayMemberPath="Name" SelectedItem="{Binding SelectedIngredient.Type, Source={StaticResource viewModel}}" 
+                          DisplayMemberPath="Name" 
+                          SelectedItem="{Binding SelectedIngredient.IngredientType, Source={StaticResource viewModel}}" 
                           ></ComboBox>
 
                 <Label Grid.Row="4" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">Flags</Label>
@@ -184,6 +187,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -200,40 +205,59 @@
                 <ComboBox Grid.Row="0" Grid.Column="1" Margin="5" 
                           ItemsSource="{Binding Units, Source={StaticResource viewModel}}"
                           SelectedItem="{Binding SelectedUnit, Source={StaticResource viewModel}}"
-                          DisplayMemberPath="Symbol"></ComboBox>
+                          DisplayMemberPath="Symbol">
+                </ComboBox>
 
                 <Label Grid.Row="0" Grid.Column="2" Margin="2" FlowDirection="RightToLeft">Name</Label>
                 <TextBox Grid.Row="0" Grid.Column="3" Margin="5"
                          Text="{Binding SelectedUnit.Name, Source={StaticResource viewModel}}"></TextBox>
+                <Button Content="New" Grid.Row="0" Grid.Column="4" Margin="5" Width="70" Command="{Binding NewUnitCommand, Source={StaticResource viewModel}}"  />
 
 
                 <Label Grid.Row="1" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">Symbol</Label>
                 <TextBox Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding SelectedUnit.Symbol, Source={StaticResource viewModel}}"></TextBox>
 
                 <Label Grid.Row="1" Grid.Column="2" Margin="2" FlowDirection="RightToLeft">Type</Label>
-                <ComboBox Grid.Row="1" Grid.Column="3" Margin="5" 
-                          ItemsSource="{Binding UnitTypes, Source={StaticResource viewModel}}"
-                          DisplayMemberPath="Name" 
-                          SelectedValue="{Binding SelectedUnit.Type, Source={StaticResource viewModel}}" 
-                          SelectedValuePath="Id">
+
+                <ComboBox Grid.Row="1" Grid.Column="3" Margin="5"
+                    ItemsSource="{Binding UnitTypes, Source={StaticResource viewModel}}" 
+                    SelectedItem="{Binding SelectedUnit.UnitType, Source={StaticResource viewModel}}"
+                    DisplayMemberPath="Name" >
                 </ComboBox>
-                
-
-                <Label Grid.Row="2" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">Translations</Label>
-                <DataGrid Grid.Row="2"  Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="2" Margin="5" AutoGenerateColumns="False" ItemsSource="{Binding RecipeIngredients, Source={StaticResource viewModel}}"
-                      AlternationCount="2"
-                      RowBackground="White"
-                      AlternatingRowBackground="LightCyan">
-                    
-                </DataGrid>
-
-                <Button Content="New" Grid.Row="0" Grid.Column="4" Margin="5" Width="70" Command="{Binding NewUnitCommand, Source={StaticResource viewModel}}"  />
                 <Button Content="Delete" Grid.Row="1" Grid.Column="4" Margin="5" Command="{Binding DeleteUnitCommand, Source={StaticResource viewModel}}" />
 
+                <StackPanel Grid.Row="2" Grid.Column="0" Grid.RowSpan="3" Grid.ColumnSpan="4" Orientation="Vertical">
+                    <Label Grid.Row="2" Grid.Column="0" Margin="2">Translations</Label>
+                    <DataGrid Grid.Row="2"  Grid.Column="1" Grid.ColumnSpan="3" Grid.RowSpan="3" Margin="5" AutoGenerateColumns="False" 
+                      AlternationCount="2"
+                      RowBackground="White"
+                      AlternatingRowBackground="LightCyan" 
+                      ItemsSource="{Binding UnitTranslations, Source={StaticResource viewModel}}" 
+                      SelectedItem="{Binding SelectedUnitTranslation, Source={StaticResource viewModel}}">
+                        <DataGrid.Columns>
+                            <DataGridComboBoxColumn Header="Target=" 
+                                                ItemsSource="{Binding Units, Source={StaticResource viewModel}}" 
+                                                SelectedItemBinding="{Binding Unit1}"
+                                                DisplayMemberPath="Symbol"
+                                                >
+                            </DataGridComboBoxColumn>
+                            <DataGridTextColumn Header="Factor *" Binding="{Binding UnitTranslations/Factor, Source={StaticResource viewModel}}"/>
+                            <DataGridTextColumn Header="Base" IsReadOnly="True" Binding="{Binding UnitTranslations/Unit.Symbol, Source={StaticResource viewModel}}"/>
+                            <DataGridCheckBoxColumn Header="TypeChange"/>
+                            <DataGridCheckBoxColumn Header="Ingredient"/>
+                            <DataGridCheckBoxColumn Header="Auto"/>
+                            <DataGridCheckBoxColumn Header="OK?"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+                <Button Content="New" Grid.Row="2" Grid.Column="4" Margin="5" Width="70" Command="{Binding NewUnitTranslationCommand, Source={StaticResource viewModel}}"/>
+                <Button Content="Delete" Grid.Row="3" Grid.Column="4" Margin="5" Width="70"/>
 
-                <Button Grid.Row="3" Grid.Column="4" Content="Save" Margin="5" VerticalAlignment="Bottom" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
+
+
+                <Button Grid.Row="4" Grid.Column="4" Content="Save" Margin="5" VerticalAlignment="Bottom" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
          
-                <StatusBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" Margin="5">
+                <StatusBar Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5" Margin="5">
                     <StatusBarItem>
                         <TextBlock FontSize="10" Text="{Binding StatusBarText, Source={StaticResource viewModel}}" ></TextBlock>
                     </StatusBarItem>
