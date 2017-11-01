@@ -15,11 +15,11 @@ namespace JamieDB.ViewModel
     {
 
         #region Attributes
+        private ObservableCollection<UnitTranslation> _RelatedUnitTranslations;
         private Unit _SelectedUnit;
         private UnitTranslation _SelectedUnitTranslation;
         private UnitType _SelectedUnitType;
         private ObservableCollection<Unit> _Units;
-        private ObservableCollection<UnitTranslation> _RelatedUnitTranslations;
         private ObservableCollection<UnitType> _UnitTypes;
 
         private string _StatusBarText;
@@ -111,6 +111,7 @@ namespace JamieDB.ViewModel
             {
                 _SelectedUnit = value;
                 OnPropertyChanged("SelectedUnit");
+                OnPropertyChanged("IsStandardUnit");
                 RefreshRelatedUnitTranslations();
                 DeleteUnitTranslationCommand.OnCanExecuteChanged();
             }
@@ -195,6 +196,30 @@ namespace JamieDB.ViewModel
                 OnPropertyChanged("UnitTypes");
             }
         }
+
+        public bool IsStandardUnit
+        {
+            get
+            {
+                bool ReturnValue =false;
+
+                if ((SelectedUnit.UnitType != null) && (SelectedUnit != null)) ReturnValue = (SelectedUnit.UnitType.Unit.Equals(SelectedUnit));
+
+                return ReturnValue;
+            }
+
+            set
+            {
+                if (!IsStandardUnit)
+                {
+                    SelectedUnit.UnitType.Unit = SelectedUnit;
+                    OnPropertyChanged("IsStandardUnit");
+
+                }
+
+            }
+        }
+
         #endregion
         #region Properties: Commands
         public JamieDBViewModelCommand DeleteUnitCommand

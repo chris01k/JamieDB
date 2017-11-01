@@ -51,7 +51,7 @@
 
                 <Label Grid.Row="2" Grid.Column="6" Grid.ColumnSpan="2" Margin="0,32,105,0" Grid.RowSpan="2">Portions</Label>
                 <TextBox Grid.Row="3" Grid.Column="7" Text="{Binding SelectedRecipe.PortionQuantity , Source={StaticResource viewModel}, Mode=TwoWay}" Margin="5,4,4,5"></TextBox>
-               
+
 
                 <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,212" Grid.RowSpan="2">Source</Label>
                 <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding SelectedRecipe.Source, Source={StaticResource viewModel}}" Margin="0,5,5,4" Grid.ColumnSpan="4"></TextBox>
@@ -135,7 +135,7 @@
 
                 <Label Grid.Row="2" Grid.Column="0" Margin="2" FlowDirection="RightToLeft">TargetUnit</Label>
                 <ComboBox Grid.Row="2" Grid.Column="1" Margin="5" 
-                          ItemsSource="{Binding Units, Source={StaticResource viewModel}}" 
+                          ItemsSource="{Binding UnitVM.Units, Source={StaticResource viewModel}}" 
                           DisplayMemberPath="Symbol" 
                           SelectedItem="{Binding SelectedIngredient.Unit, Source={StaticResource viewModel}}" Grid.ColumnSpan="2">
                 </ComboBox>
@@ -212,22 +212,28 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="1" Margin="2,2,0.2,2" FlowDirection="RightToLeft" Grid.ColumnSpan="2">Type</Label>
-
+                <ComboBox Grid.Row="0" Grid.Column="3" Margin="4.8,5,5,5"  
+                         ItemsSource ="{Binding UnitVM.UnitTypes, Source={StaticResource viewModel}}"
+                         DisplayMemberPath="Name" 
+                         SelectedValue="{Binding UnitVM.SelectedUnit.TypeID, Source={StaticResource viewModel}}" 
+                         SelectedValuePath="Id"
+                         
+                         
+                ></ComboBox>
                 <Label Grid.Row="0" Grid.Column="4" Margin="2.4,2,0.2,2" FlowDirection="RightToLeft">Name</Label>
                 <ComboBox Grid.Row="0" Grid.Column="5" Margin="4.8,5,5,5" Grid.ColumnSpan="2" 
                          ItemsSource ="{Binding UnitVM.Units, Source={StaticResource viewModel} }"
                          SelectedItem ="{Binding UnitVM.SelectedUnit, Source={StaticResource viewModel}}"
-                         DisplayMemberPath="DisplayName" >
-
-                </ComboBox>
+                         DisplayMemberPath="DisplayName" 
+                ></ComboBox>
 
 
                 <Label Grid.Row="1" Grid.Column="1" Margin="0,2,2,2" FlowDirection="RightToLeft" Grid.ColumnSpan="2">Symbol</Label>
-                
-                             
+
+
                 <StackPanel Grid.Row="1" Grid.Column="6" Orientation="Horizontal" Margin="4.6,5,5,5">
                     <Label VerticalAlignment="Top">Std</Label>
-                    <CheckBox Margin="5" IsChecked="{Binding SelectedUnit.IsStandardUnit, Mode=TwoWay, Source={StaticResource viewModel}}" ></CheckBox>
+                    <CheckBox Margin="5,5,5,0" IsChecked="{Binding UnitVM.IsStandardUnit, Source={StaticResource viewModel}}" Height="16" VerticalAlignment="Top" ></CheckBox>
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Grid.Column="0" Grid.RowSpan="3" Grid.ColumnSpan="7" Orientation="Vertical">
@@ -259,7 +265,7 @@
                             <DataGridCheckBoxColumn Header="TypeChange" Binding="{Binding IsTypeChange}"/>
                             <DataGridCheckBoxColumn Header="Ingredient" Binding="{Binding IsIngredientDependent}"/>
                             <DataGridCheckBoxColumn Header="Auto" Binding="{Binding IsAutomaticCreated}" />
-                            <DataGridCheckBoxColumn Header="OK?" Binding="{Binding IsOK}"/> 
+                            <DataGridCheckBoxColumn Header="OK?" Binding="{Binding IsOK}"/>
 
                             <!--
                             <DataGridTextColumn Header="AffectedIngredientID" Binding="{Binding AffectedIngredientID}"/>
@@ -276,10 +282,10 @@
                     <StatusBarItem>
                         <TextBlock FontSize="10" Text="{Binding UnitVM.SelectedUnitTranslation, Source={StaticResource viewModel}}" ></TextBlock>
                     </StatusBarItem>
-<!--                    <StatusBarItem>
+                    <!--                    <StatusBarItem>
                         <TextBlock FontSize="10" Text="{Binding StatusBarText, Source={StaticResource viewModel}}" ></TextBlock>
                     </StatusBarItem>
--->                    
+-->
                 </StatusBar>
             </Grid>
         </TabItem>
