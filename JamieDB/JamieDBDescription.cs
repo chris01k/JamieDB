@@ -51,15 +51,20 @@
  *                            - NewFoodPlanTemplateCommand implemented
  *                            - DeleteFoodPlanTemplateCommand implemented
  *                            - LoadFoodPlanTemplateCommand implemented
- */
-
-/* Version 0.13 - 2017-03-02: Unit Translations
+ * Version 0.13 - 2017-03-02: Unit Translations
  *                            - Command NewUnitTranslation added
  *                            - UnitTranslation bound to XML
  *                            
  *                            Bugfixes
  *                            - XML-TabItem Units: UnitType Combobox
  *                            - XML-TabItem Ingredients: TargetUnit & Type Combobox
+ */
+
+/* Version 0.14 - 2017-03-xx: 
+ *                            - 
+ *                            
+ *                            Bugfixes
+ *                            - xxx=Getxxx --> Refreshxxx()
  *
  *                      open: - Add Inverse UnitTranslations to Table (l-->ml) => (ml -->l)
  *                            - Edit Inverse UnitTranslations

@@ -21,6 +21,7 @@ namespace JamieDB.ViewModel
         private ObservableCollection<FoodPlanTemplateItem> _FoodPlanTemplateItems;
         private ObservableCollection<Ingredient> _Ingredients;
         private ObservableCollection<IngredientType> _IngredientTypes;
+        private ObservableCollection<UnitTranslation> _ManualUnitTranslationsToSelectedUnit;
         private ObservableCollection<Recipe> _Recipes;
         private ObservableCollection<RecipeIngredient> _RecipeIngredients;
         private DateTime _SelectedFoodPlanDate;
@@ -30,20 +31,16 @@ namespace JamieDB.ViewModel
         private Ingredient _SelectedIngredient;
         private Recipe _SelectedRecipe;
         private RecipeIngredient _SelectedRecipeIngredient;
-        private Unit _SelectedUnit;
-        private UnitTranslation _SelectedUnitTranslation;
         private ObservableCollection<ShoppingListItem> _ShoppingListItems;
         private string _StatusBarText;
-        private ObservableCollection<Unit> _Units;
-        private ObservableCollection<UnitTranslation> _UnitTranslations;
-        private ObservableCollection<UnitType> _UnitTypes;
+
+        private UnitsVMClass _UnitVM;
+
 
         #endregion
-
-        #region Context
+        #region Attributes:Context
         private JamieDBLinqDataContext _context;
         #endregion
-
         #region Attributes: Commands
         private JamieDBViewModelCommand _DeleteFoodPlanItemCommand;
         private JamieDBViewModelCommand _DeleteFoodPlanTemplateCommand;
@@ -51,6 +48,7 @@ namespace JamieDB.ViewModel
         private JamieDBViewModelCommand _DeleteRecipeCommand;
         private JamieDBViewModelCommand _DeleteRecipeIngredientCommand;
         private JamieDBViewModelCommand _DeleteUnitCommand;
+        private JamieDBViewModelCommand _DeleteUnitTranslationCommand;
         private JamieDBViewModelCommand _LoadFoodPlanTemplateCommand;
         private JamieDBViewModelCommand _NewFoodPlanItemCommand;
         private JamieDBViewModelCommand _NewFoodPlanTemplateCommand;
@@ -66,13 +64,14 @@ namespace JamieDB.ViewModel
         public MaintainanceRecipesViewModel()
         {
             _context = new JamieDBLinqDataContext();
+            UnitVM = new UnitsVMClass(_context);
+
 
             DeleteFoodPlanItemCommand = new JamieDBViewModelCommand(CanExecuteDeleteFoodPlanItem, ExecuteDeleteFoodPlanItem);
             DeleteFoodPlanTemplateCommand = new JamieDBViewModelCommand(CanExecuteDeleteFoodPlanTemplate, ExecuteDeleteFoodPlanTemplate);
             DeleteIngredientCommand = new JamieDBViewModelCommand(CanExecuteDeleteIngredient, ExecuteDeleteIngredient);
             DeleteRecipeCommand = new JamieDBViewModelCommand(CanExecuteDeleteRecipe, ExecuteDeleteRecipe);
             DeleteRecipeIngredientCommand = new JamieDBViewModelCommand(CanExecuteDeleteRecipeIngredient, ExecuteDeleteRecipeIngredient);
-            DeleteUnitCommand = new JamieDBViewModelCommand(CanExecuteDeleteUnit, ExecuteDeleteUnit);
 
             LoadFoodPlanTemplateCommand = new JamieDBViewModelCommand(CanExecuteLoadFoodPlanTemplate, ExecuteLoadFoodPlanTemplate);
 
@@ -81,8 +80,6 @@ namespace JamieDB.ViewModel
             NewIngredientCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewIngredient);
             NewRecipeCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewRecipe);
             NewRecipeIngredientCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewRecipeIngredient);
-            NewUnitCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewUnit);
-            NewUnitTranslationCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewUnitTranslation);
             SaveCommand = new JamieDBViewModelCommand(CanExecuteSaveRecipe, ExecuteSaveRecipe);
 
             RefreshRecipes();
@@ -91,11 +88,110 @@ namespace JamieDB.ViewModel
             RefreshFoodPlanItems();
             RefreshShoppingListItems();
 
-            Ingredients = GetIngredients();
-            IngredientTypes = GetIngredientTypes();
-            Units = GetUnits();
-            UnitTranslations = GetUnitTranslations();
-            UnitTypes = GetUnitTypes();
+            RefreshIngredients();
+            RefreshIngredientTypes();
+        }
+        #endregion
+
+        #region Events
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
+        #region Events:EventHandler
+        public void FoodPlanItemChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems != null)
+                {
+                    FoodPlanItem NewFoodPlanItem = (FoodPlanItem)e.NewItems[0];
+
+                    NewFoodPlanItem.DateTime = SelectedFoodPlanDate;
+                    NewFoodPlanItem.Recipe = SelectedRecipe;
+
+                    SelectedFoodPlanItem = NewFoodPlanItem;
+
+                    StatusBarText = "FoodPlanItem Added: "
+                    + ((SelectedFoodPlanItem == null) ? "null" : SelectedFoodPlanItem.Recipe.Name);
+
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    foreach (FoodPlanItem FPI in e.OldItems)
+                    {
+                        _context.FoodPlanItems.DeleteOnSubmit(FPI);
+                        StatusBarText = "FoodPlanItem Deleted";
+                    }
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                StatusBarText = "FoodPlanItem Replaced";
+            }
+        }
+        public void FoodPlanTemplateChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems != null)
+                {
+                    FoodPlanTemplate NewFoodPlanTemplate = (FoodPlanTemplate)e.NewItems[0];
+
+                    //                    NewFoodPlanTemplate.DateTime = SelectedFoodPlanDate;
+
+                    SelectedFoodPlanTemplate = NewFoodPlanTemplate;
+
+                    StatusBarText = "FoodPlanTemplate Added: " + SelectedFoodPlanTemplate.Name;
+
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    foreach (FoodPlanTemplate FPT in e.OldItems)
+                    {
+                        _context.FoodPlanTemplates.DeleteOnSubmit(FPT);
+                        StatusBarText = "FoodPlanTemplate Deleted";
+                    }
+                }
+            }
+        }
+        public void RecipeIngredientChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems != null)
+                {
+                    var NewIngredientChange = (RecipeIngredient)e.NewItems[0];
+
+                    //Fill Foreign Keys
+
+                    NewIngredientChange.RecipeID = SelectedRecipe.Id;
+                    NewIngredientChange.Recipe = SelectedRecipe;
+
+                    NewIngredientChange.IngredientID = SelectedIngredient.Id;
+                    NewIngredientChange.Ingredient = SelectedIngredient;
+
+                    NewIngredientChange.UnitID = UnitVM.SelectedUnit.Id;
+                    NewIngredientChange.Unit = UnitVM.SelectedUnit;
+                    StatusBarText = "RecipeIngredient Added";
+
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    foreach (RecipeIngredient RI in e.OldItems)
+                    {
+                        _context.RecipeIngredients.DeleteOnSubmit(RI);
+                        StatusBarText = "RecipeIngredient Deleted";
+                    }
+                }
+            }
         }
         #endregion
 
@@ -172,6 +268,21 @@ namespace JamieDB.ViewModel
 
             }
         }
+        public ObservableCollection<UnitTranslation> ManualUnitTranslationsToSelectedUnit
+        {
+            get
+            {
+                return _ManualUnitTranslationsToSelectedUnit;
+            }
+
+            set
+            {
+                _ManualUnitTranslationsToSelectedUnit = value;
+                OnPropertyChanged("ManualUnitTranslationsToSelectedUnit");
+
+            }
+        }
+
         public ObservableCollection<Recipe> Recipes
         {
             get
@@ -298,8 +409,8 @@ namespace JamieDB.ViewModel
             {
                 _SelectedRecipe = value;
                 OnPropertyChanged("SelectedRecipe");
-                DeleteRecipeCommand.OnCanExecuteChanged();
                 RefreshRecipeIngredients();
+                DeleteRecipeCommand.OnCanExecuteChanged();
             }
         }
         public RecipeIngredient SelectedRecipeIngredient
@@ -317,33 +428,6 @@ namespace JamieDB.ViewModel
                 StatusBarText = "SelectedRecipeIngredient changed: ";
                 if ((value != null) && (value.Ingredient!=null)) StatusBarText += value.Ingredient.Name;
                 else StatusBarText += "null";
-            }
-        }
-        public Unit SelectedUnit
-        {
-            get
-            {
-                return _SelectedUnit;
-            }
-
-            set
-            {
-                _SelectedUnit = value;
-                OnPropertyChanged("SelectedUnit");
-                UnitTranslations = GetUnitTranslations();
-            }
-        }
-        public UnitTranslation SelectedUnitTranslation
-        {
-            get
-            {
-                return _SelectedUnitTranslation;
-            }
-
-            set
-            {
-                _SelectedUnitTranslation = value;
-                OnPropertyChanged("SelectedUnitTranslation");
             }
         }
         public ObservableCollection<ShoppingListItem> ShoppingListItems
@@ -372,50 +456,23 @@ namespace JamieDB.ViewModel
 
             }
         }
-        public ObservableCollection<Unit> Units
+
+        public UnitsVMClass UnitVM
         {
             get
             {
-                return _Units;
+                return _UnitVM;
             }
 
             set
             {
-                _Units = value;
-                OnPropertyChanged("Units");
-
+                _UnitVM = value;
+                OnPropertyChanged("UnitVM");
             }
         }
-        public ObservableCollection<UnitTranslation> UnitTranslations
-        {
-            get
-            {
-                return _UnitTranslations;
-            }
 
-            set
-            {
-                _UnitTranslations = value;
-                OnPropertyChanged("UnitTranslations");
-
-            }
-        }
-        public ObservableCollection<UnitType> UnitTypes
-        {
-            get
-            {
-                return _UnitTypes;
-            }
-
-            set
-            {
-                _UnitTypes = value;
-                OnPropertyChanged("UnitTypes");
-            }
-        }
 
         #endregion
-
         #region Properties: Commands
         public JamieDBViewModelCommand DeleteFoodPlanItemCommand
         {
@@ -487,6 +544,18 @@ namespace JamieDB.ViewModel
             set
             {
                 _DeleteUnitCommand = value;
+            }
+        }
+        public JamieDBViewModelCommand DeleteUnitTranslationCommand
+        {
+            get
+            {
+                return _DeleteUnitTranslationCommand;
+            }
+
+            set
+            {
+                _DeleteUnitTranslationCommand = value;
             }
         }
         // ---------------------
@@ -602,118 +671,8 @@ namespace JamieDB.ViewModel
         }
         #endregion
 
-        #region Events
-        public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
-
-        #region EventHandler
-        public void FoodPlanItemChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                if (e.NewItems != null)
-                {
-                    FoodPlanItem NewFoodPlanItem = (FoodPlanItem)e.NewItems[0];
-
-                    NewFoodPlanItem.DateTime = SelectedFoodPlanDate;
-                    NewFoodPlanItem.Recipe = SelectedRecipe;
-
-                    SelectedFoodPlanItem = NewFoodPlanItem;
-
-                    StatusBarText = "FoodPlanItem Added: "
-                    +((SelectedFoodPlanItem == null) ? "null" : SelectedFoodPlanItem.Recipe.Name);
-
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                if (e.OldItems != null)
-                {
-                    foreach (FoodPlanItem FPI in e.OldItems)
-                    {
-                        _context.FoodPlanItems.DeleteOnSubmit(FPI);
-                        StatusBarText = "FoodPlanItem Deleted";
-                    }
-                }
-            }
-        }
-        public void FoodPlanTemplateChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                if (e.NewItems != null)
-                {
-                    FoodPlanTemplate NewFoodPlanTemplate = (FoodPlanTemplate)e.NewItems[0];
-
-                    //                    NewFoodPlanTemplate.DateTime = SelectedFoodPlanDate;
-
-                    SelectedFoodPlanTemplate = NewFoodPlanTemplate;
-
-                    StatusBarText = "FoodPlanTemplate Added: " + SelectedFoodPlanTemplate.Name;
-
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                if (e.OldItems != null)
-                {
-                    foreach (FoodPlanTemplate FPT in e.OldItems)
-                    {
-                        _context.FoodPlanTemplates.DeleteOnSubmit(FPT);
-                        StatusBarText = "FoodPlanTemplate Deleted";
-                    }
-                }
-            }
-        }
-        public void RecipeIngredientChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                if (e.NewItems != null)
-                {
-                    var NewIngredientChange = (RecipeIngredient)e.NewItems[0];
-
-                    //Fill Foreign Keys
-
-                    NewIngredientChange.RecipeID = SelectedRecipe.Id;
-                    NewIngredientChange.Recipe = SelectedRecipe;
-
-                    NewIngredientChange.IngredientID = SelectedIngredient.Id;
-                    NewIngredientChange.Ingredient = SelectedIngredient;
-
-                    NewIngredientChange.UnitID = SelectedUnit.Id;
-                    NewIngredientChange.Unit = SelectedUnit;
-                    StatusBarText = "RecipeIngredient Added";
-
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                if (e.OldItems != null)
-                {
-                    foreach (RecipeIngredient RI in e.OldItems)
-                    {
-                        _context.RecipeIngredients.DeleteOnSubmit(RI);
-                        StatusBarText = "RecipeIngredient Deleted";
-                    }
-                }
-            }
-       }
-        #endregion
-
         #region Methods
-        private Unit DefaultUnit()
-        {
-            Unit result;
-
-            if (SelectedUnit == null)
-            {
-                result = Units.FirstOrDefault();
-            }
-            else result = SelectedUnit;
-
-            return result;
-        }
+        
         private Ingredient DefaultIngredient()
         {
             Ingredient result;
@@ -726,43 +685,10 @@ namespace JamieDB.ViewModel
 
             return result;
         }
-        private ObservableCollection<Ingredient> GetIngredients()
+        private ObservableCollection<UnitTranslation> GetUnitTranslationsInverse()
         {
-            var result = _context.Ingredients.OrderBy(i => i.Name);
-            var ReturnList = new ObservableCollection<Ingredient>(result);
-
-            SelectedIngredient = result.FirstOrDefault();
-
-            return ReturnList;
-        }
-        private ObservableCollection<IngredientType> GetIngredientTypes()
-        {
-            var result = _context.IngredientTypes.OrderBy(i => i.Name);
-            var ReturnList = new ObservableCollection<IngredientType>(result);
-
-            return ReturnList;
-        }
-        private ObservableCollection<Unit> GetUnits()
-        {
-            var result = _context.Units.OrderBy(u => u.Symbol);
-            var ReturnList = new ObservableCollection<Unit>(result);
-
-            SelectedUnit = result.FirstOrDefault();
-
-            return ReturnList;
-        }
-        private ObservableCollection<UnitTranslation> GetUnitTranslations()
-        {
-            var result = _context.UnitTranslations.Where(ut => ut.BaseUnitID == SelectedUnit.Id).OrderBy(ut => ut.Unit1.Symbol);
+            var result = _context.UnitTranslations.Where(ut => ut.TargetUnitID == UnitVM.SelectedUnit.Id).OrderBy(ut => ut.Unit.Symbol);
             var ReturnList = new ObservableCollection<UnitTranslation>(result);
-
-            SelectedUnitTranslation = result.FirstOrDefault();
-            return ReturnList;
-        }
-        private ObservableCollection<UnitType> GetUnitTypes()
-        {
-            var result = _context.UnitTypes.OrderBy(u => u.Name);
-            var ReturnList = new ObservableCollection<UnitType>(result);
 
             return ReturnList;
         }
@@ -821,7 +747,20 @@ namespace JamieDB.ViewModel
         }
         private void RefreshIngredients()
         {
-            Ingredients = GetIngredients();
+            var result = _context.Ingredients.OrderBy(i => i.Name);
+            Ingredients = new ObservableCollection<Ingredient>(result);
+
+            SelectedIngredient = result.FirstOrDefault();
+        }
+        private void RefreshIngredientTypes()
+        {
+            var result = _context.IngredientTypes.OrderBy(i => i.Name);
+            IngredientTypes = new ObservableCollection<IngredientType>(result);
+        }
+        private void RefreshManualUnitTranslations()
+        {
+            var result = _context.UnitTranslations.Where(i => i.Unit == UnitVM.SelectedUnit);
+            ManualUnitTranslationsToSelectedUnit = new ObservableCollection<UnitTranslation>(result);
         }
         private void RefreshRecipeIngredients()
         {
@@ -829,6 +768,7 @@ namespace JamieDB.ViewModel
             {
                 RecipeIngredients = new ObservableCollection<RecipeIngredient>(_context.RecipeIngredients.Where(ri => ri.RecipeID == SelectedRecipe.Id));
                 RecipeIngredients.CollectionChanged += new NotifyCollectionChangedEventHandler(RecipeIngredientChanged);
+                
 
                 if (SelectedRecipeIngredient == null)
                 {
@@ -856,37 +796,44 @@ namespace JamieDB.ViewModel
         }
         private void RefreshShoppingListItems()
         {
+
+            ShoppingListItems = new ObservableCollection<ShoppingListItem>();
+            var SelectedFoodPlanItems = _context.FoodPlanItems.Where(fpi => fpi.DateTime > DateTime.Now);
+            
+
+            foreach (var fpi in SelectedFoodPlanItems)
+            {
+                //var RelatedRecipe = fpi.Recipe;
+                var RelatedRecipeIngredients = _context.RecipeIngredients.Where(ri => ri.RecipeID == fpi.RecipeID);
+                
+                foreach (var rri in RelatedRecipeIngredients)
+                {
+                    ShoppingListItems.Add(new ShoppingListItem
+                    {
+                        FoodPlanDate = fpi.DateTime,
+                        Ingredient = rri.Ingredient.Name,
+                        Quantity = (fpi.PortionCount/fpi.Recipe.PortionQuantity) * rri.Quantity,
+                        Unit = rri.Unit.Symbol,
+                        Recipe = rri.Recipe.Name
+                    });
+                }
+            }
+
+            ShoppingListItems.OrderBy(sli => sli.Ingredient);
+
+
             var result = _context.ShoppingListItems
                                  .OrderBy(sli => sli.Ingredient)
                                  .ThenBy(sli=>sli.FoodPlanDate.Date)
                                  .ThenBy(sli=>sli.FoodPlanDate.TimeOfDay);
 
-            ShoppingListItems = new ObservableCollection<ShoppingListItem>(result);
 
-        }
-        private void RefreshUnits()
-        {
-            Units = GetUnits();
+            
+//            ShoppingListItems = new ObservableCollection<ShoppingListItem>(result);
+
         }
         #endregion
-        #region Command Methods
-
-        #region Command Methods: Generic
-        public bool CanAlwaysExecute(object o)
-        {
-            return true;
-        }
-        /*      public bool CanExecute<NewCommand>(object o)
-                {
-
-                }
-
-                public void Execute<NewCommand>(object o)
-                {
-
-                }
-        */
-        #endregion
+        #region Methods:Command Methods
         public bool CanExecuteDeleteFoodPlanItem(object o)
         {
             return (SelectedFoodPlanItem != null);
@@ -909,7 +856,11 @@ namespace JamieDB.ViewModel
         }
         public bool CanExecuteDeleteUnit(object o)
         {
-            return (SelectedUnit != null);
+            return (UnitVM.SelectedUnit != null);
+        }
+        public bool CanExecuteDeleteUnitTranslation(object o)
+        {
+            return (UnitVM.SelectedUnitTranslation != null);
         }
         public bool CanExecuteLoadFoodPlanTemplate(object o)
         {
@@ -1111,40 +1062,8 @@ namespace JamieDB.ViewModel
             }
 
         }
-        public void ExecuteDeleteUnit(object o)
+        public void ExecuteDeleteUnitTranslation(object o)
         {
-            string MessageText;
-
-            if (SelectedUnit != null)
-            {
-                var rIndex = Units.IndexOf(SelectedUnit);
-                if (rIndex == Units.Count() - 1) rIndex -= 1;
-                MessageText = "Unit " + SelectedUnit.Symbol + " deleted";
-
-                _context.Units.DeleteOnSubmit(SelectedUnit);
-
-                // foreach () in Detailtable --> DeleteOnSubmit DetailEntry
-
-                try
-                {
-                    _context.SubmitChanges();
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.ToString(), "Exception Handling");
-                    // Make some adjustments.
-                    // ...
-                    // Try again.
-                    //_context.SubmitChanges();
-                    MessageText = "Unit " + SelectedUnit.Symbol + " NOT deleted";
-                }
-
-                RefreshUnits();
-                if (rIndex >= 0) SelectedUnit = Units[rIndex];
-                else SelectedUnit = null;
-                StatusBarText = MessageText;
-            }
-
         }
         public void ExecuteSaveRecipe(object o)
         {
@@ -1360,7 +1279,7 @@ namespace JamieDB.ViewModel
             Ingredient NewIngredient = new Ingredient();
 
             NewIngredient.Name = "<Ingredient>";
-            NewIngredient.TargetUnitID = SelectedUnit.Id;
+            NewIngredient.TargetUnitID = UnitVM.SelectedUnit.Id;
             NewIngredient.IngredientType = IngredientTypes.FirstOrDefault();
 
             _context.Ingredients.InsertOnSubmit(NewIngredient);
@@ -1377,7 +1296,7 @@ namespace JamieDB.ViewModel
                 // Try again.
                 //_context.SubmitChanges();
             }
-            Ingredients = GetIngredients();
+            RefreshIngredients();
             SelectedIngredient = NewIngredient;
             StatusBarText = "Ingredient Added";
         }
@@ -1409,7 +1328,7 @@ namespace JamieDB.ViewModel
             RecipeIngredient NewRecipeIngredient = new RecipeIngredient();
 
             NewRecipeIngredient.Recipe = SelectedRecipe;
-            NewRecipeIngredient.Unit = DefaultUnit();
+            NewRecipeIngredient.Unit = UnitVM.DefaultUnit();
             NewRecipeIngredient.Ingredient = DefaultIngredient();
 
             _context.RecipeIngredients.InsertOnSubmit(NewRecipeIngredient);
@@ -1428,562 +1347,520 @@ namespace JamieDB.ViewModel
             }
             StatusBarText = "RecipeIngredient Added";
         }
-        public void ExecuteNewUnit(object o)
+        #endregion
+        #region Methods: Generic Command Methods
+        public bool CanAlwaysExecute(object o)
         {
-            Unit NewUnit = new Unit();
-
-            NewUnit.Name = "<Unit>: New " + DateTime.Now.ToString();
-            NewUnit.Symbol = "new";
-            NewUnit.TypeID = 1000004;
-
-            _context.Units.InsertOnSubmit(NewUnit);
-
-            try
-            {
-                _context.SubmitChanges();
-
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString(), "Exception Handling");
-                // Make some adjustments.
-                // ...
-                // Try again.
-                //_context.SubmitChanges();
-            }
-            Units = GetUnits();
-            SelectedUnit = NewUnit;
-            StatusBarText = "Unit Added";
+            return true;
         }
-        public void ExecuteNewUnitTranslation(object o)
-        {
-            UnitTranslation NewUnitTranslation = new UnitTranslation();
+        /*      public bool CanExecute<NewCommand>(object o)
+                {
 
-            NewUnitTranslation.Unit = SelectedUnit;
-            NewUnitTranslation.Unit1 = SelectedUnit;
-            NewUnitTranslation.Factor = 1.0;
-            NewUnitTranslation.IsAutomaticCreated = false;
-            NewUnitTranslation.IsIngredientDependent = false;
-            NewUnitTranslation.IsTypeChange = false;
-            NewUnitTranslation.IsOK = true;
+                }
 
-            _context.UnitTranslations.InsertOnSubmit(NewUnitTranslation);
+                public void Execute<NewCommand>(object o)
+                {
 
-            try
-            {
-                _context.SubmitChanges();
-
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString(), "Exception Handling");
-                // Make some adjustments.
-                // ...
-                // Try again.
-                //_context.SubmitChanges();
-            }
-            UnitTranslations = GetUnitTranslations();
-            SelectedUnitTranslation = NewUnitTranslation;
-            StatusBarText = "UnitTranslation Added";
-        }
+                }
+        */
         #endregion
     }
 
-/*
-    [Flags] public enum TranslationType
-                        { IsTypeChange = 0x1, IsIngredientDependent = 0x2 }
+    /*
+        [Flags] public enum TranslationType
+                            { IsTypeChange = 0x1, IsIngredientDependent = 0x2 }
 
-    public class UnitTranslation : IEquatable<UnitTranslation>
-    {
-        //Variables
-        private long? _ID;
-        private Ingredient _AffectedIngredient;
-        private Unit _BaseUnit;
-        private IngredientType _IngredientType;
-        private Unit _TargetUnit;
-        private double _TranslationFactor;
-        private TranslationType _TranslationFlag;
-        private ListEntryStatus _TranslationStatus;
-
-        //Constructors
-        public UnitTranslation()
+        public class UnitTranslation : IEquatable<UnitTranslation>
         {
-            TranslationFlag = (TranslationType)0;
-            TranslationStatus = ListEntryStatus.IsOK;
-        }
-        public UnitTranslation(Unit Base, Unit Target, double TranslationFactor, UnitTranslation Template)
-        {
-            // auf der Basis einer Vorlage (Ingredient und TranslationFlag werden übernommen),
+            //Variables
+            private long? _ID;
+            private Ingredient _AffectedIngredient;
+            private Unit _BaseUnit;
+            private IngredientType _IngredientType;
+            private Unit _TargetUnit;
+            private double _TranslationFactor;
+            private TranslationType _TranslationFlag;
+            private ListEntryStatus _TranslationStatus;
 
-            _BaseUnit = Base;
-            _TargetUnit = Target;
-            _TranslationFactor = TranslationFactor;
-            _AffectedIngredient = Template.AffectedIngredient;
-            _TranslationFlag = Template.TranslationFlag;
-            _TranslationStatus = ListEntryStatus.IsOK;
-
-        }
-        public UnitTranslation(Unit Base, Unit Target, double TranslationFactor, Ingredient AffectedIngredient,
-                               ListEntryStatus Status)
-        {
-            _BaseUnit = Base;
-            _TargetUnit = Target;
-            _TranslationFactor = TranslationFactor;
-            _AffectedIngredient = AffectedIngredient;
-            _TranslationFlag = (TranslationType)0;
-            if (AffectedIngredient != null) _TranslationFlag = TranslationType.IsIngredientDependent;
-            if (Base.Type != Target.Type) _TranslationFlag |= TranslationType.IsTypeChange;
-            _TranslationStatus = Status;
-        }
-        public UnitTranslation(string BaseUnitSymbol, string TargetUnitSymbol, double TranslationFactor, TranslationType TType, IngredientType IType, UnitSet UnitSetData)
-        {
-            _BaseUnit = UnitSetData.SelectItem(BaseUnitSymbol);
-            _IngredientType = IType;
-            _TargetUnit = UnitSetData.SelectItem(TargetUnitSymbol);
-            _TranslationFactor = TranslationFactor;
-            _TranslationFlag = TType;
-            _TranslationStatus = ListEntryStatus.IsOK;
-            _UnitSetData = UnitSetData;
-        }
-
-
-        //Methods
-        public bool Equals(UnitTranslation ItemToCompare)
-        {
-            if (ItemToCompare == null) return false;
-            return _ID.Equals(ItemToCompare._ID) || EqualKey(ItemToCompare);
-        }
-        public bool EqualKey(UnitTranslation ItemToCompare)
-        {
-            bool ReturnValue;
-
-
-            ReturnValue = TranslationFlag.Equals(ItemToCompare.TranslationFlag);
-            if (TranslationFlag == (TranslationType)0)
+            //Constructors
+            public UnitTranslation()
             {
-                ReturnValue &= (BaseUnit.Equals(ItemToCompare.BaseUnit) && TargetUnit.Equals(ItemToCompare.TargetUnit)) ||
-                               (BaseUnit.Equals(ItemToCompare.TargetUnit) && TargetUnit.Equals(ItemToCompare.BaseUnit));
+                TranslationFlag = (TranslationType)0;
+                TranslationStatus = ListEntryStatus.IsOK;
+            }
+            public UnitTranslation(Unit Base, Unit Target, double TranslationFactor, UnitTranslation Template)
+            {
+                // auf der Basis einer Vorlage (Ingredient und TranslationFlag werden übernommen),
+
+                _BaseUnit = Base;
+                _TargetUnit = Target;
+                _TranslationFactor = TranslationFactor;
+                _AffectedIngredient = Template.AffectedIngredient;
+                _TranslationFlag = Template.TranslationFlag;
+                _TranslationStatus = ListEntryStatus.IsOK;
+
+            }
+            public UnitTranslation(Unit Base, Unit Target, double TranslationFactor, Ingredient AffectedIngredient,
+                                   ListEntryStatus Status)
+            {
+                _BaseUnit = Base;
+                _TargetUnit = Target;
+                _TranslationFactor = TranslationFactor;
+                _AffectedIngredient = AffectedIngredient;
+                _TranslationFlag = (TranslationType)0;
+                if (AffectedIngredient != null) _TranslationFlag = TranslationType.IsIngredientDependent;
+                if (Base.Type != Target.Type) _TranslationFlag |= TranslationType.IsTypeChange;
+                _TranslationStatus = Status;
+            }
+            public UnitTranslation(string BaseUnitSymbol, string TargetUnitSymbol, double TranslationFactor, TranslationType TType, IngredientType IType, UnitSet UnitSetData)
+            {
+                _BaseUnit = UnitSetData.SelectItem(BaseUnitSymbol);
+                _IngredientType = IType;
+                _TargetUnit = UnitSetData.SelectItem(TargetUnitSymbol);
+                _TranslationFactor = TranslationFactor;
+                _TranslationFlag = TType;
+                _TranslationStatus = ListEntryStatus.IsOK;
+                _UnitSetData = UnitSetData;
             }
 
-            if ((AffectedIngredient != null) && TranslationFlag.HasFlag(TranslationType.IsIngredientDependent))
+
+            //Methods
+            public bool Equals(UnitTranslation ItemToCompare)
             {
-                ReturnValue &= AffectedIngredient.Equals(ItemToCompare.AffectedIngredient);
+                if (ItemToCompare == null) return false;
+                return _ID.Equals(ItemToCompare._ID) || EqualKey(ItemToCompare);
+            }
+            public bool EqualKey(UnitTranslation ItemToCompare)
+            {
+                bool ReturnValue;
+
+
+                ReturnValue = TranslationFlag.Equals(ItemToCompare.TranslationFlag);
+                if (TranslationFlag == (TranslationType)0)
+                {
+                    ReturnValue &= (BaseUnit.Equals(ItemToCompare.BaseUnit) && TargetUnit.Equals(ItemToCompare.TargetUnit)) ||
+                                   (BaseUnit.Equals(ItemToCompare.TargetUnit) && TargetUnit.Equals(ItemToCompare.BaseUnit));
+                }
+
+                if ((AffectedIngredient != null) && TranslationFlag.HasFlag(TranslationType.IsIngredientDependent))
+                {
+                    ReturnValue &= AffectedIngredient.Equals(ItemToCompare.AffectedIngredient);
+                }
+
+                if (TranslationFlag.HasFlag(TranslationType.IsTypeChange) && (!TranslationFlag.HasFlag(TranslationType.IsIngredientDependent)))
+                {
+                    ReturnValue &= (IngredientType == ItemToCompare.IngredientType);
+                }
+
+                if ((TranslationFlag.HasFlag(TranslationType.IsIngredientDependent)) && (AffectedIngredient != null) &&
+                    (ItemToCompare.AffectedIngredient != null)) ReturnValue &= AffectedIngredient.Equals(ItemToCompare.AffectedIngredient);
+
+
+                return ReturnValue;
+            }
+            public UnitTranslation Inverse()
+            {
+                UnitTranslation ReturnItem;
+
+                ReturnItem = new Model.UnitTranslation();
+
+                ReturnItem.ID = 0;
+                ReturnItem.BaseUnit = this.TargetUnit;
+                ReturnItem.TargetUnit = this.BaseUnit;
+                ReturnItem.TranslationFactor = (1 / this.TranslationFactor);
+
+                return ReturnItem;
+            }
+            public void SetDataReference(IngredientSet IngredientSetData, UnitSet UnitSetData)
+            {
+                _IngredientSetData = IngredientSetData;
+                _UnitSetData = UnitSetData;
+            }
+            public override string ToString()
+            {
+                string ReturnString = (TranslationStatus == ListEntryStatus.IsNotConfirmed ? "invalid: " : "  valid: ");
+                ReturnString += string.Format("{0,6}-UnitTranslation: {1,5} =  {2,15:F6} {3,-5} {4}\n   - IngredientType:{5} \n    {6}", ID, BaseUnit, TranslationFactor, TargetUnit,
+                                      (TranslationFlag == 0 ? "NoTypeChange, IngredientIndepedant" : string.Format("{0}", TranslationFlag)), IngredientType, AffectedIngredient);
+                return ReturnString;
             }
 
-            if (TranslationFlag.HasFlag(TranslationType.IsTypeChange) && (!TranslationFlag.HasFlag(TranslationType.IsIngredientDependent)))
+        }
+
+        public class UnitTranslationSet : ObservableCollection<UnitTranslation>
+        {
+
+            //Methods
+            /* AddInactiveTranslation(BaseUnit, TargetUnit, Ingredient)
+            * - Creates UnitTranslation Base->Target for Ingredient to be verified.
+            * 
+            * AddInactiveTranslation (BaseUnit, TargetUnit, Ingredient.Type)
+            * - Creates UnitTranslation Base->Target for Ingredient.Type to be verified.
+            * 
+            * AddInactiveranslation (BaseUnit, TargetUnit, Ingredient.Type)
+            * - Creates UnitTranslation Base->Target for Ingredient.Type to be verified.
+
+
+            public void AddInactiveItem(Unit Base, Unit Target)
             {
-                ReturnValue &= (IngredientType == ItemToCompare.IngredientType);
+                if (Base.Type == Target.Type)
+                {
+                    UnitTranslation NewUnitTranslation = new UnitTranslation();
+                    NewUnitTranslation.BaseUnit = Base;
+                    NewUnitTranslation.TargetUnit = Target;
+                    NewUnitTranslation.AffectedIngredient = null;
+                    NewUnitTranslation.TranslationFactor = 0;
+                    NewUnitTranslation.TranslationFlag = (TranslationType)0;
+                    NewUnitTranslation.TranslationStatus = ListEntryStatus.IsNotConfirmed;
+                    AddItem(NewUnitTranslation);
+                }
             }
 
-            if ((TranslationFlag.HasFlag(TranslationType.IsIngredientDependent)) && (AffectedIngredient != null) &&
-                (ItemToCompare.AffectedIngredient != null)) ReturnValue &= AffectedIngredient.Equals(ItemToCompare.AffectedIngredient);
-
-
-            return ReturnValue;
-        }
-        public UnitTranslation Inverse()
-        {
-            UnitTranslation ReturnItem;
-
-            ReturnItem = new Model.UnitTranslation();
-
-            ReturnItem.ID = 0;
-            ReturnItem.BaseUnit = this.TargetUnit;
-            ReturnItem.TargetUnit = this.BaseUnit;
-            ReturnItem.TranslationFactor = (1 / this.TranslationFactor);
-
-            return ReturnItem;
-        }
-        public void SetDataReference(IngredientSet IngredientSetData, UnitSet UnitSetData)
-        {
-            _IngredientSetData = IngredientSetData;
-            _UnitSetData = UnitSetData;
-        }
-        public override string ToString()
-        {
-            string ReturnString = (TranslationStatus == ListEntryStatus.IsNotConfirmed ? "invalid: " : "  valid: ");
-            ReturnString += string.Format("{0,6}-UnitTranslation: {1,5} =  {2,15:F6} {3,-5} {4}\n   - IngredientType:{5} \n    {6}", ID, BaseUnit, TranslationFactor, TargetUnit,
-                                  (TranslationFlag == 0 ? "NoTypeChange, IngredientIndepedant" : string.Format("{0}", TranslationFlag)), IngredientType, AffectedIngredient);
-            return ReturnString;
-        }
-
-    }
-
-    public class UnitTranslationSet : ObservableCollection<UnitTranslation>
-    {
-
-        //Methods
-        /* AddInactiveTranslation(BaseUnit, TargetUnit, Ingredient)
-        * - Creates UnitTranslation Base->Target for Ingredient to be verified.
-        * 
-        * AddInactiveTranslation (BaseUnit, TargetUnit, Ingredient.Type)
-        * - Creates UnitTranslation Base->Target for Ingredient.Type to be verified.
-        * 
-        * AddInactiveranslation (BaseUnit, TargetUnit, Ingredient.Type)
-        * - Creates UnitTranslation Base->Target for Ingredient.Type to be verified.
-        
-
-        public void AddInactiveItem(Unit Base, Unit Target)
-        {
-            if (Base.Type == Target.Type)
+            public void AddInactiveItem(Unit Base, Unit Target, Ingredient AffectedIngredient)
+            {
+                UnitTranslation NewUnitTranslation = new UnitTranslation();
+                NewUnitTranslation.BaseUnit = Base;
+                NewUnitTranslation.TargetUnit = Target;
+                NewUnitTranslation.AffectedIngredient = AffectedIngredient;
+                NewUnitTranslation.IngredientType = AffectedIngredient.Type;
+                NewUnitTranslation.TranslationFactor = 0;
+                NewUnitTranslation.TranslationFlag = (TranslationType.IsIngredientDependent | TranslationType.IsTypeChange);
+                NewUnitTranslation.TranslationStatus = ListEntryStatus.IsNotConfirmed;
+                AddItem(NewUnitTranslation);
+            }
+            public void AddInactiveItem(Unit Base, Unit Target, IngredientType IType)
             {
                 UnitTranslation NewUnitTranslation = new UnitTranslation();
                 NewUnitTranslation.BaseUnit = Base;
                 NewUnitTranslation.TargetUnit = Target;
                 NewUnitTranslation.AffectedIngredient = null;
+                NewUnitTranslation.IngredientType = IType;
                 NewUnitTranslation.TranslationFactor = 0;
-                NewUnitTranslation.TranslationFlag = (TranslationType)0;
+                NewUnitTranslation.TranslationFlag = TranslationType.IsTypeChange;
                 NewUnitTranslation.TranslationStatus = ListEntryStatus.IsNotConfirmed;
                 AddItem(NewUnitTranslation);
             }
-        }
 
-        public void AddInactiveItem(Unit Base, Unit Target, Ingredient AffectedIngredient)
-        {
-            UnitTranslation NewUnitTranslation = new UnitTranslation();
-            NewUnitTranslation.BaseUnit = Base;
-            NewUnitTranslation.TargetUnit = Target;
-            NewUnitTranslation.AffectedIngredient = AffectedIngredient;
-            NewUnitTranslation.IngredientType = AffectedIngredient.Type;
-            NewUnitTranslation.TranslationFactor = 0;
-            NewUnitTranslation.TranslationFlag = (TranslationType.IsIngredientDependent | TranslationType.IsTypeChange);
-            NewUnitTranslation.TranslationStatus = ListEntryStatus.IsNotConfirmed;
-            AddItem(NewUnitTranslation);
-        }
-        public void AddInactiveItem(Unit Base, Unit Target, IngredientType IType)
-        {
-            UnitTranslation NewUnitTranslation = new UnitTranslation();
-            NewUnitTranslation.BaseUnit = Base;
-            NewUnitTranslation.TargetUnit = Target;
-            NewUnitTranslation.AffectedIngredient = null;
-            NewUnitTranslation.IngredientType = IType;
-            NewUnitTranslation.TranslationFactor = 0;
-            NewUnitTranslation.TranslationFlag = TranslationType.IsTypeChange;
-            NewUnitTranslation.TranslationStatus = ListEntryStatus.IsNotConfirmed;
-            AddItem(NewUnitTranslation);
-        }
-
-        public bool AddItem(UnitTranslation ItemToBeAdded)
-        {
-            bool ReturnValue = true;
-
-            if (Count == 0) ItemToBeAdded.SetDataReference(IngredientSetData, UnitSetData);
-
-            //Fälle können reduziert werden
-
-            //ItemToBeAdded und der Kehrwert nicht vorhanden
-            if (!Contains(ItemToBeAdded))
+            public bool AddItem(UnitTranslation ItemToBeAdded)
             {
-                if ((ItemToBeAdded.TranslationFlag & TranslationType.IsIngredientDependent) == TranslationType.IsIngredientDependent)
-                // von Zutat ABHÄNGIG   
+                bool ReturnValue = true;
 
+                if (Count == 0) ItemToBeAdded.SetDataReference(IngredientSetData, UnitSetData);
+
+                //Fälle können reduziert werden
+
+                //ItemToBeAdded und der Kehrwert nicht vorhanden
+                if (!Contains(ItemToBeAdded))
                 {
-                    if ((ItemToBeAdded.TranslationFlag & TranslationType.IsTypeChange) == TranslationType.IsTypeChange)
-                    // Fall 3: von Zutat ABHÄNGIG - MIT Wechsel des UnitTyps
+                    if ((ItemToBeAdded.TranslationFlag & TranslationType.IsIngredientDependent) == TranslationType.IsIngredientDependent)
+                    // von Zutat ABHÄNGIG   
+
                     {
-                    }
-                    else
-                    // Fall 2: von Zutat ABHÄNGIG - OHNE Wechsel des UnitTyps
-                    {
-                        //trow Exception --> Fall 2 kommt nicht vor
+                        if ((ItemToBeAdded.TranslationFlag & TranslationType.IsTypeChange) == TranslationType.IsTypeChange)
+                        // Fall 3: von Zutat ABHÄNGIG - MIT Wechsel des UnitTyps
+                        {
+                        }
+                        else
+                        // Fall 2: von Zutat ABHÄNGIG - OHNE Wechsel des UnitTyps
+                        {
+                            //trow Exception --> Fall 2 kommt nicht vor
+                        }
+
                     }
 
+                    else
+                    // von Zutat UNABHÄNGIG
+                    {
+                        if ((ItemToBeAdded.TranslationFlag & TranslationType.IsTypeChange) == TranslationType.IsTypeChange)
+                        // Fall 1: von Zutat UNABHÄNGIG - MIT Wechsel des UnitTyps
+                        {
+                        }
+                        else
+                        // Fall 0: von Zutat UNABHÄNGIG - OHNE Wechsel des UnitTyps
+                        {
+                            AddAllItemsWithSameType(ItemToBeAdded);
+                            _SelectedItem = ItemToBeAdded;
+                        }
+
+                    }
+                    ItemToBeAdded.ID = ++_MaxID;
+                    Add(ItemToBeAdded);
                 }
 
-                else
-                // von Zutat UNABHÄNGIG
-                {
-                    if ((ItemToBeAdded.TranslationFlag & TranslationType.IsTypeChange) == TranslationType.IsTypeChange)
-                    // Fall 1: von Zutat UNABHÄNGIG - MIT Wechsel des UnitTyps
-                    {
-                    }
-                    else
-                    // Fall 0: von Zutat UNABHÄNGIG - OHNE Wechsel des UnitTyps
-                    {
-                        AddAllItemsWithSameType(ItemToBeAdded);
-                        _SelectedItem = ItemToBeAdded;
-                    }
+                else ReturnValue = false;
 
-                }
-                ItemToBeAdded.ID = ++_MaxID;
-                Add(ItemToBeAdded);
+                return ReturnValue;
             }
-
-            else ReturnValue = false;
-
-            return ReturnValue;
-        }
-        public void AddAllItemsWithSameType(UnitTranslation ItemToBeAdded)
-        {
-            UnitTranslation GeneratedUnitTranslation;
-            UnitTranslation HelpingUnitTranslation;
-
-            if (ItemToBeAdded.BaseUnit.Type == ItemToBeAdded.TargetUnit.Type)
+            public void AddAllItemsWithSameType(UnitTranslation ItemToBeAdded)
             {
-                // TranslationTobeAdded.BaseUnit -> Different Unit with same Type
-                var ImplicitTranslations = (from u in UnitSetData
-                                            where (u.Type == ItemToBeAdded.BaseUnit.Type) && (u != ItemToBeAdded.BaseUnit)
+                UnitTranslation GeneratedUnitTranslation;
+                UnitTranslation HelpingUnitTranslation;
+
+                if (ItemToBeAdded.BaseUnit.Type == ItemToBeAdded.TargetUnit.Type)
+                {
+                    // TranslationTobeAdded.BaseUnit -> Different Unit with same Type
+                    var ImplicitTranslations = (from u in UnitSetData
+                                                where (u.Type == ItemToBeAdded.BaseUnit.Type) && (u != ItemToBeAdded.BaseUnit)
+                                                select new { Target = (Unit)u }).ToList();
+
+                    foreach (var i in ImplicitTranslations)
+                    {
+                        // Factor(ItemToBeAdded.Base, i.Target) 
+                        //       = ItemToBeAdded.Factor * Factor(ItemToBeAdded.Target, i.Target)
+                        //       = ItemToBeAdded.Factor * HelpingUnitTranslation.Factor
+                        //       --> HelpingUnitTranslation = ItemToBeAdded.Target --> i.Target
+
+                        HelpingUnitTranslation = GetTranslation(ItemToBeAdded.TargetUnit, i.Target);
+                        if (HelpingUnitTranslation != null)
+                        {
+                            GeneratedUnitTranslation = new UnitTranslation(ItemToBeAdded.BaseUnit, i.Target,
+                                                              ItemToBeAdded.TranslationFactor * HelpingUnitTranslation.TranslationFactor,
+                                                              ItemToBeAdded);
+                            GeneratedUnitTranslation.ID = ++_MaxID;
+                            Add(GeneratedUnitTranslation);
+                        }
+
+
+                    }
+                    // and TranslationTobeAdded.TargetUnit -> Different Unit with same Type
+                    ImplicitTranslations = (from u in UnitSetData
+                                            where (u.Type == ItemToBeAdded.TargetUnit.Type) && (u != ItemToBeAdded.TargetUnit)
                                             select new { Target = (Unit)u }).ToList();
 
-                foreach (var i in ImplicitTranslations)
-                {
-                    // Factor(ItemToBeAdded.Base, i.Target) 
-                    //       = ItemToBeAdded.Factor * Factor(ItemToBeAdded.Target, i.Target)
-                    //       = ItemToBeAdded.Factor * HelpingUnitTranslation.Factor
-                    //       --> HelpingUnitTranslation = ItemToBeAdded.Target --> i.Target
-
-                    HelpingUnitTranslation = GetTranslation(ItemToBeAdded.TargetUnit, i.Target);
-                    if (HelpingUnitTranslation != null)
+                    foreach (var i in ImplicitTranslations)
                     {
-                        GeneratedUnitTranslation = new UnitTranslation(ItemToBeAdded.BaseUnit, i.Target,
-                                                          ItemToBeAdded.TranslationFactor * HelpingUnitTranslation.TranslationFactor,
-                                                          ItemToBeAdded);
-                        GeneratedUnitTranslation.ID = ++_MaxID;
-                        Add(GeneratedUnitTranslation);
+                        // Factor(ItemToBeAdded.Target, i.Target) 
+                        //       =   Factor(ItemToBeAdded.Target, ItemToBeAdded.Base) * Factor(ItemToBeAdded.Base, i.Target) 
+                        //       = 1/Factor(ItemToBeAdded.Base, ItemToBeAdded.Target) * Factor(ItemToBeAdded.Base, i.Target) 
+                        //       =   Factor(ItemToBeAdded.Base, i.Target) / Factor(ItemToBeAdded.Base, ItemToBeAdded.Target)
+                        //       =   HelpingUnitTranslation.Factor / ItemToBeAdded.Factor
+                        //       --> HelpingUnitTranslation = ItemToBeAdded.Base --> i.Target
+
+                        HelpingUnitTranslation = GetTranslation(ItemToBeAdded.BaseUnit, i.Target);
+                        if (HelpingUnitTranslation != null)
+                        {
+                            GeneratedUnitTranslation = new UnitTranslation(ItemToBeAdded.TargetUnit, i.Target,
+                                                               HelpingUnitTranslation.TranslationFactor / ItemToBeAdded.TranslationFactor,
+                                                               ItemToBeAdded);
+                            GeneratedUnitTranslation.ID = ++_MaxID;
+                            Add(GeneratedUnitTranslation);
+                        }
+
                     }
 
 
                 }
-                // and TranslationTobeAdded.TargetUnit -> Different Unit with same Type
-                ImplicitTranslations = (from u in UnitSetData
-                                        where (u.Type == ItemToBeAdded.TargetUnit.Type) && (u != ItemToBeAdded.TargetUnit)
-                                        select new { Target = (Unit)u }).ToList();
+            }
+            public void DeleteSelectedItem()
+            {
+                int NewSelectedIndex;
 
-                foreach (var i in ImplicitTranslations)
+                if ((Count == 0) || (SelectedItem == null)) return;
+
+                if (Count > 1)
                 {
-                    // Factor(ItemToBeAdded.Target, i.Target) 
-                    //       =   Factor(ItemToBeAdded.Target, ItemToBeAdded.Base) * Factor(ItemToBeAdded.Base, i.Target) 
-                    //       = 1/Factor(ItemToBeAdded.Base, ItemToBeAdded.Target) * Factor(ItemToBeAdded.Base, i.Target) 
-                    //       =   Factor(ItemToBeAdded.Base, i.Target) / Factor(ItemToBeAdded.Base, ItemToBeAdded.Target)
-                    //       =   HelpingUnitTranslation.Factor / ItemToBeAdded.Factor
-                    //       --> HelpingUnitTranslation = ItemToBeAdded.Base --> i.Target
+                    NewSelectedIndex = IndexOf(SelectedItem) - 1;
+                    if (NewSelectedIndex < 0) NewSelectedIndex = 0;
+                }
+                else NewSelectedIndex = 1;
 
-                    HelpingUnitTranslation = GetTranslation(ItemToBeAdded.BaseUnit, i.Target);
-                    if (HelpingUnitTranslation != null)
+                Remove(SelectedItem);
+
+                if (Count > 0) _SelectedItem = this[NewSelectedIndex];
+                else _SelectedItem = null;
+            }
+
+
+            public UnitTranslation GetTranslation(Unit Base, Unit Target)
+            {
+                UnitTranslation ReturnObject = null;
+
+                if (Base.Type == Target.Type)
+                {
+                    var TList = this
+                                .Where(s => (s.AffectedIngredient == null) &&
+                                (s.TranslationStatus != ListEntryStatus.IsNotConfirmed) &&
+                                ((s.BaseUnit == Base) && (s.TargetUnit == Target)) ||
+                                ((s.BaseUnit == Target) && (s.TargetUnit == Base)));
+
+                    if (TList.Count() >= 1) ReturnObject = TList.ElementAt(0);
+                    if ((ReturnObject != null) && (ReturnObject.BaseUnit != Base)) ReturnObject.Inverse();
+                }
+                return ReturnObject;
+            }
+            public UnitTranslation GetTranslation(Unit Base, Unit Target, Ingredient Ingred)
+            {
+                UnitTranslation BaseTranslation;
+                UnitTranslation InterTypeTranslation;
+                UnitTranslation ReturnObject = null;
+                UnitTranslation TargetTranslation;
+
+                if (Base.Type == Target.Type)
+                {
+                    ReturnObject = GetTranslation(Base, Target);
+                }
+                else
+                {
+                    InterTypeTranslation = GetTranslation(Base.Type, Target.Type, Ingred);
+
+                    if (InterTypeTranslation != null)
                     {
-                        GeneratedUnitTranslation = new UnitTranslation(ItemToBeAdded.TargetUnit, i.Target,
-                                                           HelpingUnitTranslation.TranslationFactor / ItemToBeAdded.TranslationFactor,
-                                                           ItemToBeAdded);
-                        GeneratedUnitTranslation.ID = ++_MaxID;
-                        Add(GeneratedUnitTranslation);
+                        BaseTranslation = GetTranslation(Base, InterTypeTranslation.BaseUnit);
+                        TargetTranslation = GetTranslation(InterTypeTranslation.TargetUnit, Target);
+
+                        if ((BaseTranslation != null) && (TargetTranslation != null))
+                        {
+                            ReturnObject = new UnitTranslation();
+                            ReturnObject.BaseUnit = Base;
+                            ReturnObject.TargetUnit = Target;
+                            ReturnObject.AffectedIngredient = Ingred;
+                            ReturnObject.IngredientType = Ingred.Type;
+                            ReturnObject.TranslationFlag = TranslationType.IsTypeChange | TranslationType.IsIngredientDependent;
+                            ReturnObject.TranslationFactor = BaseTranslation.TranslationFactor *
+                                                             InterTypeTranslation.TranslationFactor *
+                                                             TargetTranslation.TranslationFactor;
+                        }
+                    }
+                    else
+                    {
+                        AddInactiveItem(Base, Target, Ingred);
+                        InterTypeTranslation = GetTranslation(Base, Target, Ingred.Type);
+                        if (InterTypeTranslation != null)
+                        {
+                            BaseTranslation = GetTranslation(Base, InterTypeTranslation.BaseUnit);
+                            TargetTranslation = GetTranslation(InterTypeTranslation.TargetUnit, Target);
+                            if ((BaseTranslation != null) && (TargetTranslation != null))
+                            {
+                                ReturnObject = new UnitTranslation();
+                                ReturnObject.BaseUnit = Base;
+                                ReturnObject.TargetUnit = Target;
+                                ReturnObject.AffectedIngredient = null;
+                                ReturnObject.IngredientType = Ingred.Type;
+                                ReturnObject.TranslationFlag = TranslationType.IsTypeChange;
+                                ReturnObject.TranslationFactor = BaseTranslation.TranslationFactor *
+                                                                 InterTypeTranslation.TranslationFactor *
+                                                                 TargetTranslation.TranslationFactor;
+                            }
+                        }
+                        else AddInactiveItem(Base, Target, Ingred.Type);
                     }
 
                 }
-
-
+                return ReturnObject;
             }
-        }
-        public void DeleteSelectedItem()
-        {
-            int NewSelectedIndex;
-
-            if ((Count == 0) || (SelectedItem == null)) return;
-
-            if (Count > 1)
+            public UnitTranslation GetTranslation(Unit Base, Unit Target, IngredientType IType)
             {
-                NewSelectedIndex = IndexOf(SelectedItem) - 1;
-                if (NewSelectedIndex < 0) NewSelectedIndex = 0;
-            }
-            else NewSelectedIndex = 1;
+                UnitTranslation ReturnObject = null;
 
-            Remove(SelectedItem);
-
-            if (Count > 0) _SelectedItem = this[NewSelectedIndex];
-            else _SelectedItem = null;
-        }
-
-
-        public UnitTranslation GetTranslation(Unit Base, Unit Target)
-        {
-            UnitTranslation ReturnObject = null;
-
-            if (Base.Type == Target.Type)
-            {
+                // Ermittle alle UnitTranslations mit zugeordnetem Ingredient, welches den IngredientType IType hat
+                // mit den beiden Units Base und Target
                 var TList = this
-                            .Where(s => (s.AffectedIngredient == null) &&
+                            .Where(s => (s.AffectedIngredient != null) && (s.IngredientType == IType) &&
                             (s.TranslationStatus != ListEntryStatus.IsNotConfirmed) &&
                             ((s.BaseUnit == Base) && (s.TargetUnit == Target)) ||
                             ((s.BaseUnit == Target) && (s.TargetUnit == Base)));
 
                 if (TList.Count() >= 1) ReturnObject = TList.ElementAt(0);
                 if ((ReturnObject != null) && (ReturnObject.BaseUnit != Base)) ReturnObject.Inverse();
+
+                return ReturnObject;
             }
-            return ReturnObject;
-        }
-        public UnitTranslation GetTranslation(Unit Base, Unit Target, Ingredient Ingred)
-        {
-            UnitTranslation BaseTranslation;
-            UnitTranslation InterTypeTranslation;
-            UnitTranslation ReturnObject = null;
-            UnitTranslation TargetTranslation;
-
-            if (Base.Type == Target.Type)
+            public UnitTranslation GetTranslation(UnitType BaseType, UnitType TargetType, Ingredient Ingred)
             {
-                ReturnObject = GetTranslation(Base, Target);
-            }
-            else
-            {
-                InterTypeTranslation = GetTranslation(Base.Type, Target.Type, Ingred);
+                UnitTranslation ReturnObject = null;
 
-                if (InterTypeTranslation != null)
-                {
-                    BaseTranslation = GetTranslation(Base, InterTypeTranslation.BaseUnit);
-                    TargetTranslation = GetTranslation(InterTypeTranslation.TargetUnit, Target);
+                var TList = this
+                            .Where(s => (s.AffectedIngredient != null) && (s.AffectedIngredient == Ingred) &&
+                                        (s.TranslationStatus != ListEntryStatus.IsNotConfirmed) &&
+                                        (((s.BaseUnit.Type == BaseType) && (s.TargetUnit.Type == TargetType)) ||
+                                        ((s.BaseUnit.Type == TargetType) && (s.TargetUnit.Type == BaseType))));
 
-                    if ((BaseTranslation != null) && (TargetTranslation != null))
-                    {
-                        ReturnObject = new UnitTranslation();
-                        ReturnObject.BaseUnit = Base;
-                        ReturnObject.TargetUnit = Target;
-                        ReturnObject.AffectedIngredient = Ingred;
-                        ReturnObject.IngredientType = Ingred.Type;
-                        ReturnObject.TranslationFlag = TranslationType.IsTypeChange | TranslationType.IsIngredientDependent;
-                        ReturnObject.TranslationFactor = BaseTranslation.TranslationFactor *
-                                                         InterTypeTranslation.TranslationFactor *
-                                                         TargetTranslation.TranslationFactor;
-                    }
-                }
-                else
+                if (TList.Count() == 1)
                 {
-                    AddInactiveItem(Base, Target, Ingred);
-                    InterTypeTranslation = GetTranslation(Base, Target, Ingred.Type);
-                    if (InterTypeTranslation != null)
-                    {
-                        BaseTranslation = GetTranslation(Base, InterTypeTranslation.BaseUnit);
-                        TargetTranslation = GetTranslation(InterTypeTranslation.TargetUnit, Target);
-                        if ((BaseTranslation != null) && (TargetTranslation != null))
-                        {
-                            ReturnObject = new UnitTranslation();
-                            ReturnObject.BaseUnit = Base;
-                            ReturnObject.TargetUnit = Target;
-                            ReturnObject.AffectedIngredient = null;
-                            ReturnObject.IngredientType = Ingred.Type;
-                            ReturnObject.TranslationFlag = TranslationType.IsTypeChange;
-                            ReturnObject.TranslationFactor = BaseTranslation.TranslationFactor *
-                                                             InterTypeTranslation.TranslationFactor *
-                                                             TargetTranslation.TranslationFactor;
-                        }
-                    }
-                    else AddInactiveItem(Base, Target, Ingred.Type);
+                    ReturnObject = TList.ElementAt(0);
+                    if (ReturnObject.BaseUnit.Type != BaseType) ReturnObject.Inverse();
                 }
 
+                return ReturnObject;
             }
-            return ReturnObject;
-        }
-        public UnitTranslation GetTranslation(Unit Base, Unit Target, IngredientType IType)
-        {
-            UnitTranslation ReturnObject = null;
-
-            // Ermittle alle UnitTranslations mit zugeordnetem Ingredient, welches den IngredientType IType hat
-            // mit den beiden Units Base und Target
-            var TList = this
-                        .Where(s => (s.AffectedIngredient != null) && (s.IngredientType == IType) &&
-                        (s.TranslationStatus != ListEntryStatus.IsNotConfirmed) &&
-                        ((s.BaseUnit == Base) && (s.TargetUnit == Target)) ||
-                        ((s.BaseUnit == Target) && (s.TargetUnit == Base)));
-
-            if (TList.Count() >= 1) ReturnObject = TList.ElementAt(0);
-            if ((ReturnObject != null) && (ReturnObject.BaseUnit != Base)) ReturnObject.Inverse();
-
-            return ReturnObject;
-        }
-        public UnitTranslation GetTranslation(UnitType BaseType, UnitType TargetType, Ingredient Ingred)
-        {
-            UnitTranslation ReturnObject = null;
-
-            var TList = this
-                        .Where(s => (s.AffectedIngredient != null) && (s.AffectedIngredient == Ingred) &&
-                                    (s.TranslationStatus != ListEntryStatus.IsNotConfirmed) &&
-                                    (((s.BaseUnit.Type == BaseType) && (s.TargetUnit.Type == TargetType)) ||
-                                    ((s.BaseUnit.Type == TargetType) && (s.TargetUnit.Type == BaseType))));
-
-            if (TList.Count() == 1)
+            public UnitTranslationSet OpenSet(string FileName)
             {
-                ReturnObject = TList.ElementAt(0);
-                if (ReturnObject.BaseUnit.Type != BaseType) ReturnObject.Inverse();
-            }
+                UnitTranslationSet ReturnSet = this;
+                ReturnSet.Clear();
+                FileName += FileExtension;
+                using (Stream fs = new FileStream(FileName, FileMode.Open))
+                {
+                    System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(ReturnSet.GetType());
+                    ReturnSet = (UnitTranslationSet)x.Deserialize(fs);
+                }
+                return ReturnSet;
 
-            return ReturnObject;
-        }
-        public UnitTranslationSet OpenSet(string FileName)
-        {
-            UnitTranslationSet ReturnSet = this;
-            ReturnSet.Clear();
-            FileName += FileExtension;
-            using (Stream fs = new FileStream(FileName, FileMode.Open))
+            }// --> Data
+
+            public void PopulateSetWithDefaults()
             {
-                System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(ReturnSet.GetType());
-                ReturnSet = (UnitTranslationSet)x.Deserialize(fs);
+
+                TranslationType UTType = TranslationType.IsTypeChange;
+
+                Clear();
+                //IsWeight
+                AddItem(new UnitTranslation("kg", "g", 1000.0, 0, 0, UnitSetData));
+                AddItem(new UnitTranslation("g", "dg", 10.0, 0, 0, UnitSetData));   //dg: Dezi-Gramm
+                AddItem(new UnitTranslation("g", "cg", 100.0, 0, 0, UnitSetData));  //cg: Zenti-Gramm
+                AddItem(new UnitTranslation("g", "mg", 1000.0, 0, 0, UnitSetData)); //mg: Milli-Gramm
+                AddItem(new UnitTranslation("g", "dag", 0.1, 0, 0, UnitSetData)); //mg: Milli-Gramm
+                AddItem(new UnitTranslation("pf", "g", 500.0, 0, 0, UnitSetData));  //pf: Pfund
+
+
+                AddItem(new UnitTranslation("oz", "g", 28.3495, 0, 0, UnitSetData));   //oz: Unzen
+                AddItem(new UnitTranslation("lb", "oz", 16.0, 0, 0, UnitSetData));  //lb: Pound
+                AddItem(new UnitTranslation("oz", "dr", 16.0, 0, 0, UnitSetData));  //dr: dram
+                AddItem(new UnitTranslation("lb", "gr", 7000.0, 0, 0, UnitSetData));  //gr: grain
+
+                //IsWeight: zu ermitteln
+                //  Msp (Messerspitze) -> g (Gramm)
+                //  Pr (Prise) -> g (Gramm)
+
+
+                //IsVolume
+                AddItem(new UnitTranslation("l", "ml", 1000.0, 0, 0, UnitSetData));
+                AddItem(new UnitTranslation("l", "cl", 100.0, 0, 0, UnitSetData));
+                AddItem(new UnitTranslation("l", "dl", 10.0, 0, 0, UnitSetData));
+                AddItem(new UnitTranslation("Ta", "ml", 237.0, 0, 0, UnitSetData));              //Ta = Tasse
+                AddItem(new UnitTranslation("TL", "ml", 5.0, 0, 0, UnitSetData));                //TL = Teelöffel
+                AddItem(new UnitTranslation("BL", "ml", 5.0, 0, 0, UnitSetData));                //BL = Barlöffel
+                AddItem(new UnitTranslation("EL", "ml", 15.0, 0, 0, UnitSetData));               //TL = Teelöffel
+                AddItem(new UnitTranslation("ml", "Tr", 30.0, 0, 0, UnitSetData));               //Tr = Tropfen
+                AddItem(new UnitTranslation("ds", "ml", 0.6, 0, 0, UnitSetData));                //Dash = Spritzer
+                AddItem(new UnitTranslation("Spr", "ml", 25.0, 0, 0, UnitSetData));              //sht = Schuss
+                AddItem(new UnitTranslation("ga (US)", "l", 3.785, 0, 0, UnitSetData));          //ga(US) = US Galone
+                AddItem(new UnitTranslation("ga (US)", "fl.oz (US)", 128, 0, 0, UnitSetData));   //fl.oz (US) = fluid ounce US
+                AddItem(new UnitTranslation("qt (US)", "fl.oz (US)", 32, 0, 0, UnitSetData));    //qt (US) = fluid ounce US
+                AddItem(new UnitTranslation("pt (US)", "fl.oz (US)", 16, 0, 0, UnitSetData));    //pt (US) = fluid ounce US
+
+
+                AddItem(new UnitTranslation("ga (UK)", "l", 4.546, 0, 0, UnitSetData));          //ga(UK): ga(UK) = Imperial Galone
+                AddItem(new UnitTranslation("ga (UK)", "fl.oz (UK)", 160, 0, 0, UnitSetData));   //fl.oz (US) = fluid ounce US
+                AddItem(new UnitTranslation("qt (UK)", "fl.oz (UK)", 40, 0, 0, UnitSetData));    //qt (US) = fluid ounce US
+                AddItem(new UnitTranslation("pt (UK)", "fl.oz (UK)", 20, 0, 0, UnitSetData));    //pt (US) = fluid ounce US
+
+
+                // IsTypeChange = 0x1 --> max ein Eintrag je IngredientType
+                UTType = TranslationType.IsTypeChange;
+
+                //Volume -> Weight
+                AddItem(new UnitTranslation("l", "kg", 1.0, UTType, IngredientType.IsFluid, UnitSetData)); //Volume -> Weight
+                AddItem(new UnitTranslation("l", "kg", 1.0, UTType, IngredientType.IsSolid, UnitSetData)); //Volume -> Weight
+                AddItem(new UnitTranslation("l", "kg", 1.0, UTType, IngredientType.IsCrystal, UnitSetData)); //Volume -> Weight
+                AddItem(new UnitTranslation("l", "g", 1000.0 / 145 * 70, UTType, IngredientType.IsPowder, UnitSetData)); //Volume -> Weight
+                AddItem(new UnitTranslation("l", "g", 1000.0 / 115 * 85, UTType, IngredientType.IsGranular, UnitSetData)); //Volume -> Weight
+                AddItem(new UnitTranslation("l", "g", 1000.0 / 115 * 85, UTType, IngredientType.IsHerb, UnitSetData)); //Volume -> Weight
+
+                //Count --> Weight
+                AddItem(new UnitTranslation("st", "g", 100.0, UTType, IngredientType.IsSolid, UnitSetData)); //Count --> Weight
+
+
             }
-            return ReturnSet;
-
-        }// --> Data
-
-        public void PopulateSetWithDefaults()
-        {
-
-            TranslationType UTType = TranslationType.IsTypeChange;
-
-            Clear();
-            //IsWeight
-            AddItem(new UnitTranslation("kg", "g", 1000.0, 0, 0, UnitSetData));
-            AddItem(new UnitTranslation("g", "dg", 10.0, 0, 0, UnitSetData));   //dg: Dezi-Gramm
-            AddItem(new UnitTranslation("g", "cg", 100.0, 0, 0, UnitSetData));  //cg: Zenti-Gramm
-            AddItem(new UnitTranslation("g", "mg", 1000.0, 0, 0, UnitSetData)); //mg: Milli-Gramm
-            AddItem(new UnitTranslation("g", "dag", 0.1, 0, 0, UnitSetData)); //mg: Milli-Gramm
-            AddItem(new UnitTranslation("pf", "g", 500.0, 0, 0, UnitSetData));  //pf: Pfund
-
-
-            AddItem(new UnitTranslation("oz", "g", 28.3495, 0, 0, UnitSetData));   //oz: Unzen
-            AddItem(new UnitTranslation("lb", "oz", 16.0, 0, 0, UnitSetData));  //lb: Pound
-            AddItem(new UnitTranslation("oz", "dr", 16.0, 0, 0, UnitSetData));  //dr: dram
-            AddItem(new UnitTranslation("lb", "gr", 7000.0, 0, 0, UnitSetData));  //gr: grain
-
-            //IsWeight: zu ermitteln
-            //  Msp (Messerspitze) -> g (Gramm)
-            //  Pr (Prise) -> g (Gramm)
-        
-
-            //IsVolume
-            AddItem(new UnitTranslation("l", "ml", 1000.0, 0, 0, UnitSetData));
-            AddItem(new UnitTranslation("l", "cl", 100.0, 0, 0, UnitSetData));
-            AddItem(new UnitTranslation("l", "dl", 10.0, 0, 0, UnitSetData));
-            AddItem(new UnitTranslation("Ta", "ml", 237.0, 0, 0, UnitSetData));              //Ta = Tasse
-            AddItem(new UnitTranslation("TL", "ml", 5.0, 0, 0, UnitSetData));                //TL = Teelöffel
-            AddItem(new UnitTranslation("BL", "ml", 5.0, 0, 0, UnitSetData));                //BL = Barlöffel
-            AddItem(new UnitTranslation("EL", "ml", 15.0, 0, 0, UnitSetData));               //TL = Teelöffel
-            AddItem(new UnitTranslation("ml", "Tr", 30.0, 0, 0, UnitSetData));               //Tr = Tropfen
-            AddItem(new UnitTranslation("ds", "ml", 0.6, 0, 0, UnitSetData));                //Dash = Spritzer
-            AddItem(new UnitTranslation("Spr", "ml", 25.0, 0, 0, UnitSetData));              //sht = Schuss
-            AddItem(new UnitTranslation("ga (US)", "l", 3.785, 0, 0, UnitSetData));          //ga(US) = US Galone
-            AddItem(new UnitTranslation("ga (US)", "fl.oz (US)", 128, 0, 0, UnitSetData));   //fl.oz (US) = fluid ounce US
-            AddItem(new UnitTranslation("qt (US)", "fl.oz (US)", 32, 0, 0, UnitSetData));    //qt (US) = fluid ounce US
-            AddItem(new UnitTranslation("pt (US)", "fl.oz (US)", 16, 0, 0, UnitSetData));    //pt (US) = fluid ounce US
-
-
-            AddItem(new UnitTranslation("ga (UK)", "l", 4.546, 0, 0, UnitSetData));          //ga(UK): ga(UK) = Imperial Galone
-            AddItem(new UnitTranslation("ga (UK)", "fl.oz (UK)", 160, 0, 0, UnitSetData));   //fl.oz (US) = fluid ounce US
-            AddItem(new UnitTranslation("qt (UK)", "fl.oz (UK)", 40, 0, 0, UnitSetData));    //qt (US) = fluid ounce US
-            AddItem(new UnitTranslation("pt (UK)", "fl.oz (UK)", 20, 0, 0, UnitSetData));    //pt (US) = fluid ounce US
-
-
-            // IsTypeChange = 0x1 --> max ein Eintrag je IngredientType
-            UTType = TranslationType.IsTypeChange;
-
-            //Volume -> Weight
-            AddItem(new UnitTranslation("l", "kg", 1.0, UTType, IngredientType.IsFluid, UnitSetData)); //Volume -> Weight
-            AddItem(new UnitTranslation("l", "kg", 1.0, UTType, IngredientType.IsSolid, UnitSetData)); //Volume -> Weight
-            AddItem(new UnitTranslation("l", "kg", 1.0, UTType, IngredientType.IsCrystal, UnitSetData)); //Volume -> Weight
-            AddItem(new UnitTranslation("l", "g", 1000.0 / 145 * 70, UTType, IngredientType.IsPowder, UnitSetData)); //Volume -> Weight
-            AddItem(new UnitTranslation("l", "g", 1000.0 / 115 * 85, UTType, IngredientType.IsGranular, UnitSetData)); //Volume -> Weight
-            AddItem(new UnitTranslation("l", "g", 1000.0 / 115 * 85, UTType, IngredientType.IsHerb, UnitSetData)); //Volume -> Weight
-
-            //Count --> Weight
-            AddItem(new UnitTranslation("st", "g", 100.0, UTType, IngredientType.IsSolid, UnitSetData)); //Count --> Weight
-
-
-        }
- */
+     */
 
 }
 

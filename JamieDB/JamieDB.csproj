@@ -95,13 +95,16 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JamieDBDescription.cs" />
+    <Compile Include="Model\Unit.cs" />
     <Compile Include="Model\JamieDBLinq.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>JamieDBLinq.dbml</DependentUpon>
     </Compile>
+    <Compile Include="Model\UnitTranslation.cs" />
     <Compile Include="ViewModel\JamieDBViewModelCommand.cs" />
     <Compile Include="ViewModel\MaintainanceRecipesViewModel.cs" />
+    <Compile Include="ViewModel\UnitsVMClass.cs" />
     <Compile Include="View\MaintainanceRecipes.xaml.cs">
       <DependentUpon>MaintainanceRecipes.xaml</DependentUpon>
       <SubType>Code</SubType>
