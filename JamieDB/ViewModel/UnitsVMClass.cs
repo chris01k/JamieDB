@@ -11,24 +11,20 @@ using System.Windows;
 
 namespace JamieDB.ViewModel
 {
-    class UnitsVMClass : INotifyPropertyChanged
+    class UnitsVMClass : JamieDBViewModelBase
     {
 
         #region Attributes
-        private ObservableCollection<UnitTranslation> _RelatedUnitTranslations;
+        private Unit _LastSelectedUnit;
+        private ObservableCollection<MissingUnit> _MissingUnits;
+        private MissingUnit _SelectedMisssingUnit;
         private Unit _SelectedUnit;
         private UnitTranslation _SelectedUnitTranslation;
-        private UnitType _SelectedUnitType;
         private ObservableCollection<Unit> _Units;
+        private ObservableCollection<UnitTranslation> _UnitTranslations;
         private ObservableCollection<UnitType> _UnitTypes;
-
-        private string _StatusBarText;
-
         #endregion
 
-        #region Attributes: Context
-        private JamieDBLinqDataContext _context;
-        #endregion
 
         #region Attributes: Commands
         private JamieDBViewModelCommand _DeleteUnitCommand;
@@ -39,12 +35,9 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Constructors
-
-        public UnitsVMClass(JamieDBLinqDataContext ctx)
+        public UnitsVMClass()
         {
-            _context = ctx;
-
-            DeleteUnitCommand = new JamieDBViewModelCommand(CanExecuteDeleteUnit, ExecuteDeleteUnit);
+            /*DeleteUnitCommand = new JamieDBViewModelCommand(CanExecuteDeleteUnit, ExecuteDeleteUnit);
             DeleteUnitTranslationCommand = new JamieDBViewModelCommand(CanExecuteDeleteUnitTranslation, ExecuteDeleteUnitTranslation);
 
             NewUnitCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewUnit);
@@ -52,54 +45,118 @@ namespace JamieDB.ViewModel
 
             SaveCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteSaveUnit);
 
-
+            */
+            
             RefreshUnits();
-            RefreshRelatedUnitTranslations();
             RefreshUnitTypes();
+            RefreshMissingUnits();
         }
         #endregion
 
         #region Events
-        public event PropertyChangedEventHandler PropertyChanged;
+//        public event PropertyChangedEventHandler PropertyChanged;
+
         #endregion
         #region Events:EventHandler
-        public void UnitTranslationChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public void UnitsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == NotifyCollectionChangedAction.Add)
+            if (e.Action == NotifyCollectionChangedAction.Add) 
             {
                 if (e.NewItems != null)
                 {
+                    Unit NewUnit = (Unit)e.NewItems[0];
 
-                    foreach (UnitTranslation Item in e.NewItems)
-                    {
-                        //Item.BaseUnitID = SelectedUnit.Id;
-                        Item.Unit = SelectedUnit;
-                        StatusBarText = Item + "Created";
+/*                    var NewIngredientChange = (RecipeIngredient)e.NewItems[0];
 
-                    }
+                    //Fill Foreign Keys
+
+                    NewIngredientChange.RecipeID = SelectedRecipe.Id;
+                    NewIngredientChange.Recipe = SelectedRecipe;
+
+                    NewIngredientChange.IngredientID = SelectedIngredient.Id;
+                    NewIngredientChange.Ingredient = SelectedIngredient;
+
+                    NewIngredientChange.UnitID = UnitVM.SelectedUnit.Id;
+                    NewIngredientChange.Unit = UnitVM.SelectedUnit;
+                    StatusBarMessage = "RecipeIngredient Added";
+*/
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 if (e.OldItems != null)
                 {
-                    foreach (UnitTranslation Item in e.OldItems)
-                    {
-                        if (Item.Id != 0)
+ /*                  foreach (RecipeIngredient RI in e.OldItems)
                         {
-                            _context.UnitTranslations.DeleteOnSubmit(Item);
-                            _context.SubmitChanges();
-                            StatusBarText = Item + "Deleted";
+                        _context.RecipeIngredients.DeleteOnSubmit(RI);
+                        StatusBarMessage = "RecipeIngredient Deleted";
                         }
-                    }
+*/
                 }
             }
 
         }
+        public void UnitTranslationsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+
+        }
+
         #endregion
 
 
         #region Properties
+        public Unit LastSelectedUnit
+        {
+            get
+            {
+                return _LastSelectedUnit;
+            }
+
+            set
+            {
+                if (_LastSelectedUnit != value)
+                {
+                    _LastSelectedUnit = value;
+                    OnPropertyChanged("LastSelectedUnit");
+                }
+
+            }
+        }
+
+        public ObservableCollection<MissingUnit> MissingUnits
+        {
+            get
+            {
+                return _MissingUnits;
+            }
+
+            set
+            {
+                if (_MissingUnits != value)
+                {
+                    _MissingUnits = value;
+                    OnPropertyChanged("MissingUnits");
+                }
+            }
+        }
+        public MissingUnit SelectedMisssingUnit
+        {
+            get
+            {
+                return _SelectedMisssingUnit;
+            }
+
+            set
+            {
+                if (_SelectedMisssingUnit != value)
+                {
+                    _SelectedMisssingUnit = value;
+                    OnPropertyChanged("SelectedMisssingUnit");
+                }
+
+            }
+        }
+
         public Unit SelectedUnit
         {
             get
@@ -109,11 +166,21 @@ namespace JamieDB.ViewModel
 
             set
             {
-                _SelectedUnit = value;
-                OnPropertyChanged("SelectedUnit");
-                OnPropertyChanged("IsStandardUnit");
-                RefreshRelatedUnitTranslations();
-                DeleteUnitTranslationCommand.OnCanExecuteChanged();
+                if (_SelectedUnit != value)
+                {
+                    if (ValidateSelectedUnitChanges(LastSelectedUnit,SelectedUnit))
+                    {
+                        _SelectedUnit = value;
+                        if (value != null) LastSelectedUnit = SelectedUnit.Clone();
+                        else LastSelectedUnit = value;
+                        OnPropertyChanged("SelectedUnit");
+                        StatusBarMessage = "New Selected Unit = " + _SelectedUnit;
+                        context.SubmitChanges();
+                    }
+
+
+                }
+
             }
         }
         public UnitTranslation SelectedUnitTranslation
@@ -129,33 +196,6 @@ namespace JamieDB.ViewModel
                 OnPropertyChanged("SelectedUnitTranslation");
             }
         }
-        public UnitType SelectedUnitType
-        {
-            get
-            {
-                return _SelectedUnitType;
-            }
-
-            set
-            {
-                _SelectedUnitType = value;
-                OnPropertyChanged("SelectedUnitType");
-            }
-        }
-        public string StatusBarText
-        {
-            get
-            {
-                return _StatusBarText;
-            }
-
-            set
-            {
-                _StatusBarText = value;
-                OnPropertyChanged("StatusBarText");
-
-            }
-        }
         public ObservableCollection<Unit> Units
         {
             get
@@ -169,17 +209,17 @@ namespace JamieDB.ViewModel
                 OnPropertyChanged("Units");
             }
         }
-        public ObservableCollection<UnitTranslation> RelatedUnitTranslations
+        public ObservableCollection<UnitTranslation> UnitTranslations
         {
             get
             {
-                return _RelatedUnitTranslations;
+                return _UnitTranslations;
             }
 
             set
             {
-                _RelatedUnitTranslations = value;
-                OnPropertyChanged("RelatedUnitTranslations");
+                _UnitTranslations = value;
+                OnPropertyChanged("UnitTranslations");
 
             }
         }
@@ -197,30 +237,7 @@ namespace JamieDB.ViewModel
             }
         }
 
-        public bool IsStandardUnit
-        {
-            get
-            {
-                bool ReturnValue =false;
-
-                if ((SelectedUnit.UnitType != null) && (SelectedUnit != null)) ReturnValue = (SelectedUnit.UnitType.Unit.Equals(SelectedUnit));
-
-                return ReturnValue;
-            }
-
-            set
-            {
-                if (!IsStandardUnit)
-                {
-                    SelectedUnit.UnitType.Unit = SelectedUnit;
-                    OnPropertyChanged("IsStandardUnit");
-
-                }
-
-            }
-        }
-
-        #endregion
+         #endregion
         #region Properties: Commands
         public JamieDBViewModelCommand DeleteUnitCommand
         {
@@ -246,6 +263,8 @@ namespace JamieDB.ViewModel
                 _DeleteUnitTranslationCommand = value;
             }
         }
+
+
         public JamieDBViewModelCommand NewUnitCommand
         {
             get
@@ -299,35 +318,133 @@ namespace JamieDB.ViewModel
         }
         private ObservableCollection<UnitTranslation> GetUnitTranslationsInverse()
         {
-            var result = _context.UnitTranslations.Where(ut => ut.TargetUnitID == SelectedUnit.Id).OrderBy(ut => ut.Unit.Symbol);
+            var result = context.UnitTranslations.Where(ut => ut.TargetUnitID == SelectedUnit.Id).OrderBy(ut => ut.Unit.Symbol);
             var ReturnList = new ObservableCollection<UnitTranslation>(result);
 
             return ReturnList;
         }
-        public void OnPropertyChanged(string PropertyName)
+
+
+        private void RefreshMissingUnits()
         {
-            if (this.PropertyChanged != null)
+            var result = context.RecipeIngredients.Where(ri => ri.UnitID != ri.Ingredient.TargetUnitID);
+
+            ObservableCollection<RecipeIngredient> test = new ObservableCollection<RecipeIngredient>(result);
+
+            MissingUnits = new ObservableCollection<MissingUnit>();
+
+            foreach (var r in result)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
+                if (!(r.Unit.TypeID == r.Ingredient.Unit.TypeID && r.Unit.TypeStandard && r.Unit.TypeStandard))
+                {
+                    MissingUnit x = new MissingUnit();
+
+                    x.AffectedIngredient = r.Ingredient;
+                    x.BaseUnit = r.Unit;
+                    x.TargetUnit = r.Ingredient.Unit;
+                    x.Factor = 0;
+                    x.RelatedRecipe = r.Recipe;
+
+
+                    if (!MissingUnits.Contains(x)) MissingUnits.Add(x);
+
+                }
+
             }
+
+            
         }
+        
         private void RefreshUnits()
         {
-            var result = _context.Units.OrderBy(u => u.Symbol);
+            var result = context.Units.OrderBy(u => u.Symbol);
+
             Units = new ObservableCollection<Unit>(result);
+            Units.CollectionChanged += new NotifyCollectionChangedEventHandler(UnitsChanged);
             SelectedUnit = Units.FirstOrDefault();
+
         }
-        private void RefreshRelatedUnitTranslations()
+        
+/*        private void RefreshRelatedUnitTranslations()
         {
-            var result = _context.UnitTranslations.Where(s => (s.BaseUnitID == SelectedUnit.Id) || (s.TargetUnitID== SelectedUnit.Id));
-            RelatedUnitTranslations = new ObservableCollection<UnitTranslation>(result);
-            RelatedUnitTranslations.CollectionChanged += new NotifyCollectionChangedEventHandler(UnitTranslationChanged);
-            SelectedUnitTranslation = RelatedUnitTranslations.FirstOrDefault();
+            var result = context.UnitTranslations.Where(s => (s.BaseUnitID == SelectedUnit.Id) || (s.TargetUnitID== SelectedUnit.Id));
+            if (result.ToList().Count()!=0)
+
+            {
+                RelatedUnitTranslations = new ObservableCollection<UnitTranslation>(result);
+                RelatedUnitTranslations.CollectionChanged += new NotifyCollectionChangedEventHandler(UnitTranslationsChanged);
+                SelectedUnitTranslation = RelatedUnitTranslations.FirstOrDefault();
+            }
         }
+  */
         private void RefreshUnitTypes()
         {
-            var result = _context.UnitTypes.OrderBy(u => u.Name);
+            var result = context.UnitTypes.OrderBy(u => u.Name);
             UnitTypes = new ObservableCollection<UnitType>(result);
+        }
+
+        public void SomeMethod()
+        {
+
+            DateTime RightNow = DateTime.Now;
+            string NewText;
+
+            NewText = "Hier geben wir einen Text aus: " + RightNow;
+
+            StatusBarMessage = NewText;
+
+        }
+
+        private bool RecalculateFactors(long UTypeID, Unit NewStandardUnit)
+        {
+            bool ReturnValue = false;
+
+
+
+
+            if (NewStandardUnit.TypeFactor != null)
+            {
+                double? Umrechnung = 1 / NewStandardUnit.TypeFactor;
+
+                var result = context.Units.Where(u => (u.UnitType.Id == UTypeID) && u.TypeUniversal ).ToList();
+
+                foreach ( Unit u in result)
+                {
+                    if (u.Id  == NewStandardUnit.Id)
+                    {
+                        u.TypeStandard = true;
+                        u.TypeFactor = 1;
+                    }
+                    else 
+                    {
+                        u.TypeStandard = false;
+                        u.TypeFactor = u.TypeFactor * Umrechnung;
+                    }
+                }
+                context.SubmitChanges();
+                ReturnValue = true;
+            }
+
+            return ReturnValue;
+            
+        }
+
+        private bool ValidateSelectedUnitChanges(Unit OldSelected, Unit NewSelected)
+        {
+            bool ReturnValue = false;
+
+            if (OldSelected !=null && !OldSelected.TypeStandard)
+            {
+                if (NewSelected != null && NewSelected.TypeStandard)
+                {
+                    ReturnValue = RecalculateFactors(OldSelected.TypeID, NewSelected);
+                }
+            }
+
+            return ReturnValue;
+
+
+
         }
         #endregion
         #region Methods: Command Methods
@@ -339,6 +456,12 @@ namespace JamieDB.ViewModel
         {
             return (SelectedUnitTranslation != null);
         }
+        public bool CanExecuteInitializeBasicUnitTranslations(object o)
+        {
+            return (context.UnitTypes.Count() > 0);
+        }
+
+
         public void ExecuteDeleteUnit(object o)
         {
             string MessageText;
@@ -349,13 +472,14 @@ namespace JamieDB.ViewModel
                 if (rIndex == Units.Count() - 1) rIndex -= 1;
                 MessageText = "Unit " + SelectedUnit.Symbol + " deleted";
 
-                _context.Units.DeleteOnSubmit(SelectedUnit);
+                context.Units.DeleteOnSubmit(SelectedUnit);
 
+                
                 // foreach () in Detailtable --> DeleteOnSubmit DetailEntry
 
                 try
                 {
-                    _context.SubmitChanges();
+                    context.SubmitChanges();
                 }
                 catch (Exception e)
                 {
@@ -363,18 +487,18 @@ namespace JamieDB.ViewModel
                     // Make some adjustments.
                     // ...
                     // Try again.
-                    //_context.SubmitChanges();
+                    //context.SubmitChanges();
                     MessageText = "Unit " + SelectedUnit.Symbol + " NOT deleted";
                 }
 
-                RefreshUnits();
+                //RefreshUnits();
                 if (rIndex >= 0) SelectedUnit = Units[rIndex];
                 else SelectedUnit = null;
-                StatusBarText = MessageText;
+                //StatusBarMessage = MessageText;
             }
 
         }
-        public void ExecuteDeleteUnitTranslation(object o)
+/*        public void ExecuteDeleteUnitTranslation(object o)
         {
             string MessageText;
 
@@ -382,11 +506,11 @@ namespace JamieDB.ViewModel
             if (rowIndex == (RelatedUnitTranslations.Count() - 1)) rowIndex -= 1;
             MessageText = "UnitTranslation" + SelectedUnitTranslation.Id + "deleted";
 
-            _context.UnitTranslations.DeleteOnSubmit(SelectedUnitTranslation);
+            context.UnitTranslations.DeleteOnSubmit(SelectedUnitTranslation);
 
             try
             {
-                _context.SubmitChanges();
+                context.SubmitChanges();
             }
             catch (Exception e)
             {
@@ -394,17 +518,25 @@ namespace JamieDB.ViewModel
                 // Make some adjustments.
                 // ...
                 // Try again.
-                //_context.SubmitChanges();
+                //context.SubmitChanges();
                 MessageText = "UnitTranslation" + SelectedUnitTranslation.Id + "NOT deleted";
             }
 
-            RefreshUnits();
+            //RefreshUnits();
             if (rowIndex >= 0) SelectedUnitTranslation = RelatedUnitTranslations[rowIndex];
             else SelectedUnitTranslation = null;
 
-            StatusBarText = MessageText;
+            StatusBarMessage = MessageText;
 
         }
+        public void ExecuteInitializeBasicUnitTranslations(object o)
+        {
+            var result = context.UnitTypes;
+
+            
+
+        }
+*/
         public void ExecuteNewUnit(object o)
         {
             Unit NewUnit = new Unit();
@@ -413,11 +545,11 @@ namespace JamieDB.ViewModel
             NewUnit.Symbol = "new";
             NewUnit.TypeID = 1000004;
 
-            _context.Units.InsertOnSubmit(NewUnit);
+            context.Units.InsertOnSubmit(NewUnit);
 
             try
             {
-                _context.SubmitChanges();
+                context.SubmitChanges();
 
             }
             catch (Exception e)
@@ -426,11 +558,11 @@ namespace JamieDB.ViewModel
                 // Make some adjustments.
                 // ...
                 // Try again.
-                //_context.SubmitChanges();
+                //context.SubmitChanges();
             }
-            RefreshUnits();
+            //RefreshUnits();
             SelectedUnit = NewUnit;
-            StatusBarText = "Unit Added";
+            StatusBarMessage = "Unit Added";
         }
         public void ExecuteNewUnitTranslation(object o)
         {
@@ -444,11 +576,11 @@ namespace JamieDB.ViewModel
             NewUnitTranslation.IsTypeChange = false;
             NewUnitTranslation.IsOK = true;
 
-            _context.UnitTranslations.InsertOnSubmit(NewUnitTranslation);
+            context.UnitTranslations.InsertOnSubmit(NewUnitTranslation);
 
             try
             {
-                _context.SubmitChanges();
+                context.SubmitChanges();
 
             }
             catch (Exception e)
@@ -457,18 +589,17 @@ namespace JamieDB.ViewModel
                 // Make some adjustments.
                 // ...
                 // Try again.
-                //_context.SubmitChanges();
+                //context.SubmitChanges();
             }
-            RefreshRelatedUnitTranslations();
             SelectedUnitTranslation = NewUnitTranslation;
-            StatusBarText = "UnitTranslation Added";
+            StatusBarMessage = "UnitTranslation Added";
         }
 
         public void ExecuteSaveUnit(object o)
         {
             try
             {
-                _context.SubmitChanges();
+                context.SubmitChanges();
             }
             catch (Exception e)
             {
@@ -476,10 +607,10 @@ namespace JamieDB.ViewModel
                 // Make some adjustments.
                 // ...
                 // Try again.
-                //_context.SubmitChanges();
+                //context.SubmitChanges();
             }
-            RefreshUnits();
-            StatusBarText = "All Units Saved";
+            //RefreshUnits();
+            StatusBarMessage = "All Units Saved";
         }
 
         #endregion
@@ -490,5 +621,123 @@ namespace JamieDB.ViewModel
             return true;
         }
         #endregion
+    }
+
+    class MissingUnit : JamieDBViewModelBase, IEquatable<MissingUnit>
+    {
+        #region Attributes
+        private Ingredient _AffectedIngredient;
+        private Unit _BaseUnit;
+        private Unit _TargetUnit;
+        private double _Factor;
+        private Recipe _RelatedRecipe;
+        #endregion
+
+        #region Constructors
+        public MissingUnit()
+        {
+        }
+        #endregion
+
+        #region Properties
+        
+        public Ingredient AffectedIngredient
+        {
+            get
+            {
+                return _AffectedIngredient;
+            }
+            set
+            {
+                if (_AffectedIngredient != value)
+                {
+                    _AffectedIngredient = value;
+                    OnPropertyChanged("AffectedIngredient");
+                    
+                }
+            }
+        }
+
+        public Unit BaseUnit
+        {
+            get
+            {
+                return _BaseUnit;
+            }
+            set
+            {
+                if (_BaseUnit != value)
+                {
+                    _BaseUnit = value;
+                    OnPropertyChanged("BaseUnit");
+                }
+            }
+        }
+        public Unit TargetUnit
+        {
+            get
+            {
+                return _TargetUnit;
+            }
+            set
+            {
+                if (_TargetUnit != value)
+                {
+                    _TargetUnit = value;
+                    OnPropertyChanged("TargetUnit");
+                }
+            }
+        }
+        public double Factor
+        {
+            get
+            {
+                return _Factor;
+            }
+            set
+            {
+                if (_Factor != value)
+                {
+                    _Factor = value;
+                    OnPropertyChanged("Factor");
+
+
+                }
+            }
+        }
+
+        public Recipe RelatedRecipe
+
+        {
+            get
+            {
+                return _RelatedRecipe;
+            }
+            set
+            {
+                if (_RelatedRecipe != value)
+                {
+                    _RelatedRecipe = value;
+                    OnPropertyChanged("RelatedRecipe");
+
+
+                }
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public bool Equals (MissingUnit ToBeCompared)
+        {
+            return (this.BaseUnit.Id == ToBeCompared.BaseUnit.Id && this.TargetUnit.Id == ToBeCompared.TargetUnit.Id && 
+                    this.AffectedIngredient.Id == ToBeCompared.AffectedIngredient.Id) ||
+                    (this.BaseUnit.Id == ToBeCompared.TargetUnit.Id && this.TargetUnit.Id == ToBeCompared.BaseUnit.Id &&
+                    this.AffectedIngredient.Id == ToBeCompared.AffectedIngredient.Id);
+        }
+
+        #endregion
+
     }
 }

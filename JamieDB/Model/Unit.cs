@@ -7,33 +7,40 @@ using System.Threading.Tasks;
 
 namespace JamieDB.Model
 {
+
     public partial class Unit : INotifyPropertyChanging, INotifyPropertyChanged
     {
-        public bool IsStandardUnit
+
+        public Unit Clone()
         {
-        
-            get
-            {
-                return (this == this.UnitType.Unit);
-            }
-            set
-            {
-                this.UnitType.Unit = this;
-            }
-        
+            Unit ClonedUnit = new Unit();
+
+            ClonedUnit.Id = this.Id;
+            ClonedUnit.Symbol = this.Symbol;
+            ClonedUnit.Name = this.Name;
+            ClonedUnit.TypeID = this.TypeID;
+            ClonedUnit.TypeStandard = this.TypeStandard;
+            ClonedUnit.TypeFactor = this.TypeFactor;
+            ClonedUnit.TypeUniversal = this.TypeUniversal;
+            //ClonedUnit.UnitType = this.UnitType;
+
+            return ClonedUnit;
         }
 
-        public string DisplayName
+        partial void OnTypeStandardChanging(bool value)
         {
-            get
-            {
-                return (this.Symbol + ": " +this.Name);
-            }
-        
+//            if (this.TypeStandard != true) TypeFactor = 1;
+//            else this.TypeFactor = 10;
         }
-     }
 
+        public override string ToString()
+        {
+            return this.Name + ": " + this.Symbol;
+        }
 
+        
 
+    }
 }
+
 

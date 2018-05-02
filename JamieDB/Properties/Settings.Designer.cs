@@ -26,7 +26,8 @@ namespace JamieDB.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=FOLLETT\\SQLEXPRESS;Initial Catalog=JamieDB;Integrated Security=True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=FOLLETT\\SQLEXPRESS;Initial Catalog=JamieDB;User ID=JamieDBUser;Passwo" +
+            "rd=JamieDBUser")]
         public string JamieDBConnectionString {
             get {
                 return ((string)(this["JamieDBConnectionString"]));

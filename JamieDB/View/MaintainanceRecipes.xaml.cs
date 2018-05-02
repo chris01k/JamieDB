@@ -23,6 +23,7 @@ namespace JamieDB
     public partial class MainWindow : Window
     {
         private MaintainanceRecipesViewModel ViewModel = new MaintainanceRecipesViewModel();
+
         public MainWindow()
         {
             InitializeComponent();

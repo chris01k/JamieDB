@@ -64,16 +64,20 @@
  *                            - 
  *                            
  *                            Bugfixes
- *                            - xxx=Getxxx --> Refreshxxx()
+ *                            - 
  *
- *                      open: - Add Inverse UnitTranslations to Table (l-->ml) => (ml -->l)
- *                            - Edit Inverse UnitTranslations
- *                            - Enter Test Data to Unit Translations
- *                            - Implement Unit Translation Calculation
+ *                      open: - Units: change Standard Unit
+ *                            - UnitTranslations: CreateMissingBasicTranslations
+ *                            - UnitTranslation.AddBasicUnitTranslations(); läuft nicht richtig
+ *                            - 
  *                            - 
  *                            
- *            open Questions: - Right Orientation DataGridComboBoxColumn
- *                            - Umstellung auf SQL Authentication
+ *            open Questions: - public static void AddBasicUnitTranslations(): Warum wird eine Unit Translation angelegt: 
+ *                               1001694	NULL	1000005	1000010	0	False	False	True	False
+ *                               1000000	Count	1000010
+ *                               1000003	Volume	1000005
+ *                               1000004	Weight	1000007
+ *                            - 
  *                            - 
  *
  * 

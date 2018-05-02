@@ -1,66 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="JamieDB" Class="JamieDBLinqDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="AppSettings" ConnectionString="Data Source=FOLLETT\SQLEXPRESS;Initial Catalog=JamieDB;Integrated Security=True" SettingsObjectName="JamieDB.Properties.Settings" SettingsPropertyName="JamieDBConnectionString" Provider="System.Data.SqlClient" />
-  <Table Name="dbo.FoodPlanItems" Member="FoodPlanItems">
-    <Type Name="FoodPlanItem">
-      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="PortionCount" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
-      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
-      <Association Name="Recipe_FoodPlanItem" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
-    </Type>
-  </Table>
+  <Connection Mode="AppSettings" ConnectionString="Data Source=FOLLETT\SQLEXPRESS;Initial Catalog=JamieDB;User ID=JamieDBUser" SettingsObjectName="JamieDB.Properties.Settings" SettingsPropertyName="JamieDBConnectionString" Provider="System.Data.SqlClient" />
   <Table Name="dbo.IngredientTypes" Member="IngredientTypes">
     <Type Name="IngredientType">
       <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="TargetUnitType" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
       <Association Name="IngredientType_Ingredient" Member="Ingredients" ThisKey="Id" OtherKey="TypeID" Type="Ingredient" />
-    </Type>
-  </Table>
-  <Table Name="dbo.RecipeIngredients" Member="RecipeIngredients">
-    <Type Name="RecipeIngredient">
-      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Column Name="IngredientID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(18,2) NOT NULL" CanBeNull="false" />
-      <Column Name="UnitID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Association Name="Recipe_RecipeIngredient" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
-      <Association Name="Ingredient_RecipeIngredient" Member="Ingredient" ThisKey="IngredientID" OtherKey="Id" Type="Ingredient" IsForeignKey="true" />
-      <Association Name="Unit_RecipeIngredient" Member="Unit" ThisKey="UnitID" OtherKey="Id" Type="Unit" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Recipes" Member="Recipes">
-    <Type Name="Recipe">
-      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="PortionQuantity" Type="System.Decimal" DbType="Decimal(18,2) NOT NULL" CanBeNull="false" />
-      <Column Name="Source" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="SourcePage" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="SourceISBN" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
-      <Column Name="Summary" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Association Name="Recipe_FoodPlanItem" Member="FoodPlanItems" ThisKey="Id" OtherKey="RecipeID" Type="FoodPlanItem" />
-      <Association Name="Recipe_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="RecipeID" Type="RecipeIngredient" />
-      <Association Name="Recipe_FoodPlanTemplateItem" Member="FoodPlanTemplateItems" ThisKey="Id" OtherKey="RecipeID" Type="FoodPlanTemplateItem" />
-    </Type>
-  </Table>
-  <Table Name="dbo.ShoppingListItems" Member="ShoppingListItems">
-    <Type Name="ShoppingListItem">
-      <Column Name="FoodPlanDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="Ingredient" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(38,6)" CanBeNull="true" />
-      <Column Name="Unit" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
-      <Column Name="Recipe" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
-    </Type>
-  </Table>
-  <Table Name="dbo.FoodPlanTemplateItems" Member="FoodPlanTemplateItems">
-    <Type Name="FoodPlanTemplateItem">
-      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="TemplateID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Column Name="DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="PortionCount" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
-      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Association Name="Recipe_FoodPlanTemplateItem" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
-      <Association Name="FoodPlanTemplate_FoodPlanTemplateItem" Member="FoodPlanTemplate" ThisKey="TemplateID" OtherKey="Id" Type="FoodPlanTemplate" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.FoodPlanTemplates" Member="FoodPlanTemplates">
@@ -82,8 +27,8 @@
       <Column Name="IsVegetarian" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
       <Column Name="IsLowCarb" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
       <Column Name="IsLowFat" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
-      <Association Name="Ingredient_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="IngredientID" Type="RecipeIngredient" />
       <Association Name="Ingredient_UnitTranslation" Member="UnitTranslations" ThisKey="Id" OtherKey="AffectedIngredientID" Type="UnitTranslation" />
+      <Association Name="Ingredient_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="IngredientID" Type="RecipeIngredient" />
       <Association Name="IngredientType_Ingredient" Member="IngredientType" ThisKey="TypeID" OtherKey="Id" Type="IngredientType" IsForeignKey="true" />
       <Association Name="Unit_Ingredient" Member="Unit" ThisKey="TargetUnitID" OtherKey="Id" Type="Unit" IsForeignKey="true" />
     </Type>
@@ -104,20 +49,6 @@
       <Association Name="Unit_UnitTranslation1" Member="Unit1" ThisKey="TargetUnitID" OtherKey="Id" Type="Unit" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Units" Member="Units">
-    <Type Name="Unit">
-      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Symbol" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
-      <Column Name="Name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="TypeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Association Name="Unit_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="UnitID" Type="RecipeIngredient" />
-      <Association Name="Unit_Ingredient" Member="Ingredients" ThisKey="Id" OtherKey="TargetUnitID" Type="Ingredient" />
-      <Association Name="Unit_UnitTranslation" Member="UnitTranslations" ThisKey="Id" OtherKey="BaseUnitID" Type="UnitTranslation" />
-      <Association Name="Unit_UnitTranslation1" Member="UnitTranslations1" ThisKey="Id" OtherKey="TargetUnitID" Type="UnitTranslation" />
-      <Association Name="Unit_UnitType" Member="UnitTypes" ThisKey="Id" OtherKey="StandardUnit" Type="UnitType" />
-      <Association Name="UnitType_Unit" Member="UnitType" ThisKey="TypeID" OtherKey="Id" Type="UnitType" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.UnitTypes" Member="UnitTypes">
     <Type Name="UnitType">
       <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -125,6 +56,69 @@
       <Column Name="StandardUnit" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
       <Association Name="UnitType_Unit" Member="Units" ThisKey="Id" OtherKey="TypeID" Type="Unit" />
       <Association Name="Unit_UnitType" Member="Unit" ThisKey="StandardUnit" OtherKey="Id" Type="Unit" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Units" Member="Units">
+    <Type Name="Unit">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Symbol" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="TypeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="TypeStandard" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="TypeFactor" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="TypeUniversal" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="Unit_Ingredient" Member="Ingredients" ThisKey="Id" OtherKey="TargetUnitID" Type="Ingredient" />
+      <Association Name="Unit_UnitTranslation" Member="UnitTranslations" ThisKey="Id" OtherKey="BaseUnitID" Type="UnitTranslation" />
+      <Association Name="Unit_UnitTranslation1" Member="UnitTranslations1" ThisKey="Id" OtherKey="TargetUnitID" Type="UnitTranslation" />
+      <Association Name="Unit_UnitType" Member="UnitTypes" ThisKey="Id" OtherKey="StandardUnit" Type="UnitType" />
+      <Association Name="Unit_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="UnitID" Type="RecipeIngredient" />
+      <Association Name="UnitType_Unit" Member="UnitType" ThisKey="TypeID" OtherKey="Id" Type="UnitType" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.RecipeIngredients" Member="RecipeIngredients">
+    <Type Name="RecipeIngredient">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="IngredientID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Quantity" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="UnitID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="Ingredient_RecipeIngredient" Member="Ingredient" ThisKey="IngredientID" OtherKey="Id" Type="Ingredient" IsForeignKey="true" />
+      <Association Name="Unit_RecipeIngredient" Member="Unit" ThisKey="UnitID" OtherKey="Id" Type="Unit" IsForeignKey="true" />
+      <Association Name="Recipe_RecipeIngredient" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Recipes" Member="Recipes">
+    <Type Name="Recipe">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="PortionQuantity" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="Source" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="SourcePage" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="SourceISBN" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Column Name="Summary" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Association Name="Recipe_RecipeIngredient" Member="RecipeIngredients" ThisKey="Id" OtherKey="RecipeID" Type="RecipeIngredient" />
+      <Association Name="Recipe_FoodPlanTemplateItem" Member="FoodPlanTemplateItems" ThisKey="Id" OtherKey="RecipeID" Type="FoodPlanTemplateItem" />
+      <Association Name="Recipe_FoodPlanItem" Member="FoodPlanItems" ThisKey="Id" OtherKey="RecipeID" Type="FoodPlanItem" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FoodPlanTemplateItems" Member="FoodPlanTemplateItems">
+    <Type Name="FoodPlanTemplateItem">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="TemplateID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="PortionCount" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="FoodPlanTemplate_FoodPlanTemplateItem" Member="FoodPlanTemplate" ThisKey="TemplateID" OtherKey="Id" Type="FoodPlanTemplate" IsForeignKey="true" />
+      <Association Name="Recipe_FoodPlanTemplateItem" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.FoodPlanItems" Member="FoodPlanItems">
+    <Type Name="FoodPlanItem">
+      <Column Name="Id" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="DateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="PortionCount" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="RecipeID" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Association Name="Recipe_FoodPlanItem" Member="Recipe" ThisKey="RecipeID" OtherKey="Id" Type="Recipe" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>
