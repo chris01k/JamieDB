@@ -112,8 +112,7 @@ namespace JamieDB.ViewModel
         private ObservableCollection<FoodPlanItem> _FoodPlanItems;
         private ObservableCollection<FoodPlanTemplate> _FoodPlanTemplates;
         private ObservableCollection<FoodPlanTemplateItem> _FoodPlanTemplateItems;
-             
-        private ObservableCollection<UnitTranslation> _ManualUnitTranslationsToSelectedUnit;
+           
         private ObservableCollection<Recipe> _Recipes;
         private ObservableCollection<RecipeIngredient> _RecipeIngredients;
         private DateTime _SelectedFoodPlanDate;

@@ -58,9 +58,16 @@
  *                            Bugfixes
  *                            - XML-TabItem Units: UnitType Combobox
  *                            - XML-TabItem Ingredients: TargetUnit & Type Combobox
+ * Version 0.14 - 2018-05-xx: Unit Translations
+ *                            - Reorganization: Unit Translation Factor splitted in Table UnitTranslation (different type)
+ *                              and Unit (same type)
+ *                            JamieDBViewModelBase 
+ *                            - Base class for all ViewModel classes created
+ *                            - JamieDBEieModelBase applied to new VM classes UnitVMClass, IngredientVMClass
+ *                            
  */
 
-/* Version 0.14 - 2017-03-xx: 
+/* Version 0.15 - 2018-05-xx: 
  *                            - 
  *                            
  *                            Bugfixes

@@ -91,7 +91,7 @@
                                         SelectedItemBinding="{Binding Unit}">
                         </DataGridComboBoxColumn>
                         <DataGridComboBoxColumn Header="Ingredient" Width="8*" 
-                                        ItemsSource="{Binding Ingredients, Source={StaticResource viewModel}}"
+                                        ItemsSource="{Binding IngredientVM.Ingredients, Source={StaticResource viewModel}}"
                                         DisplayMemberPath="Name" SelectedItemBinding="{Binding Ingredient}"/>
                     </DataGrid.Columns>
                 </DataGrid>
@@ -127,52 +127,69 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="7*"/>
                     <ColumnDefinition Width="112*"/>
-                    <ColumnDefinition Width="27"/>
+                    <ColumnDefinition Width="13"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="63"/>
                     <ColumnDefinition Width="118*"/>
                     <ColumnDefinition Width="119*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Margin="5" Width="Auto" Text="{Binding SelectedIngredient.Id, Source={StaticResource viewModel}}" IsReadOnly="True" Grid.ColumnSpan="2"></TextBox>
-                <ComboBox Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="4" Margin="5" ItemsSource="{Binding Ingredients, Mode=TwoWay, Source={StaticResource viewModel}}" DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedIngredient, Mode=TwoWay, Source={StaticResource viewModel}}"></ComboBox>
-                <Button Content="New" Grid.Row="0" Grid.Column="6" Margin="5" Width="70" Command="{Binding NewIngredientCommand, Mode=OneWay, Source={StaticResource viewModel}}" />
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="5" Width="Auto" Text="{Binding IngredientVM.SelectedIngredient.Id, Source={StaticResource viewModel}}" IsReadOnly="True" Grid.ColumnSpan="2"></TextBox>
+                <ComboBox Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="5" Margin="5" ItemsSource="{Binding IngredientVM.Ingredients, Source={StaticResource viewModel}}" DisplayMemberPath="Name"
+                          SelectedItem="{Binding IngredientVM.SelectedIngredient, Source={StaticResource viewModel}}"></ComboBox>
+                <Button Content="New" Grid.Row="0" Grid.Column="7" Margin="5" Width="70" Command="{Binding NewIngredientCommand, Mode=OneWay, Source={StaticResource viewModel}}" />
 
-                <TextBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="4" Margin="5" Text="{Binding SelectedIngredient.Name, Source={StaticResource viewModel}}"></TextBox>
-                <Button Content="Delete" Grid.Row="1" Grid.Column="6" Margin="5" Command="{Binding DeleteIngredientCommand, Source={StaticResource viewModel}}" />
+                <TextBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="5" Margin="5" Text="{Binding IngredientVM.SelectedIngredient.Name, Source={StaticResource viewModel}}"></TextBox>
+                <Button Content="Delete" Grid.Row="1" Grid.Column="7" Margin="5" Command="{Binding DeleteIngredientCommand, Source={StaticResource viewModel}}" />
 
                 <Label Grid.Row="2" Grid.Column="0" Margin="2" FlowDirection="RightToLeft" Grid.ColumnSpan="2">TargetUnit</Label>
                 <ComboBox Grid.Row="2" Grid.Column="2" Margin="5" 
                           ItemsSource="{Binding UnitVM.Units, Source={StaticResource viewModel}}" 
-                          DisplayMemberPath="Symbol" 
-                          SelectedItem="{Binding SelectedIngredient.Unit, Source={StaticResource viewModel}}" Grid.ColumnSpan="2">
-                </ComboBox>
+                          DisplayMemberPath="Symbol" Grid.ColumnSpan="3" SelectedValue="{Binding IngredientVM.SelectedIngredient.Unit, Source={StaticResource viewModel}}"/>
 
 
                 <Label Grid.Row="3" Grid.Column="0" Margin="5" FlowDirection="RightToLeft" Grid.ColumnSpan="2">Type</Label>
                 <ComboBox Grid.Row="3" Grid.Column="2" Width="80" Margin="5" HorizontalAlignment="Center"
-                          ItemsSource="{Binding IngredientTypes, Source={StaticResource viewModel}}" 
+                          ItemsSource="{Binding IngredientVM.IngredientTypes, Source={StaticResource viewModel}}" 
                           DisplayMemberPath="Name" 
-                          SelectedItem="{Binding SelectedIngredient.IngredientType, Source={StaticResource viewModel}}" Grid.ColumnSpan="2" 
+                          SelectedItem="{Binding IngredientVM.SelectedIngredient.IngredientType, Source={StaticResource viewModel}}" Grid.ColumnSpan="3" 
                           ></ComboBox>
 
                 <Label Grid.Row="4" Grid.Column="0" Margin="2" FlowDirection="RightToLeft" Grid.ColumnSpan="2">Flags</Label>
-                <GroupBox Grid.Row="4" Grid.Column="2" Margin="5" Grid.ColumnSpan="4">
+                <GroupBox Grid.Row="4" Grid.Column="2" Margin="5" Grid.ColumnSpan="6">
                     <WrapPanel Orientation="Horizontal">
-                        <CheckBox Margin="5" Width="80" IsChecked="{Binding SelectedIngredient.IsVegetarian, Source={StaticResource viewModel}}" >vegetarisch</CheckBox>
-                        <CheckBox Margin="5" Width="80" IsChecked="{Binding SelectedIngredient.IsVegan, Source={StaticResource viewModel}}">vegan</CheckBox>
-                        <CheckBox Margin="5" Width="80" IsChecked="{Binding SelectedIngredient.IsLowCarb, Source={StaticResource viewModel}}">Low Carb</CheckBox>
-                        <CheckBox Margin="5" Width="80" IsChecked="{Binding SelectedIngredient.IsLowFat, Source={StaticResource viewModel}}">Low Fat</CheckBox>
+                        <CheckBox Margin="5" Width="80" IsChecked="{Binding IngredientVM.SelectedIngredient.IsVegetarian, Source={StaticResource viewModel}}" >vegetarisch</CheckBox>
+                        <CheckBox Margin="5" Width="80" IsChecked="{Binding IngredientVM.SelectedIngredient.IsVegan, Source={StaticResource viewModel}}">vegan</CheckBox>
+                        <CheckBox Margin="5" Width="80" IsChecked="{Binding IngredientVM.SelectedIngredient.IsLowCarb, Source={StaticResource viewModel}}">Low Carb</CheckBox>
+                        <CheckBox Margin="5" Width="80" IsChecked="{Binding IngredientVM.SelectedIngredient.IsLowFat, Source={StaticResource viewModel}}">Low Fat</CheckBox>
                     </WrapPanel>
                 </GroupBox>
 
 
                 <Label  Grid.Row="5" Grid.Column="0" Margin="2" FlowDirection="RightToLeft" Grid.ColumnSpan="2">Unit Translations</Label>
+                <DataGrid Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="6" ItemsSource="{Binding IngredientVM.MissingTranslations, Source={StaticResource viewModel}}" SelectedItem="{Binding IngredientVM.SelectedMissingTranslation, Source={StaticResource viewModel}}" AutoGenerateColumns="False" >
 
-                <Button Grid.Row="6" Grid.Column="6" Content="Save" Margin="5" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
-                <StatusBar Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="7" Margin="5">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Ingredient" Binding="{Binding AffectedIngredient.Name}" Width="3*"/>
+                        <DataGridComboBoxColumn Header="BaseUnit" Width="*"
+                                ItemsSource="{Binding UnitVM.Units, Source={StaticResource viewModel}}"
+                                DisplayMemberPath="Symbol"
+                                SelectedItemBinding="{Binding BaseUnit}">
+                        </DataGridComboBoxColumn>
+                        <DataGridComboBoxColumn Header="TargetUnit" Width="*"
+                                ItemsSource="{Binding UnitVM.Units, Source={StaticResource viewModel}}"
+                                DisplayMemberPath="Symbol"
+                                SelectedItemBinding="{Binding TargetUnit}">
+                        </DataGridComboBoxColumn>
+                        <DataGridTextColumn Header="Factor" Binding="{Binding Factor}"/>
+                        <DataGridTextColumn Header="Recipe" Binding="{Binding RelatedRecipe.Name}" Width="3*"/>
+                    </DataGrid.Columns>
+
+                </DataGrid>
+                <Button Grid.Row="6" Grid.Column="7" Content="Save" Margin="5" Width="70" Command="{Binding SaveCommand, Mode=TwoWay, Source={StaticResource viewModel}}" />
+                <StatusBar Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="8" Margin="5">
                     <StatusBarItem>
-                        <TextBlock FontSize="10" Text="{Binding StatusBarMessage, Source={StaticResource viewModel}}" ></TextBlock>
+                        <TextBlock FontSize="10" Text="{Binding IngredientVM.StatusBarMessage, Source={StaticResource viewModel}}" ></TextBlock>
                     </StatusBarItem>
                 </StatusBar>
 
@@ -221,10 +238,10 @@
                       AlternationCount="2"
                       RowBackground="White"
                       AlternatingRowBackground="LightCyan"
-                      ItemsSource="{Binding UnitVM.MissingUnits, Source={StaticResource viewModel}}"
-                      SelectedItem="{Binding UnitVM.SelectedMisssingUnit, Source={StaticResource viewModel}}">
+                      ItemsSource="{Binding UnitVM.MissingTranslations, Source={StaticResource viewModel}}"
+                      SelectedItem="{Binding UnitVM.SelectedMissingTranslation, Source={StaticResource viewModel}}">
 
-                  <DataGrid.Columns>
+                    <DataGrid.Columns>
                         <DataGridTextColumn Header="Ingredient" Binding="{Binding AffectedIngredient.Name}" Width="3*"/>
                         <DataGridComboBoxColumn Header="BaseUnit" Width="*"
                                 ItemsSource="{Binding UnitVM.Units, Source={StaticResource viewModel}}"
@@ -258,8 +275,11 @@
                 </StatusBar>
 
             </DockPanel>
-        </TabItem>
+        </TabItem
+                 >
 
+        <!-- Tab Food Plan -->
+            
         <TabItem Header="Food Plan">
             <Grid ShowGridLines="False">
                 <Grid.RowDefinitions>
@@ -336,6 +356,8 @@
                 </StatusBar>
             </Grid>
         </TabItem>
+
+        <!-- Tab Shopping List -->
         <TabItem Header="Shopping List" Visibility="Collapsed">
             <Grid ShowGridLines="True">
                 <Grid.RowDefinitions>
@@ -393,6 +415,9 @@
                 </StatusBar>
             </Grid>
         </TabItem>
+
+        <!-- Tab Stock -->
+            
         <TabItem Header="Stock">
             <Calendar SelectionMode="SingleRange"/>
         </TabItem>

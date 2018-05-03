@@ -16,8 +16,8 @@ namespace JamieDB.ViewModel
 
         #region Attributes
         private Unit _LastSelectedUnit;
-        private ObservableCollection<MissingUnit> _MissingUnits;
-        private MissingUnit _SelectedMisssingUnit;
+        private ObservableCollection<MissingTranslation> _MissingTranslations;
+        private MissingTranslation _SelectedMissingTranslation;
         private Unit _SelectedUnit;
         private UnitTranslation _SelectedUnitTranslation;
         private ObservableCollection<Unit> _Units;
@@ -49,7 +49,7 @@ namespace JamieDB.ViewModel
             
             RefreshUnits();
             RefreshUnitTypes();
-            RefreshMissingUnits();
+            RefreshMissingUnitTranslations();
         }
         #endregion
 
@@ -123,35 +123,35 @@ namespace JamieDB.ViewModel
             }
         }
 
-        public ObservableCollection<MissingUnit> MissingUnits
+        public ObservableCollection<MissingTranslation> MissingTranslations
         {
             get
             {
-                return _MissingUnits;
+                return _MissingTranslations;
             }
 
             set
             {
-                if (_MissingUnits != value)
+                if (_MissingTranslations != value)
                 {
-                    _MissingUnits = value;
-                    OnPropertyChanged("MissingUnits");
+                    _MissingTranslations = value;
+                    OnPropertyChanged("MissingTranslations");
                 }
             }
         }
-        public MissingUnit SelectedMisssingUnit
+        public MissingTranslation SelectedMissingTranslation
         {
             get
             {
-                return _SelectedMisssingUnit;
+                return _SelectedMissingTranslation;
             }
 
             set
             {
-                if (_SelectedMisssingUnit != value)
+                if (_SelectedMissingTranslation != value)
                 {
-                    _SelectedMisssingUnit = value;
-                    OnPropertyChanged("SelectedMisssingUnit");
+                    _SelectedMissingTranslation = value;
+                    OnPropertyChanged("SelectedMissingTranslation");
                 }
 
             }
@@ -168,19 +168,16 @@ namespace JamieDB.ViewModel
             {
                 if (_SelectedUnit != value)
                 {
+                    _SelectedUnit = value;
                     if (ValidateSelectedUnitChanges(LastSelectedUnit,SelectedUnit))
                     {
-                        _SelectedUnit = value;
                         if (value != null) LastSelectedUnit = SelectedUnit.Clone();
                         else LastSelectedUnit = value;
                         OnPropertyChanged("SelectedUnit");
                         StatusBarMessage = "New Selected Unit = " + _SelectedUnit;
-                        context.SubmitChanges();
                     }
-
-
                 }
-
+                context.SubmitChanges();
             }
         }
         public UnitTranslation SelectedUnitTranslation
@@ -304,6 +301,7 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Methods
+
         public Unit DefaultUnit()
         {
             Unit result;
@@ -325,19 +323,19 @@ namespace JamieDB.ViewModel
         }
 
 
-        private void RefreshMissingUnits()
+        private void RefreshMissingUnitTranslations()
         {
             var result = context.RecipeIngredients.Where(ri => ri.UnitID != ri.Ingredient.TargetUnitID);
 
             ObservableCollection<RecipeIngredient> test = new ObservableCollection<RecipeIngredient>(result);
 
-            MissingUnits = new ObservableCollection<MissingUnit>();
+            MissingTranslations = new ObservableCollection<MissingTranslation>();
 
             foreach (var r in result)
             {
                 if (!(r.Unit.TypeID == r.Ingredient.Unit.TypeID && r.Unit.TypeStandard && r.Unit.TypeStandard))
                 {
-                    MissingUnit x = new MissingUnit();
+                    MissingTranslation x = new MissingTranslation();
 
                     x.AffectedIngredient = r.Ingredient;
                     x.BaseUnit = r.Unit;
@@ -346,15 +344,15 @@ namespace JamieDB.ViewModel
                     x.RelatedRecipe = r.Recipe;
 
 
-                    if (!MissingUnits.Contains(x)) MissingUnits.Add(x);
+                    if (!MissingTranslations.Contains(x)) MissingTranslations.Add(x);
 
                 }
 
             }
 
-            
+
         }
-        
+
         private void RefreshUnits()
         {
             var result = context.Units.OrderBy(u => u.Symbol);
@@ -623,7 +621,7 @@ namespace JamieDB.ViewModel
         #endregion
     }
 
-    class MissingUnit : JamieDBViewModelBase, IEquatable<MissingUnit>
+    class MissingTranslation : JamieDBViewModelBase, IEquatable<MissingTranslation>
     {
         #region Attributes
         private Ingredient _AffectedIngredient;
@@ -634,7 +632,7 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Constructors
-        public MissingUnit()
+        public MissingTranslation()
         {
         }
         #endregion
@@ -729,7 +727,7 @@ namespace JamieDB.ViewModel
 
         #region Methods
 
-        public bool Equals (MissingUnit ToBeCompared)
+        public bool Equals (MissingTranslation ToBeCompared)
         {
             return (this.BaseUnit.Id == ToBeCompared.BaseUnit.Id && this.TargetUnit.Id == ToBeCompared.TargetUnit.Id && 
                     this.AffectedIngredient.Id == ToBeCompared.AffectedIngredient.Id) ||
@@ -737,7 +735,123 @@ namespace JamieDB.ViewModel
                     this.AffectedIngredient.Id == ToBeCompared.AffectedIngredient.Id);
         }
 
+        public override string ToString()
+        {
+            return string.Format("{0}: 1 {1} = {2} {3} " , AffectedIngredient.Name , BaseUnit.Symbol , this.Factor, TargetUnit.Symbol);
+        }
+
+
         #endregion
 
     }
+
+    class UnitTranslator:JamieDBViewModelBase
+    {
+
+        #region Attributes
+        private ObservableCollection<Unit> _Units;
+        private ObservableCollection<UnitTranslation> _UnitTranslations;
+
+        #region Attributes: Commands
+        #endregion
+        #endregion
+
+        #region Constructors
+        public UnitTranslator()
+        {
+            _Units = new ObservableCollection<Unit>(context.Units.ToList());
+            _UnitTranslations = new ObservableCollection<UnitTranslation>(context.UnitTranslations.ToList());
+        }
+        #endregion
+
+        #region Events
+        #region Events:EventHandler
+        #endregion
+        #endregion
+
+        #region Properties
+        public ObservableCollection<Unit> Units
+        {
+            get
+            {
+                return _Units;
+            }
+            set
+            {
+                if (_Units != value)
+                {
+                    _Units = value;
+                    OnPropertyChanged("Units");
+                }
+            }
+        }
+        public ObservableCollection<UnitTranslation> UnitTranslations
+        {
+            get
+            {
+                return _UnitTranslations;
+            }
+            set
+            {
+                if (_UnitTranslations != value)
+                {
+                    _UnitTranslations = value;
+                    OnPropertyChanged("UnitTranslations");
+                }
+            }
+        }
+        #region Properties: Commands
+        #endregion
+        #endregion
+
+        #region Methods
+        public double GetTranslationFactor(Ingredient i, Unit Unit1, Unit Unit2)
+        {
+            double ReturnValue=0;
+
+///
+/// Hier geht es weiter
+///            
+
+
+            return ReturnValue;
+        }
+        #region Methods: Command Methods
+        #region Methods: Generic Command Methods
+        #endregion
+        #endregion
+        #endregion
+
+
+
+    }
 }
+
+
+/*
+    #region Attributes
+    #region Attributes: Commands
+    #endregion
+    #endregion
+
+    #region Constructors
+    #endregion
+
+    #region Events
+    #region Events:EventHandler
+    #endregion
+    #endregion
+
+    #region Properties
+    #region Properties: Commands
+    #endregion
+    #endregion
+
+    #region Methods
+    #region Methods: Command Methods
+    #region Methods: Generic Command Methods
+    #endregion
+    #endregion
+    #endregion
+
+ */
