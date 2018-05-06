@@ -29,7 +29,7 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Attributes: Commands
-        private JamieDBViewModelCommand _SaveCommand;
+//        private JamieDBViewModelCommand _SaveCommand;
         #endregion
 
         #region Constructors
@@ -713,13 +713,6 @@ namespace JamieDB.ViewModel
 
         #region Methods
         
-        private ObservableCollection<UnitTranslation> GetUnitTranslationsInverse()
-        {
-            var result = _context.UnitTranslations.Where(ut => ut.TargetUnitID == UnitVM.SelectedUnit.Id).OrderBy(ut => ut.Unit.Symbol);
-            var ReturnList = new ObservableCollection<UnitTranslation>(result);
-
-            return ReturnList;
-        }
         private ObservableCollection<FoodPlanTemplateItem> GetFoodPlanTemplateItems(FoodPlanTemplate ConsideredFPT)
         {
             return new ObservableCollection<FoodPlanTemplateItem>(
@@ -731,15 +724,6 @@ namespace JamieDB.ViewModel
         {
             return GetFoodPlanTemplateItems(ConsideredFPT).Count();
         }
-
-        /*public void OnPropertyChanged(string PropertyName)
-        {
-            if (this.PropertyChanged != null)
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(PropertyName));
-            }
-        }
-        */
 
         private void RefreshFoodPlanItems()
         {
@@ -809,7 +793,8 @@ namespace JamieDB.ViewModel
             if (SelectedRecipe == null) SelectedRecipe = result.FirstOrDefault();
 
         }
-      /*  private void RefreshShoppingListItems()
+      
+        /*  private void RefreshShoppingListItems()
         {
 
             ShoppingListItems = new ObservableCollection<ShoppingListItem>();

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,11 +16,13 @@ namespace JamieDB.ViewModel
         #region Attributes
         private ObservableCollection<Ingredient> _Ingredients;
         private ObservableCollection<IngredientType> _IngredientTypes;
-        private ObservableCollection<MissingTranslation> _MissingTranslations;
+        private ObservableCollection<MissingTranslation> _RecipeTranslations;
         
-        private ObservableCollection<RecipeIngredient> _RelatedRecipesIngredients;
         private Ingredient _SelectedIngredient;
-        private MissingTranslation _SelectedMissingTranslation;
+        private MissingTranslation _SelectedRecipeTranslation;
+        private UnitTranslation _SelectedUnitTranslation;
+        private UnitTranslator _UnitTranslator;
+        private ObservableCollection<UnitTranslation> _UnitTranslations;
         #endregion
 
         #region Attributes: Commands
@@ -30,14 +33,62 @@ namespace JamieDB.ViewModel
         #region Constructors
         public IngredientsVMClass()
         {
+            _UnitTranslator = new UnitTranslator();
             DeleteIngredientCommand = new JamieDBViewModelCommand(CanExecuteDeleteIngredient, ExecuteDeleteIngredient);
             NewIngredientCommand = new JamieDBViewModelCommand(CanAlwaysExecute, ExecuteNewIngredient);
             RefreshIngredients();
             RefreshIngredientTypes();
-            
+            RefreshUnitTranslations();
+        }
+        #endregion
+
+        #region Events
+        //        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+        #region Events:EventHandler
+        public void UnitTranslationsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems != null)
+                {
+                    UnitTranslation NewUnitTranslation = (UnitTranslation)e.NewItems[0];
+
+                    NewUnitTranslation.Ingredient = SelectedIngredient;
+
+                    /*                    var NewIngredientChange = (RecipeIngredient)e.NewItems[0];
+
+                                        //Fill Foreign Keys
+
+                                        NewIngredientChange.RecipeID = SelectedRecipe.Id;
+                                        NewIngredientChange.Recipe = SelectedRecipe;
+
+                                        NewIngredientChange.IngredientID = SelectedIngredient.Id;
+                                        NewIngredientChange.Ingredient = SelectedIngredient;
+
+                                        NewIngredientChange.UnitID = UnitVM.SelectedUnit.Id;
+                                        NewIngredientChange.Unit = UnitVM.SelectedUnit;
+                                        StatusBarMessage = "RecipeIngredient Added";
+                    */
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems != null)
+                {
+                    /*                  foreach (RecipeIngredient RI in e.OldItems)
+                                           {
+                                           _context.RecipeIngredients.DeleteOnSubmit(RI);
+                                           StatusBarMessage = "RecipeIngredient Deleted";
+                                           }
+                   */
+                }
+            }
 
         }
         #endregion
+
 
         #region Properties
         public ObservableCollection<Ingredient> Ingredients
@@ -72,23 +123,22 @@ namespace JamieDB.ViewModel
                 }
             }
         }
-        public ObservableCollection<MissingTranslation> MissingTranslations
+        public ObservableCollection<MissingTranslation> RecipeTranslations
         {
             get
             {
-                return _MissingTranslations;
+                return _RecipeTranslations;
             }
 
             set
             {
-                if (_MissingTranslations != value)
+                if (_RecipeTranslations != value)
                 {
-                    _MissingTranslations = value;
-                    OnPropertyChanged("MissingTranslations");
+                    _RecipeTranslations = value;
+                    OnPropertyChanged("RecipeTranslations");
                 }
             }
         }
-
         public Ingredient SelectedIngredient
         {
             get
@@ -102,8 +152,8 @@ namespace JamieDB.ViewModel
                 {
                     _SelectedIngredient = value;
                     OnPropertyChanged("SelectedIngredient");
+                    OnPropertyChanged("IngredientUnitTranslations");
                     RefreshMissingUnitTranslations();
-
                 }
             }
         }
@@ -111,17 +161,57 @@ namespace JamieDB.ViewModel
         {
             get
             {
-                return _SelectedMissingTranslation;
+                return _SelectedRecipeTranslation;
             }
 
             set
             {
-                if (_SelectedMissingTranslation != value)
+                if (_SelectedRecipeTranslation != value)
                 {
-                    _SelectedMissingTranslation = value;
-                    OnPropertyChanged("SelectedMissingTranslation");
-                    StatusBarMessage = "Selected Missing Translation " + value;
+                    _SelectedRecipeTranslation = value;
+                    OnPropertyChanged("SelectedRecipeTranslation");
+                    StatusBarMessage = "Selected Recipe Translation " + value;
                 }
+            }
+        }
+        public UnitTranslation SelectedUnitTranslation
+        {
+            get
+            {
+                return _SelectedUnitTranslation;
+            }
+
+            set
+            {
+                if (_SelectedUnitTranslation != value)
+                {
+                    _SelectedUnitTranslation = value;
+                    OnPropertyChanged("SelectedUnitTranslation");
+                    StatusBarMessage = "Selected UnitTranslation" + value;
+                }
+            }
+        }
+        public ObservableCollection<UnitTranslation> UnitTranslations
+        {
+            get
+            {
+                return _UnitTranslations;
+            }
+
+            set
+            {
+                if (_UnitTranslations != value)
+                {
+                    _UnitTranslations = value;
+                    OnPropertyChanged("UnitTranslations");
+                }
+            }
+        }
+        public ObservableCollection<UnitTranslation> IngredientUnitTranslations
+        {
+            get
+            {
+                return new ObservableCollection<UnitTranslation>(_UnitTranslations.Where(u=>u.Ingredient == SelectedIngredient));
             }
         }
         #endregion
@@ -151,7 +241,6 @@ namespace JamieDB.ViewModel
                 _NewIngredientCommand = value;
             }
         }
-
         #endregion
 
         #region Methods
@@ -171,33 +260,25 @@ namespace JamieDB.ViewModel
         {
             var result = context.RecipeIngredients.Where(ri => ri.Ingredient == SelectedIngredient && (ri.UnitID != ri.Ingredient.TargetUnitID));
 
-            ObservableCollection<RecipeIngredient> test = new ObservableCollection<RecipeIngredient>(result);
-
-            MissingTranslations = new ObservableCollection<MissingTranslation>();
+            RecipeTranslations = new ObservableCollection<MissingTranslation>();
 
             foreach (var r in result)
             {
-                if (!(r.Unit.TypeID == r.Ingredient.Unit.TypeID && r.Unit.TypeStandard && r.Unit.TypeStandard))
-                {
                     MissingTranslation x = new MissingTranslation();
 
                     x.AffectedIngredient = r.Ingredient;
                     x.BaseUnit = r.Unit;
                     x.TargetUnit = r.Ingredient.Unit;
-                    x.Factor = 0;
+                    x.Factor = _UnitTranslator.GetTranslationFactor(r.Ingredient,r.Unit, r.Ingredient.Unit);
                     x.RelatedRecipe = r.Recipe;
-
-
-                    if (!MissingTranslations.Contains(x)) MissingTranslations.Add(x);
-
-                }
-
+                    RecipeTranslations.Add(x);
             }
-
-
         }
-
-
+        private void RefreshUnitTranslations()
+        {
+            UnitTranslations = new ObservableCollection<UnitTranslation>(context.UnitTranslations);
+            UnitTranslations.CollectionChanged += new NotifyCollectionChangedEventHandler(UnitTranslationsChanged);
+        }
         #endregion
 
         #region Methods:Command Methods

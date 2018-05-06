@@ -58,16 +58,23 @@
  *                            Bugfixes
  *                            - XML-TabItem Units: UnitType Combobox
  *                            - XML-TabItem Ingredients: TargetUnit & Type Combobox
- * Version 0.14 - 2018-05-xx: Unit Translations
+ * Version 0.14 - 2018-05-02: Unit Translations
  *                            - Reorganization: Unit Translation Factor splitted in Table UnitTranslation (different type)
  *                              and Unit (same type)
  *                            JamieDBViewModelBase 
  *                            - Base class for all ViewModel classes created
  *                            - JamieDBEieModelBase applied to new VM classes UnitVMClass, IngredientVMClass
+ *                            SQL Server
+ *                            - Connection changed to IP
+ *                            - Login Changed to JamieDBUser
+ * Version 0.15 - 2018-05-06: 
+ *                            - Einheitenumrechnung Implementiert (noch nicht getestet) 
+ *                            - Überarbeitung Eingabe UnitTranslations begonnen
+ *                            
  *                            
  */
 
-/* Version 0.15 - 2018-05-xx: 
+/* Version 0.16 - 2018-05-xx: 
  *                            - 
  *                            
  *                            Bugfixes
@@ -90,6 +97,15 @@
  * 
  *               Checklists : 1. <Name Programmiercheckliste>
  *                            -
+ *                            
+ *                    To DOs: - Refresh Methoden umbenennen nach GetXXFromDatabase
+ *                            -      
+ *                            
+ *                   Planung: - Einheiten - Umrechnung finalisieren
+ *                            - Generieren von Einkaufslisten
+ *                            - User-Verwaltung: Rumpf erzeugen...
+ *                            - Produkteverwaltung
+ *                            - Bezugsquellen
  */
 
 /*[Flags] public enum TranslationType

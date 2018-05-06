@@ -13,11 +13,20 @@ namespace JamieDB.ViewModel
 {
     class UnitsVMClass : JamieDBViewModelBase
     {
+        [FlagsAttribute]
+        enum UnitChanges : short
+        {
+            ucNone = 0,
+            ucID = 1,
+            ucName = 2,
+            ucType = 4,
+            ucTypeStd = 8,
+            ucTypeFactor = 16,
+            ucTypeUniv = 32
+        };
 
         #region Attributes
         private Unit _LastSelectedUnit;
-        private ObservableCollection<MissingTranslation> _MissingTranslations;
-        private MissingTranslation _SelectedMissingTranslation;
         private Unit _SelectedUnit;
         private UnitTranslation _SelectedUnitTranslation;
         private ObservableCollection<Unit> _Units;
@@ -49,12 +58,12 @@ namespace JamieDB.ViewModel
             
             RefreshUnits();
             RefreshUnitTypes();
-            RefreshMissingUnitTranslations();
+            RefreshUnitTranslations();
         }
         #endregion
 
         #region Events
-//        public event PropertyChangedEventHandler PropertyChanged;
+        //        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
         #region Events:EventHandler
@@ -100,7 +109,6 @@ namespace JamieDB.ViewModel
         {
 
         }
-
         #endregion
 
 
@@ -123,40 +131,6 @@ namespace JamieDB.ViewModel
             }
         }
 
-        public ObservableCollection<MissingTranslation> MissingTranslations
-        {
-            get
-            {
-                return _MissingTranslations;
-            }
-
-            set
-            {
-                if (_MissingTranslations != value)
-                {
-                    _MissingTranslations = value;
-                    OnPropertyChanged("MissingTranslations");
-                }
-            }
-        }
-        public MissingTranslation SelectedMissingTranslation
-        {
-            get
-            {
-                return _SelectedMissingTranslation;
-            }
-
-            set
-            {
-                if (_SelectedMissingTranslation != value)
-                {
-                    _SelectedMissingTranslation = value;
-                    OnPropertyChanged("SelectedMissingTranslation");
-                }
-
-            }
-        }
-
         public Unit SelectedUnit
         {
             get
@@ -166,18 +140,35 @@ namespace JamieDB.ViewModel
 
             set
             {
-                if (_SelectedUnit != value)
+                if (_SelectedUnit != value) 
                 {
-                    _SelectedUnit = value;
-                    if (ValidateSelectedUnitChanges(LastSelectedUnit,SelectedUnit))
+                    UnitChanges SelectedUnitChanges = EvaluateUnitChanges(LastSelectedUnit, SelectedUnit);
+
+                    if (ValidateSelected(_SelectedUnit))
                     {
-                        if (value != null) LastSelectedUnit = SelectedUnit.Clone();
-                        else LastSelectedUnit = value;
-                        OnPropertyChanged("SelectedUnit");
-                        StatusBarMessage = "New Selected Unit = " + _SelectedUnit;
+
+                        if (SelectedUnitChanges.HasFlag(UnitChanges.ucTypeStd))
+                            {
+                            if (SelectedUnit.TypeStandard) RecalculateNewStandardUnitFactors(SelectedUnit);
+                            else ReverseUnitChanges(LastSelectedUnit, SelectedUnit, SelectedUnitChanges);
+                            }
+
+
+
                     }
+                    else ReverseUnitChanges(LastSelectedUnit, SelectedUnit, SelectedUnitChanges);
+
+                    _SelectedUnit = value;
+                    if (value != null) LastSelectedUnit = value.Clone();
+                    else LastSelectedUnit = value;
+
+                    OnPropertyChanged("SelectedUnit");
+                    StatusBarMessage = "New Selected Unit = " + SelectedUnit;
+                    context.SubmitChanges();
+                    StatusBarMessage = "Änderungen gespeichert";
                 }
-                context.SubmitChanges();
+
+
             }
         }
         public UnitTranslation SelectedUnitTranslation
@@ -301,58 +292,21 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Methods
-
-        public Unit DefaultUnit()
+        private UnitChanges EvaluateUnitChanges(Unit U1, Unit U2)
         {
-            Unit result;
+            UnitChanges ReturnValue = UnitChanges.ucNone;
 
-            if (SelectedUnit == null)
+            if (U1 != null && U2 != null)
             {
-                result = Units.FirstOrDefault();
+                if (U1.Id != U2.Id) ReturnValue |= UnitChanges.ucID;
+                if (U1.Name != U2.Name) ReturnValue |= UnitChanges.ucName;
+                if (U1.TypeID != U2.TypeID) ReturnValue |= UnitChanges.ucType;
+                if (U1.TypeStandard != U2.TypeStandard) ReturnValue |= UnitChanges.ucTypeStd;
+                if (U1.TypeFactor != U2.TypeFactor) ReturnValue |= UnitChanges.ucTypeFactor;
+                if (U1.TypeUniversal != U2.TypeUniversal) ReturnValue |= UnitChanges.ucTypeUniv;
             }
-            else result = SelectedUnit;
-
-            return result;
+            return ReturnValue;
         }
-        private ObservableCollection<UnitTranslation> GetUnitTranslationsInverse()
-        {
-            var result = context.UnitTranslations.Where(ut => ut.TargetUnitID == SelectedUnit.Id).OrderBy(ut => ut.Unit.Symbol);
-            var ReturnList = new ObservableCollection<UnitTranslation>(result);
-
-            return ReturnList;
-        }
-
-
-        private void RefreshMissingUnitTranslations()
-        {
-            var result = context.RecipeIngredients.Where(ri => ri.UnitID != ri.Ingredient.TargetUnitID);
-
-            ObservableCollection<RecipeIngredient> test = new ObservableCollection<RecipeIngredient>(result);
-
-            MissingTranslations = new ObservableCollection<MissingTranslation>();
-
-            foreach (var r in result)
-            {
-                if (!(r.Unit.TypeID == r.Ingredient.Unit.TypeID && r.Unit.TypeStandard && r.Unit.TypeStandard))
-                {
-                    MissingTranslation x = new MissingTranslation();
-
-                    x.AffectedIngredient = r.Ingredient;
-                    x.BaseUnit = r.Unit;
-                    x.TargetUnit = r.Ingredient.Unit;
-                    x.Factor = 0;
-                    x.RelatedRecipe = r.Recipe;
-
-
-                    if (!MissingTranslations.Contains(x)) MissingTranslations.Add(x);
-
-                }
-
-            }
-
-
-        }
-
         private void RefreshUnits()
         {
             var result = context.Units.OrderBy(u => u.Symbol);
@@ -362,25 +316,30 @@ namespace JamieDB.ViewModel
             SelectedUnit = Units.FirstOrDefault();
 
         }
-        
-/*        private void RefreshRelatedUnitTranslations()
+        private void RefreshUnitTranslations()
         {
-            var result = context.UnitTranslations.Where(s => (s.BaseUnitID == SelectedUnit.Id) || (s.TargetUnitID== SelectedUnit.Id));
-            if (result.ToList().Count()!=0)
+            var result = context.UnitTranslations.ToList();
+            if (result.Count()!=0)
 
             {
-                RelatedUnitTranslations = new ObservableCollection<UnitTranslation>(result);
-                RelatedUnitTranslations.CollectionChanged += new NotifyCollectionChangedEventHandler(UnitTranslationsChanged);
-                SelectedUnitTranslation = RelatedUnitTranslations.FirstOrDefault();
+                UnitTranslations = new ObservableCollection<UnitTranslation>(result);
+                SelectedUnitTranslation = UnitTranslations.FirstOrDefault();
             }
         }
-  */
         private void RefreshUnitTypes()
         {
             var result = context.UnitTypes.OrderBy(u => u.Name);
             UnitTypes = new ObservableCollection<UnitType>(result);
         }
-
+        private void ReverseUnitChanges(Unit OldUnit, Unit NewUnit, UnitChanges uc)
+        {
+            if (uc.HasFlag(UnitChanges.ucID)) NewUnit.Id = OldUnit.Id;
+            if (uc.HasFlag(UnitChanges.ucName)) NewUnit.Name = OldUnit.Name;
+            if (uc.HasFlag(UnitChanges.ucType)) NewUnit.TypeID = OldUnit.TypeID;
+            if (uc.HasFlag(UnitChanges.ucTypeStd)) NewUnit.TypeStandard = OldUnit.TypeStandard;
+            if (uc.HasFlag(UnitChanges.ucTypeFactor)) NewUnit.TypeFactor = OldUnit.TypeFactor;
+            if (uc.HasFlag(UnitChanges.ucTypeUniv)) NewUnit.TypeUniversal = OldUnit.TypeUniversal;
+        }
         public void SomeMethod()
         {
 
@@ -392,59 +351,63 @@ namespace JamieDB.ViewModel
             StatusBarMessage = NewText;
 
         }
-
-        private bool RecalculateFactors(long UTypeID, Unit NewStandardUnit)
+        private void RecalculateNewStandardUnitFactors(Unit NewStandardUnit)
         {
-            bool ReturnValue = false;
 
+            Unit OldStandard = Units.Where(u => (u.TypeStandard && (u.UnitType.Id == NewStandardUnit.UnitType.Id)) && (u.Id !=NewStandardUnit.Id) ).FirstOrDefault();
 
-
-
-            if (NewStandardUnit.TypeFactor != null)
+            if (OldStandard != null)
             {
-                double? Umrechnung = 1 / NewStandardUnit.TypeFactor;
-
-                var result = context.Units.Where(u => (u.UnitType.Id == UTypeID) && u.TypeUniversal ).ToList();
-
-                foreach ( Unit u in result)
+                if (NewStandardUnit.TypeFactor!=null && NewStandardUnit.TypeFactor != 0)
                 {
-                    if (u.Id  == NewStandardUnit.Id)
-                    {
-                        u.TypeStandard = true;
-                        u.TypeFactor = 1;
-                    }
-                    else 
-                    {
-                        u.TypeStandard = false;
-                        u.TypeFactor = u.TypeFactor * Umrechnung;
-                    }
-                }
-                context.SubmitChanges();
-                ReturnValue = true;
-            }
+                    double? Umrechnung = 1 / NewStandardUnit.TypeFactor;
 
-            return ReturnValue;
-            
+                    var result = Units.Where(u => (u.UnitType.Id == NewStandardUnit.UnitType.Id) && u.TypeUniversal).ToList();
+
+                    foreach (Unit u in result)
+                    {
+                        if (u.Id == NewStandardUnit.Id)
+                        {
+                            u.TypeStandard = true;
+                            u.TypeFactor = 1;
+                        }
+                        else
+                        {
+                            u.TypeStandard = false;
+                            u.TypeFactor = u.TypeFactor * Umrechnung;
+                        }
+                    }
+                    context.SubmitChanges();
+                }
+            }
         }
-
-        private bool ValidateSelectedUnitChanges(Unit OldSelected, Unit NewSelected)
+        private bool ValidateSelected(Unit NewSelectedUnit)
         {
             bool ReturnValue = false;
 
-            if (OldSelected !=null && !OldSelected.TypeStandard)
+            if (NewSelectedUnit == null) ReturnValue = true;
+            else //NewSelectedUnit != null
             {
-                if (NewSelected != null && NewSelected.TypeStandard)
+                if (NewSelectedUnit.TypeUniversal)
                 {
-                    ReturnValue = RecalculateFactors(OldSelected.TypeID, NewSelected);
+                    if (NewSelectedUnit.TypeFactor > 0) ReturnValue = true;
+                    else StatusBarMessage = "Umrechnungsfaktor sollte größer als 0 sein!";
+                }
+                else // !NewSelectedUnit.TypeUniversal
+                {
+                    if (NewSelectedUnit.TypeFactor == 0 && !NewSelectedUnit.TypeStandard) ReturnValue = true;
+                    else
+                    {
+                        StatusBarMessage = "Nicht universelle Units müssen einen Faktor 0 haben dürfen nicht Standard sein.";
+                    }
                 }
             }
+            
 
             return ReturnValue;
-
-
-
         }
         #endregion
+
         #region Methods: Command Methods
         public bool CanExecuteDeleteUnit(object o)
         {
@@ -458,8 +421,6 @@ namespace JamieDB.ViewModel
         {
             return (context.UnitTypes.Count() > 0);
         }
-
-
         public void ExecuteDeleteUnit(object o)
         {
             string MessageText;
@@ -569,10 +530,6 @@ namespace JamieDB.ViewModel
             NewUnitTranslation.Unit = SelectedUnit;
             NewUnitTranslation.Unit1 = SelectedUnit;
             NewUnitTranslation.Factor = 1.0;
-            NewUnitTranslation.IsAutomaticCreated = false;
-            NewUnitTranslation.IsIngredientDependent = false;
-            NewUnitTranslation.IsTypeChange = false;
-            NewUnitTranslation.IsOK = true;
 
             context.UnitTranslations.InsertOnSubmit(NewUnitTranslation);
 
@@ -592,7 +549,6 @@ namespace JamieDB.ViewModel
             SelectedUnitTranslation = NewUnitTranslation;
             StatusBarMessage = "UnitTranslation Added";
         }
-
         public void ExecuteSaveUnit(object o)
         {
             try
@@ -610,14 +566,10 @@ namespace JamieDB.ViewModel
             //RefreshUnits();
             StatusBarMessage = "All Units Saved";
         }
-
         #endregion
+
         #region Command Methods: Generic
 
-        public bool CanAlwaysExecute(object o)
-        {
-            return true;
-        }
         #endregion
     }
 
@@ -805,17 +757,177 @@ namespace JamieDB.ViewModel
         #endregion
 
         #region Methods
-        public double GetTranslationFactor(Ingredient i, Unit Unit1, Unit Unit2)
+        public double GetSpecificTranslationFactor(Unit BaseUnit, Unit TargetUnit, ObservableCollection<UnitTranslation> RelevantTranslations)
         {
-            double ReturnValue=0;
+            double ReturnValue = 0;
+            UnitTranslation WorkingTranslation;
 
-///
-/// Hier geht es weiter
-///            
-
+            WorkingTranslation = RelevantTranslations.Where(it => it.Factor != 0 && 
+                                                                 ((it.Unit == BaseUnit) && (it.Unit1 == TargetUnit) || 
+                                                                  (it.Unit1 == BaseUnit) && (it.Unit == TargetUnit))).FirstOrDefault();
+            if (WorkingTranslation !=null) ReturnValue = (WorkingTranslation.Unit == BaseUnit ? WorkingTranslation.Factor : 1 / WorkingTranslation.Factor);
 
             return ReturnValue;
         }
+        public double GetTranslationFactor(Ingredient i, Unit BaseUnit, Unit TargetUnit)
+        {
+            double ReturnValue=0;
+            ObservableCollection<UnitTranslation> IngredientRelatedTranslations;
+            UnitTranslation[] WorkingTranslation = new UnitTranslation [2];
+            
+            int CaseSelector=0;
+
+            IngredientRelatedTranslations = IngredientUnitTranslations(i);
+
+            ReturnValue = GetSpecificTranslationFactor(BaseUnit, TargetUnit, IngredientRelatedTranslations); // Ein direkter Versuch....
+
+            if (ReturnValue == 0)
+            {
+                CaseSelector += (BaseUnit.TypeUniversal ? 0 : 1);
+                CaseSelector += (TargetUnit.TypeUniversal ? 0 : 2);
+                CaseSelector += (BaseUnit.UnitType == TargetUnit.UnitType ? 0 : 4);
+
+                switch (CaseSelector)
+                {
+                    case 0: // BaseUnit == universell, TargetUnit == universell, Type1 == Type2
+                        ReturnValue = BaseUnit.TypeFactor ?? 0;
+                        ReturnValue = (((TargetUnit.TypeFactor ?? 0) == 0) ? 0 : ReturnValue /= (TargetUnit.TypeFactor ?? 1));
+                        break;
+                    case 1: // BaseUnit != universell, TargetUnit == universell, Type1 == Type2
+                        WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations);
+                        if  (WorkingTranslation[0] != null ) ReturnValue = WorkingTranslation[0].Factor * GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
+                        break;
+                    case 2: // BaseUnit == universell, TargetUnit != universell, Type1 == Type2
+                        WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                        if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit1) / WorkingTranslation[0].Inverse().Factor;
+                        break;
+                    case 3: // BaseUnit != universell, TargetUnit != universell, Type1 == Type2
+                        WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                        WorkingTranslation[1] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                        if (WorkingTranslation[0]!= null && WorkingTranslation[1] != null)
+                        {
+                            ReturnValue = WorkingTranslation[0].Factor * 
+                                          GetTranslationFactor(i, WorkingTranslation[0].Unit1, WorkingTranslation[1].Unit1) * 
+                                          WorkingTranslation[1].Inverse().Factor;
+                        }
+                        break;
+                    case 4: // BaseUnit == universell, TargetUnit == universell, Type1 != Type2
+                        // Erster Versuch ...
+                        WorkingTranslation[0] = GetTranslationUniversalTypeToType(i, BaseUnit.UnitType, TargetUnit.UnitType, IngredientRelatedTranslations);
+                        if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit) *
+                                                                         WorkingTranslation[0].Factor *
+                                                                         GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
+                        if (ReturnValue == 0) // Zweiter Versuch durch Einbindung der Nichtuniversellen Translations.
+                        {
+
+                        }
+                        break;
+                    case 5: // BaseUnit != universell, TargetUnit == universell, Type1 != Type2
+                            // Getestet Butter EL --> g --> kg OK
+                        WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations);   // Erster Versuch
+                        if (WorkingTranslation[0] == null) WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations); // Zweiter Versuch
+                        if (WorkingTranslation[0] != null) ReturnValue = WorkingTranslation[0].Factor * GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
+                        break;
+                    case 6: // BaseUnit == universell, TargetUnit != universell, Type1 != Type2
+                        WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);   // Erster Versuch
+                        if (WorkingTranslation[0] == null) WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations); // Zweiter Versuch
+                        if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit1) * WorkingTranslation[0].Inverse().Factor;
+                        break;
+                    case 7: // BaseUnit != universell, TargetUnit != universell, Type1 != Type2
+                        WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations); // Erster Versuch
+                        WorkingTranslation[1] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                        if (WorkingTranslation[0] == null || WorkingTranslation[1] == null) // Zweiter Versuch
+                        {
+                            WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                            WorkingTranslation[1] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                        }
+                        if (WorkingTranslation[0] != null && WorkingTranslation[1] != null) ReturnValue = WorkingTranslation[0].Factor *
+                                                                                                          GetTranslationFactor(i, WorkingTranslation[0].Unit1, WorkingTranslation[1].Unit) *
+                                                                                                          WorkingTranslation[1].Inverse().Factor;
+                        break;
+                    default:
+                        ReturnValue = 0;
+                        break;
+                }
+
+            }
+            return ReturnValue;
+        }
+
+
+
+        /*            if (Unit1 != null && Unit2 != null)
+                    {
+                        if (Unit1.UnitType == Unit2.UnitType)
+                        {
+                            if (Unit1.TypeUniversal && Unit2.TypeUniversal)
+                            {
+                                ReturnValue = Unit1.TypeFactor ?? 0;
+                                ReturnValue = (((Unit2.TypeFactor ?? 0) == 0) ? 0 : ReturnValue /= (Unit2.TypeFactor ?? 1));
+                            }
+                            else // Unit1 oder Unit2 (oder beide) sind nicht Universal - aber gleichen Typs
+                            {
+                                IngredientRelatedTranslations = IngredientUnitTranslations(i);
+                            }
+                        }
+                        else  
+                        {
+                            if (Unit1.TypeUniversal && Unit2.TypeUniversal) // Unit1 und Unit2 sind universal aber unterschiedliche Typen
+                            {
+                                IngredientRelatedTranslations = IngredientUnitTranslations(i);
+                            }
+                            else // Unit1 oder Unit2 (oder beide) sind nicht universal - und unterschiedliche Typen
+                            {
+                                IngredientRelatedTranslations = IngredientUnitTranslations(i);
+                                WorkingTranslation = IngredientRelatedTranslations.Where(it => it.Factor!=0 && ((it.Unit == Unit1) && (it.Unit1 == Unit2) || (it.Unit1 == Unit1) && (it.Unit == Unit2))).FirstOrDefault();
+                                if (WorkingTranslation  == null)
+                                {
+
+                                }
+                                else
+                                {
+                                    ReturnValue = (WorkingTranslation.Unit == Unit1 ? WorkingTranslation.Factor : 1/ WorkingTranslation.Factor);
+                                }
+                            }
+                        }
+                    }
+
+            */
+
+        public UnitTranslation GetTranslationToType(Ingredient i, Unit BaseUnit, UnitType TargetType, bool isUniversal, ObservableCollection<UnitTranslation> RelevantTranslations)
+        {
+            UnitTranslation ReturnValue = null;
+            UnitTranslation WorkingTranslation;
+
+            WorkingTranslation = RelevantTranslations.Where(it => it.Factor != 0 && it.Ingredient==i &&
+                                                                (((it.Unit == BaseUnit) && (it.Unit1.UnitType == TargetType) && (it.Unit1.TypeUniversal == isUniversal) ||
+                                                                  (it.Unit1 == BaseUnit) && (it.Unit.UnitType == TargetType) && (it.Unit.TypeUniversal == isUniversal)))).FirstOrDefault();
+
+            if (WorkingTranslation != null) ReturnValue = (WorkingTranslation.Unit == BaseUnit ? WorkingTranslation : WorkingTranslation.Inverse());
+
+            return ReturnValue;
+        }
+
+        public UnitTranslation GetTranslationUniversalTypeToType(Ingredient i, UnitType BaseType, UnitType TargetType, ObservableCollection<UnitTranslation> RelevantTranslations)
+        {
+            UnitTranslation ReturnValue = null;
+            UnitTranslation WorkingTranslation;
+
+            WorkingTranslation = RelevantTranslations.Where(it => it.Factor != 0 && it.Ingredient == i &&
+                                                                (((it.Unit.UnitType == BaseType) && (it.Unit1.UnitType == TargetType) && (it.Unit1.TypeUniversal) ||
+                                                                  (it.Unit1.UnitType == BaseType) && (it.Unit.UnitType == TargetType) && (it.Unit.TypeUniversal)))).FirstOrDefault();
+
+            if (WorkingTranslation != null) ReturnValue = (WorkingTranslation.Unit.UnitType == BaseType ? WorkingTranslation : WorkingTranslation.Inverse());
+
+            return ReturnValue;
+        }
+
+        public ObservableCollection<UnitTranslation> IngredientUnitTranslations (Ingredient i)
+        {
+            return (new ObservableCollection<UnitTranslation>(UnitTranslations.Where(u => u.Ingredient == i)));
+        }
+
+
         #region Methods: Command Methods
         #region Methods: Generic Command Methods
         #endregion
