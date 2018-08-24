@@ -33,9 +33,6 @@ namespace JamieDB.Model
     partial void InsertIngredientType(IngredientType instance);
     partial void UpdateIngredientType(IngredientType instance);
     partial void DeleteIngredientType(IngredientType instance);
-    partial void InsertFoodPlanTemplate(FoodPlanTemplate instance);
-    partial void UpdateFoodPlanTemplate(FoodPlanTemplate instance);
-    partial void DeleteFoodPlanTemplate(FoodPlanTemplate instance);
     partial void InsertIngredient(Ingredient instance);
     partial void UpdateIngredient(Ingredient instance);
     partial void DeleteIngredient(Ingredient instance);
@@ -48,22 +45,31 @@ namespace JamieDB.Model
     partial void InsertRecipe(Recipe instance);
     partial void UpdateRecipe(Recipe instance);
     partial void DeleteRecipe(Recipe instance);
-    partial void InsertFoodPlanTemplateItem(FoodPlanTemplateItem instance);
-    partial void UpdateFoodPlanTemplateItem(FoodPlanTemplateItem instance);
-    partial void DeleteFoodPlanTemplateItem(FoodPlanTemplateItem instance);
-    partial void InsertFoodPlanItem(FoodPlanItem instance);
-    partial void UpdateFoodPlanItem(FoodPlanItem instance);
-    partial void DeleteFoodPlanItem(FoodPlanItem instance);
     partial void InsertUnit(Unit instance);
     partial void UpdateUnit(Unit instance);
     partial void DeleteUnit(Unit instance);
     partial void InsertUnitTranslation(UnitTranslation instance);
     partial void UpdateUnitTranslation(UnitTranslation instance);
     partial void DeleteUnitTranslation(UnitTranslation instance);
+    partial void InsertShoppingList(ShoppingList instance);
+    partial void UpdateShoppingList(ShoppingList instance);
+    partial void DeleteShoppingList(ShoppingList instance);
+    partial void InsertFoodPlanItem(FoodPlanItem instance);
+    partial void UpdateFoodPlanItem(FoodPlanItem instance);
+    partial void DeleteFoodPlanItem(FoodPlanItem instance);
+    partial void InsertShoppingListItem(ShoppingListItem instance);
+    partial void UpdateShoppingListItem(ShoppingListItem instance);
+    partial void DeleteShoppingListItem(ShoppingListItem instance);
+    partial void InsertFoodPlan(FoodPlan instance);
+    partial void UpdateFoodPlan(FoodPlan instance);
+    partial void DeleteFoodPlan(FoodPlan instance);
+    partial void InsertUser(User instance);
+    partial void UpdateUser(User instance);
+    partial void DeleteUser(User instance);
     #endregion
 		
 		public JamieDBLinqDataContext() : 
-				base(global::JamieDB.Properties.Settings.Default.JamieDBConnectionString, mappingSource)
+				base(global::JamieDB.Properties.Settings.Default.JamieDBConnectionString1, mappingSource)
 		{
 			OnCreated();
 		}
@@ -100,14 +106,6 @@ namespace JamieDB.Model
 			}
 		}
 		
-		public System.Data.Linq.Table<FoodPlanTemplate> FoodPlanTemplates
-		{
-			get
-			{
-				return this.GetTable<FoodPlanTemplate>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Ingredient> Ingredients
 		{
 			get
@@ -140,22 +138,6 @@ namespace JamieDB.Model
 			}
 		}
 		
-		public System.Data.Linq.Table<FoodPlanTemplateItem> FoodPlanTemplateItems
-		{
-			get
-			{
-				return this.GetTable<FoodPlanTemplateItem>();
-			}
-		}
-		
-		public System.Data.Linq.Table<FoodPlanItem> FoodPlanItems
-		{
-			get
-			{
-				return this.GetTable<FoodPlanItem>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Unit> Units
 		{
 			get
@@ -169,6 +151,46 @@ namespace JamieDB.Model
 			get
 			{
 				return this.GetTable<UnitTranslation>();
+			}
+		}
+		
+		public System.Data.Linq.Table<ShoppingList> ShoppingLists
+		{
+			get
+			{
+				return this.GetTable<ShoppingList>();
+			}
+		}
+		
+		public System.Data.Linq.Table<FoodPlanItem> FoodPlanItems
+		{
+			get
+			{
+				return this.GetTable<FoodPlanItem>();
+			}
+		}
+		
+		public System.Data.Linq.Table<ShoppingListItem> ShoppingListItems
+		{
+			get
+			{
+				return this.GetTable<ShoppingListItem>();
+			}
+		}
+		
+		public System.Data.Linq.Table<FoodPlan> FoodPlans
+		{
+			get
+			{
+				return this.GetTable<FoodPlan>();
+			}
+		}
+		
+		public System.Data.Linq.Table<User> Users
+		{
+			get
+			{
+				return this.GetTable<User>();
 			}
 		}
 	}
@@ -311,168 +333,6 @@ namespace JamieDB.Model
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FoodPlanTemplates")]
-	public partial class FoodPlanTemplate : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private long _Id;
-		
-		private string _Name;
-		
-		private string _Description;
-		
-		private System.DateTime _StartDate;
-		
-		private EntitySet<FoodPlanTemplateItem> _FoodPlanTemplateItems;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIdChanging(long value);
-    partial void OnIdChanged();
-    partial void OnNameChanging(string value);
-    partial void OnNameChanged();
-    partial void OnDescriptionChanging(string value);
-    partial void OnDescriptionChanged();
-    partial void OnStartDateChanging(System.DateTime value);
-    partial void OnStartDateChanged();
-    #endregion
-		
-		public FoodPlanTemplate()
-		{
-			this._FoodPlanTemplateItems = new EntitySet<FoodPlanTemplateItem>(new Action<FoodPlanTemplateItem>(this.attach_FoodPlanTemplateItems), new Action<FoodPlanTemplateItem>(this.detach_FoodPlanTemplateItems));
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public long Id
-		{
-			get
-			{
-				return this._Id;
-			}
-			set
-			{
-				if ((this._Id != value))
-				{
-					this.OnIdChanging(value);
-					this.SendPropertyChanging();
-					this._Id = value;
-					this.SendPropertyChanged("Id");
-					this.OnIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
-		public string Name
-		{
-			get
-			{
-				return this._Name;
-			}
-			set
-			{
-				if ((this._Name != value))
-				{
-					this.OnNameChanging(value);
-					this.SendPropertyChanging();
-					this._Name = value;
-					this.SendPropertyChanged("Name");
-					this.OnNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(50)")]
-		public string Description
-		{
-			get
-			{
-				return this._Description;
-			}
-			set
-			{
-				if ((this._Description != value))
-				{
-					this.OnDescriptionChanging(value);
-					this.SendPropertyChanging();
-					this._Description = value;
-					this.SendPropertyChanged("Description");
-					this.OnDescriptionChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StartDate", DbType="DateTime NOT NULL")]
-		public System.DateTime StartDate
-		{
-			get
-			{
-				return this._StartDate;
-			}
-			set
-			{
-				if ((this._StartDate != value))
-				{
-					this.OnStartDateChanging(value);
-					this.SendPropertyChanging();
-					this._StartDate = value;
-					this.SendPropertyChanged("StartDate");
-					this.OnStartDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FoodPlanTemplate_FoodPlanTemplateItem", Storage="_FoodPlanTemplateItems", ThisKey="Id", OtherKey="TemplateID")]
-		public EntitySet<FoodPlanTemplateItem> FoodPlanTemplateItems
-		{
-			get
-			{
-				return this._FoodPlanTemplateItems;
-			}
-			set
-			{
-				this._FoodPlanTemplateItems.Assign(value);
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_FoodPlanTemplateItems(FoodPlanTemplateItem entity)
-		{
-			this.SendPropertyChanging();
-			entity.FoodPlanTemplate = this;
-		}
-		
-		private void detach_FoodPlanTemplateItems(FoodPlanTemplateItem entity)
-		{
-			this.SendPropertyChanging();
-			entity.FoodPlanTemplate = null;
-		}
-	}
-	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Ingredients")]
 	public partial class Ingredient : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -498,6 +358,8 @@ namespace JamieDB.Model
 		private EntitySet<RecipeIngredient> _RecipeIngredients;
 		
 		private EntitySet<UnitTranslation> _UnitTranslations;
+		
+		private EntitySet<ShoppingListItem> _ShoppingListItems;
 		
 		private EntityRef<IngredientType> _IngredientType;
 		
@@ -529,6 +391,7 @@ namespace JamieDB.Model
 		{
 			this._RecipeIngredients = new EntitySet<RecipeIngredient>(new Action<RecipeIngredient>(this.attach_RecipeIngredients), new Action<RecipeIngredient>(this.detach_RecipeIngredients));
 			this._UnitTranslations = new EntitySet<UnitTranslation>(new Action<UnitTranslation>(this.attach_UnitTranslations), new Action<UnitTranslation>(this.detach_UnitTranslations));
+			this._ShoppingListItems = new EntitySet<ShoppingListItem>(new Action<ShoppingListItem>(this.attach_ShoppingListItems), new Action<ShoppingListItem>(this.detach_ShoppingListItems));
 			this._IngredientType = default(EntityRef<IngredientType>);
 			this._Unit = default(EntityRef<Unit>);
 			OnCreated();
@@ -728,6 +591,19 @@ namespace JamieDB.Model
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Ingredient_ShoppingListItem", Storage="_ShoppingListItems", ThisKey="Id", OtherKey="IngredientID")]
+		public EntitySet<ShoppingListItem> ShoppingListItems
+		{
+			get
+			{
+				return this._ShoppingListItems;
+			}
+			set
+			{
+				this._ShoppingListItems.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="IngredientType_Ingredient", Storage="_IngredientType", ThisKey="TypeID", OtherKey="Id", IsForeignKey=true)]
 		public IngredientType IngredientType
 		{
@@ -835,6 +711,18 @@ namespace JamieDB.Model
 		}
 		
 		private void detach_UnitTranslations(UnitTranslation entity)
+		{
+			this.SendPropertyChanging();
+			entity.Ingredient = null;
+		}
+		
+		private void attach_ShoppingListItems(ShoppingListItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.Ingredient = this;
+		}
+		
+		private void detach_ShoppingListItems(ShoppingListItem entity)
 		{
 			this.SendPropertyChanging();
 			entity.Ingredient = null;
@@ -1036,6 +924,8 @@ namespace JamieDB.Model
 		
 		private long _UnitID;
 		
+		private EntitySet<ShoppingListItem> _ShoppingListItems;
+		
 		private EntityRef<Ingredient> _Ingredient;
 		
 		private EntityRef<Recipe> _Recipe;
@@ -1060,6 +950,7 @@ namespace JamieDB.Model
 		
 		public RecipeIngredient()
 		{
+			this._ShoppingListItems = new EntitySet<ShoppingListItem>(new Action<ShoppingListItem>(this.attach_ShoppingListItems), new Action<ShoppingListItem>(this.detach_ShoppingListItems));
 			this._Ingredient = default(EntityRef<Ingredient>);
 			this._Recipe = default(EntityRef<Recipe>);
 			this._Unit = default(EntityRef<Unit>);
@@ -1175,6 +1066,19 @@ namespace JamieDB.Model
 					this.SendPropertyChanged("UnitID");
 					this.OnUnitIDChanged();
 				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="RecipeIngredient_ShoppingListItem", Storage="_ShoppingListItems", ThisKey="Id", OtherKey="RecipeIngredientID")]
+		public EntitySet<ShoppingListItem> ShoppingListItems
+		{
+			get
+			{
+				return this._ShoppingListItems;
+			}
+			set
+			{
+				this._ShoppingListItems.Assign(value);
 			}
 		}
 		
@@ -1299,6 +1203,18 @@ namespace JamieDB.Model
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
+		
+		private void attach_ShoppingListItems(ShoppingListItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.RecipeIngredient = this;
+		}
+		
+		private void detach_ShoppingListItems(ShoppingListItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.RecipeIngredient = null;
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Recipes")]
@@ -1323,9 +1239,9 @@ namespace JamieDB.Model
 		
 		private EntitySet<RecipeIngredient> _RecipeIngredients;
 		
-		private EntitySet<FoodPlanTemplateItem> _FoodPlanTemplateItems;
-		
 		private EntitySet<FoodPlanItem> _FoodPlanItems;
+		
+		private EntitySet<ShoppingListItem> _ShoppingListItems;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -1350,8 +1266,8 @@ namespace JamieDB.Model
 		public Recipe()
 		{
 			this._RecipeIngredients = new EntitySet<RecipeIngredient>(new Action<RecipeIngredient>(this.attach_RecipeIngredients), new Action<RecipeIngredient>(this.detach_RecipeIngredients));
-			this._FoodPlanTemplateItems = new EntitySet<FoodPlanTemplateItem>(new Action<FoodPlanTemplateItem>(this.attach_FoodPlanTemplateItems), new Action<FoodPlanTemplateItem>(this.detach_FoodPlanTemplateItems));
 			this._FoodPlanItems = new EntitySet<FoodPlanItem>(new Action<FoodPlanItem>(this.attach_FoodPlanItems), new Action<FoodPlanItem>(this.detach_FoodPlanItems));
+			this._ShoppingListItems = new EntitySet<ShoppingListItem>(new Action<ShoppingListItem>(this.attach_ShoppingListItems), new Action<ShoppingListItem>(this.detach_ShoppingListItems));
 			OnCreated();
 		}
 		
@@ -1508,19 +1424,6 @@ namespace JamieDB.Model
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_FoodPlanTemplateItem", Storage="_FoodPlanTemplateItems", ThisKey="Id", OtherKey="RecipeID")]
-		public EntitySet<FoodPlanTemplateItem> FoodPlanTemplateItems
-		{
-			get
-			{
-				return this._FoodPlanTemplateItems;
-			}
-			set
-			{
-				this._FoodPlanTemplateItems.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_FoodPlanItem", Storage="_FoodPlanItems", ThisKey="Id", OtherKey="RecipeID")]
 		public EntitySet<FoodPlanItem> FoodPlanItems
 		{
@@ -1531,6 +1434,19 @@ namespace JamieDB.Model
 			set
 			{
 				this._FoodPlanItems.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_ShoppingListItem", Storage="_ShoppingListItems", ThisKey="Id", OtherKey="RecipeID")]
+		public EntitySet<ShoppingListItem> ShoppingListItems
+		{
+			get
+			{
+				return this._ShoppingListItems;
+			}
+			set
+			{
+				this._ShoppingListItems.Assign(value);
 			}
 		}
 		
@@ -1566,18 +1482,6 @@ namespace JamieDB.Model
 			entity.Recipe = null;
 		}
 		
-		private void attach_FoodPlanTemplateItems(FoodPlanTemplateItem entity)
-		{
-			this.SendPropertyChanging();
-			entity.Recipe = this;
-		}
-		
-		private void detach_FoodPlanTemplateItems(FoodPlanTemplateItem entity)
-		{
-			this.SendPropertyChanging();
-			entity.Recipe = null;
-		}
-		
 		private void attach_FoodPlanItems(FoodPlanItem entity)
 		{
 			this.SendPropertyChanging();
@@ -1589,420 +1493,17 @@ namespace JamieDB.Model
 			this.SendPropertyChanging();
 			entity.Recipe = null;
 		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FoodPlanTemplateItems")]
-	public partial class FoodPlanTemplateItem : INotifyPropertyChanging, INotifyPropertyChanged
-	{
 		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private long _Id;
-		
-		private long _TemplateID;
-		
-		private System.DateTime _DateTime;
-		
-		private System.Nullable<double> _PortionCount;
-		
-		private long _RecipeID;
-		
-		private EntityRef<FoodPlanTemplate> _FoodPlanTemplate;
-		
-		private EntityRef<Recipe> _Recipe;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIdChanging(long value);
-    partial void OnIdChanged();
-    partial void OnTemplateIDChanging(long value);
-    partial void OnTemplateIDChanged();
-    partial void OnDateTimeChanging(System.DateTime value);
-    partial void OnDateTimeChanged();
-    partial void OnPortionCountChanging(System.Nullable<double> value);
-    partial void OnPortionCountChanged();
-    partial void OnRecipeIDChanging(long value);
-    partial void OnRecipeIDChanged();
-    #endregion
-		
-		public FoodPlanTemplateItem()
+		private void attach_ShoppingListItems(ShoppingListItem entity)
 		{
-			this._FoodPlanTemplate = default(EntityRef<FoodPlanTemplate>);
-			this._Recipe = default(EntityRef<Recipe>);
-			OnCreated();
+			this.SendPropertyChanging();
+			entity.Recipe = this;
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public long Id
+		private void detach_ShoppingListItems(ShoppingListItem entity)
 		{
-			get
-			{
-				return this._Id;
-			}
-			set
-			{
-				if ((this._Id != value))
-				{
-					this.OnIdChanging(value);
-					this.SendPropertyChanging();
-					this._Id = value;
-					this.SendPropertyChanged("Id");
-					this.OnIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TemplateID", DbType="BigInt NOT NULL")]
-		public long TemplateID
-		{
-			get
-			{
-				return this._TemplateID;
-			}
-			set
-			{
-				if ((this._TemplateID != value))
-				{
-					if (this._FoodPlanTemplate.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnTemplateIDChanging(value);
-					this.SendPropertyChanging();
-					this._TemplateID = value;
-					this.SendPropertyChanged("TemplateID");
-					this.OnTemplateIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DateTime", DbType="DateTime NOT NULL")]
-		public System.DateTime DateTime
-		{
-			get
-			{
-				return this._DateTime;
-			}
-			set
-			{
-				if ((this._DateTime != value))
-				{
-					this.OnDateTimeChanging(value);
-					this.SendPropertyChanging();
-					this._DateTime = value;
-					this.SendPropertyChanged("DateTime");
-					this.OnDateTimeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PortionCount", DbType="Float")]
-		public System.Nullable<double> PortionCount
-		{
-			get
-			{
-				return this._PortionCount;
-			}
-			set
-			{
-				if ((this._PortionCount != value))
-				{
-					this.OnPortionCountChanging(value);
-					this.SendPropertyChanging();
-					this._PortionCount = value;
-					this.SendPropertyChanged("PortionCount");
-					this.OnPortionCountChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RecipeID", DbType="BigInt NOT NULL")]
-		public long RecipeID
-		{
-			get
-			{
-				return this._RecipeID;
-			}
-			set
-			{
-				if ((this._RecipeID != value))
-				{
-					if (this._Recipe.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnRecipeIDChanging(value);
-					this.SendPropertyChanging();
-					this._RecipeID = value;
-					this.SendPropertyChanged("RecipeID");
-					this.OnRecipeIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FoodPlanTemplate_FoodPlanTemplateItem", Storage="_FoodPlanTemplate", ThisKey="TemplateID", OtherKey="Id", IsForeignKey=true)]
-		public FoodPlanTemplate FoodPlanTemplate
-		{
-			get
-			{
-				return this._FoodPlanTemplate.Entity;
-			}
-			set
-			{
-				FoodPlanTemplate previousValue = this._FoodPlanTemplate.Entity;
-				if (((previousValue != value) 
-							|| (this._FoodPlanTemplate.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._FoodPlanTemplate.Entity = null;
-						previousValue.FoodPlanTemplateItems.Remove(this);
-					}
-					this._FoodPlanTemplate.Entity = value;
-					if ((value != null))
-					{
-						value.FoodPlanTemplateItems.Add(this);
-						this._TemplateID = value.Id;
-					}
-					else
-					{
-						this._TemplateID = default(long);
-					}
-					this.SendPropertyChanged("FoodPlanTemplate");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_FoodPlanTemplateItem", Storage="_Recipe", ThisKey="RecipeID", OtherKey="Id", IsForeignKey=true)]
-		public Recipe Recipe
-		{
-			get
-			{
-				return this._Recipe.Entity;
-			}
-			set
-			{
-				Recipe previousValue = this._Recipe.Entity;
-				if (((previousValue != value) 
-							|| (this._Recipe.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Recipe.Entity = null;
-						previousValue.FoodPlanTemplateItems.Remove(this);
-					}
-					this._Recipe.Entity = value;
-					if ((value != null))
-					{
-						value.FoodPlanTemplateItems.Add(this);
-						this._RecipeID = value.Id;
-					}
-					else
-					{
-						this._RecipeID = default(long);
-					}
-					this.SendPropertyChanged("Recipe");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FoodPlanItems")]
-	public partial class FoodPlanItem : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private long _Id;
-		
-		private System.DateTime _DateTime;
-		
-		private System.Nullable<double> _PortionCount;
-		
-		private System.Nullable<long> _RecipeID;
-		
-		private EntityRef<Recipe> _Recipe;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIdChanging(long value);
-    partial void OnIdChanged();
-    partial void OnDateTimeChanging(System.DateTime value);
-    partial void OnDateTimeChanged();
-    partial void OnPortionCountChanging(System.Nullable<double> value);
-    partial void OnPortionCountChanged();
-    partial void OnRecipeIDChanging(System.Nullable<long> value);
-    partial void OnRecipeIDChanged();
-    #endregion
-		
-		public FoodPlanItem()
-		{
-			this._Recipe = default(EntityRef<Recipe>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public long Id
-		{
-			get
-			{
-				return this._Id;
-			}
-			set
-			{
-				if ((this._Id != value))
-				{
-					this.OnIdChanging(value);
-					this.SendPropertyChanging();
-					this._Id = value;
-					this.SendPropertyChanged("Id");
-					this.OnIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DateTime", DbType="DateTime NOT NULL")]
-		public System.DateTime DateTime
-		{
-			get
-			{
-				return this._DateTime;
-			}
-			set
-			{
-				if ((this._DateTime != value))
-				{
-					this.OnDateTimeChanging(value);
-					this.SendPropertyChanging();
-					this._DateTime = value;
-					this.SendPropertyChanged("DateTime");
-					this.OnDateTimeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PortionCount", DbType="Float")]
-		public System.Nullable<double> PortionCount
-		{
-			get
-			{
-				return this._PortionCount;
-			}
-			set
-			{
-				if ((this._PortionCount != value))
-				{
-					this.OnPortionCountChanging(value);
-					this.SendPropertyChanging();
-					this._PortionCount = value;
-					this.SendPropertyChanged("PortionCount");
-					this.OnPortionCountChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RecipeID", DbType="BigInt")]
-		public System.Nullable<long> RecipeID
-		{
-			get
-			{
-				return this._RecipeID;
-			}
-			set
-			{
-				if ((this._RecipeID != value))
-				{
-					if (this._Recipe.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnRecipeIDChanging(value);
-					this.SendPropertyChanging();
-					this._RecipeID = value;
-					this.SendPropertyChanged("RecipeID");
-					this.OnRecipeIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_FoodPlanItem", Storage="_Recipe", ThisKey="RecipeID", OtherKey="Id", IsForeignKey=true)]
-		public Recipe Recipe
-		{
-			get
-			{
-				return this._Recipe.Entity;
-			}
-			set
-			{
-				Recipe previousValue = this._Recipe.Entity;
-				if (((previousValue != value) 
-							|| (this._Recipe.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Recipe.Entity = null;
-						previousValue.FoodPlanItems.Remove(this);
-					}
-					this._Recipe.Entity = value;
-					if ((value != null))
-					{
-						value.FoodPlanItems.Add(this);
-						this._RecipeID = value.Id;
-					}
-					else
-					{
-						this._RecipeID = default(Nullable<long>);
-					}
-					this.SendPropertyChanged("Recipe");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
+			this.SendPropertyChanging();
+			entity.Recipe = null;
 		}
 	}
 	
@@ -2671,6 +2172,1284 @@ namespace JamieDB.Model
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.ShoppingLists")]
+	public partial class ShoppingList : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private long _Id;
+		
+		private string _Name;
+		
+		private System.Nullable<long> _FoodPlanID;
+		
+		private System.DateTime _LastModified;
+		
+		private System.DateTime _FoodplanStartDate;
+		
+		private System.DateTime _FoodplanEndDate;
+		
+		private EntitySet<ShoppingListItem> _ShoppingListItems;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(long value);
+    partial void OnIdChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnFoodPlanIDChanging(System.Nullable<long> value);
+    partial void OnFoodPlanIDChanged();
+    partial void OnLastModifiedChanging(System.DateTime value);
+    partial void OnLastModifiedChanged();
+    partial void OnFoodplanStartDateChanging(System.DateTime value);
+    partial void OnFoodplanStartDateChanged();
+    partial void OnFoodplanEndDateChanging(System.DateTime value);
+    partial void OnFoodplanEndDateChanged();
+    #endregion
+		
+		public ShoppingList()
+		{
+			this._ShoppingListItems = new EntitySet<ShoppingListItem>(new Action<ShoppingListItem>(this.attach_ShoppingListItems), new Action<ShoppingListItem>(this.detach_ShoppingListItems));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public long Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="VarChar(50)")]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FoodPlanID", DbType="BigInt")]
+		public System.Nullable<long> FoodPlanID
+		{
+			get
+			{
+				return this._FoodPlanID;
+			}
+			set
+			{
+				if ((this._FoodPlanID != value))
+				{
+					this.OnFoodPlanIDChanging(value);
+					this.SendPropertyChanging();
+					this._FoodPlanID = value;
+					this.SendPropertyChanged("FoodPlanID");
+					this.OnFoodPlanIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LastModified", DbType="DateTime NOT NULL")]
+		public System.DateTime LastModified
+		{
+			get
+			{
+				return this._LastModified;
+			}
+			set
+			{
+				if ((this._LastModified != value))
+				{
+					this.OnLastModifiedChanging(value);
+					this.SendPropertyChanging();
+					this._LastModified = value;
+					this.SendPropertyChanged("LastModified");
+					this.OnLastModifiedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FoodplanStartDate", DbType="DateTime NOT NULL")]
+		public System.DateTime FoodplanStartDate
+		{
+			get
+			{
+				return this._FoodplanStartDate;
+			}
+			set
+			{
+				if ((this._FoodplanStartDate != value))
+				{
+					this.OnFoodplanStartDateChanging(value);
+					this.SendPropertyChanging();
+					this._FoodplanStartDate = value;
+					this.SendPropertyChanged("FoodplanStartDate");
+					this.OnFoodplanStartDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FoodplanEndDate", DbType="DateTime NOT NULL")]
+		public System.DateTime FoodplanEndDate
+		{
+			get
+			{
+				return this._FoodplanEndDate;
+			}
+			set
+			{
+				if ((this._FoodplanEndDate != value))
+				{
+					this.OnFoodplanEndDateChanging(value);
+					this.SendPropertyChanging();
+					this._FoodplanEndDate = value;
+					this.SendPropertyChanged("FoodplanEndDate");
+					this.OnFoodplanEndDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ShoppingList_ShoppingListItem", Storage="_ShoppingListItems", ThisKey="Id", OtherKey="ShoppingListID")]
+		public EntitySet<ShoppingListItem> ShoppingListItems
+		{
+			get
+			{
+				return this._ShoppingListItems;
+			}
+			set
+			{
+				this._ShoppingListItems.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_ShoppingListItems(ShoppingListItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.ShoppingList = this;
+		}
+		
+		private void detach_ShoppingListItems(ShoppingListItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.ShoppingList = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FoodPlanItems")]
+	public partial class FoodPlanItem : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private long _Id;
+		
+		private long _FoodPlanID;
+		
+		private System.DateTime _DateTime;
+		
+		private System.Nullable<double> _PortionCount;
+		
+		private long _RecipeID;
+		
+		private EntitySet<ShoppingListItem> _ShoppingListItems;
+		
+		private EntityRef<Recipe> _Recipe;
+		
+		private EntityRef<FoodPlan> _FoodPlan;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(long value);
+    partial void OnIdChanged();
+    partial void OnFoodPlanIDChanging(long value);
+    partial void OnFoodPlanIDChanged();
+    partial void OnDateTimeChanging(System.DateTime value);
+    partial void OnDateTimeChanged();
+    partial void OnPortionCountChanging(System.Nullable<double> value);
+    partial void OnPortionCountChanged();
+    partial void OnRecipeIDChanging(long value);
+    partial void OnRecipeIDChanged();
+    #endregion
+		
+		public FoodPlanItem()
+		{
+			this._ShoppingListItems = new EntitySet<ShoppingListItem>(new Action<ShoppingListItem>(this.attach_ShoppingListItems), new Action<ShoppingListItem>(this.detach_ShoppingListItems));
+			this._Recipe = default(EntityRef<Recipe>);
+			this._FoodPlan = default(EntityRef<FoodPlan>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public long Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FoodPlanID", DbType="BigInt NOT NULL")]
+		public long FoodPlanID
+		{
+			get
+			{
+				return this._FoodPlanID;
+			}
+			set
+			{
+				if ((this._FoodPlanID != value))
+				{
+					if (this._FoodPlan.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnFoodPlanIDChanging(value);
+					this.SendPropertyChanging();
+					this._FoodPlanID = value;
+					this.SendPropertyChanged("FoodPlanID");
+					this.OnFoodPlanIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime DateTime
+		{
+			get
+			{
+				return this._DateTime;
+			}
+			set
+			{
+				if ((this._DateTime != value))
+				{
+					this.OnDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._DateTime = value;
+					this.SendPropertyChanged("DateTime");
+					this.OnDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PortionCount", DbType="Float")]
+		public System.Nullable<double> PortionCount
+		{
+			get
+			{
+				return this._PortionCount;
+			}
+			set
+			{
+				if ((this._PortionCount != value))
+				{
+					this.OnPortionCountChanging(value);
+					this.SendPropertyChanging();
+					this._PortionCount = value;
+					this.SendPropertyChanged("PortionCount");
+					this.OnPortionCountChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RecipeID", DbType="BigInt NOT NULL")]
+		public long RecipeID
+		{
+			get
+			{
+				return this._RecipeID;
+			}
+			set
+			{
+				if ((this._RecipeID != value))
+				{
+					if (this._Recipe.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnRecipeIDChanging(value);
+					this.SendPropertyChanging();
+					this._RecipeID = value;
+					this.SendPropertyChanged("RecipeID");
+					this.OnRecipeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FoodPlanItem_ShoppingListItem", Storage="_ShoppingListItems", ThisKey="Id", OtherKey="FoodPlanItemID")]
+		public EntitySet<ShoppingListItem> ShoppingListItems
+		{
+			get
+			{
+				return this._ShoppingListItems;
+			}
+			set
+			{
+				this._ShoppingListItems.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_FoodPlanItem", Storage="_Recipe", ThisKey="RecipeID", OtherKey="Id", IsForeignKey=true)]
+		public Recipe Recipe
+		{
+			get
+			{
+				return this._Recipe.Entity;
+			}
+			set
+			{
+				Recipe previousValue = this._Recipe.Entity;
+				if (((previousValue != value) 
+							|| (this._Recipe.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Recipe.Entity = null;
+						previousValue.FoodPlanItems.Remove(this);
+					}
+					this._Recipe.Entity = value;
+					if ((value != null))
+					{
+						value.FoodPlanItems.Add(this);
+						this._RecipeID = value.Id;
+					}
+					else
+					{
+						this._RecipeID = default(long);
+					}
+					this.SendPropertyChanged("Recipe");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FoodPlan_FoodPlanItem", Storage="_FoodPlan", ThisKey="FoodPlanID", OtherKey="Id", IsForeignKey=true)]
+		public FoodPlan FoodPlan
+		{
+			get
+			{
+				return this._FoodPlan.Entity;
+			}
+			set
+			{
+				FoodPlan previousValue = this._FoodPlan.Entity;
+				if (((previousValue != value) 
+							|| (this._FoodPlan.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._FoodPlan.Entity = null;
+						previousValue.FoodPlanItems.Remove(this);
+					}
+					this._FoodPlan.Entity = value;
+					if ((value != null))
+					{
+						value.FoodPlanItems.Add(this);
+						this._FoodPlanID = value.Id;
+					}
+					else
+					{
+						this._FoodPlanID = default(long);
+					}
+					this.SendPropertyChanged("FoodPlan");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_ShoppingListItems(ShoppingListItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.FoodPlanItem = this;
+		}
+		
+		private void detach_ShoppingListItems(ShoppingListItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.FoodPlanItem = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.ShoppingListItems")]
+	public partial class ShoppingListItem : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private long _ShoppingListID;
+		
+		private long _FoodPlanItemID;
+		
+		private long _RecipeID;
+		
+		private long _RecipeIngredientID;
+		
+		private long _IngredientID;
+		
+		private System.Nullable<double> _TargetUnitQuantity;
+		
+		private EntityRef<FoodPlanItem> _FoodPlanItem;
+		
+		private EntityRef<Ingredient> _Ingredient;
+		
+		private EntityRef<RecipeIngredient> _RecipeIngredient;
+		
+		private EntityRef<Recipe> _Recipe;
+		
+		private EntityRef<ShoppingList> _ShoppingList;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnShoppingListIDChanging(long value);
+    partial void OnShoppingListIDChanged();
+    partial void OnFoodPlanItemIDChanging(long value);
+    partial void OnFoodPlanItemIDChanged();
+    partial void OnRecipeIDChanging(long value);
+    partial void OnRecipeIDChanged();
+    partial void OnRecipeIngredientIDChanging(long value);
+    partial void OnRecipeIngredientIDChanged();
+    partial void OnIngredientIDChanging(long value);
+    partial void OnIngredientIDChanged();
+    partial void OnTargetUnitQuantityChanging(System.Nullable<double> value);
+    partial void OnTargetUnitQuantityChanged();
+    #endregion
+		
+		public ShoppingListItem()
+		{
+			this._FoodPlanItem = default(EntityRef<FoodPlanItem>);
+			this._Ingredient = default(EntityRef<Ingredient>);
+			this._RecipeIngredient = default(EntityRef<RecipeIngredient>);
+			this._Recipe = default(EntityRef<Recipe>);
+			this._ShoppingList = default(EntityRef<ShoppingList>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ShoppingListID", DbType="BigInt NOT NULL")]
+		public long ShoppingListID
+		{
+			get
+			{
+				return this._ShoppingListID;
+			}
+			set
+			{
+				if ((this._ShoppingListID != value))
+				{
+					if (this._ShoppingList.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnShoppingListIDChanging(value);
+					this.SendPropertyChanging();
+					this._ShoppingListID = value;
+					this.SendPropertyChanged("ShoppingListID");
+					this.OnShoppingListIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FoodPlanItemID", DbType="BigInt NOT NULL")]
+		public long FoodPlanItemID
+		{
+			get
+			{
+				return this._FoodPlanItemID;
+			}
+			set
+			{
+				if ((this._FoodPlanItemID != value))
+				{
+					if (this._FoodPlanItem.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnFoodPlanItemIDChanging(value);
+					this.SendPropertyChanging();
+					this._FoodPlanItemID = value;
+					this.SendPropertyChanged("FoodPlanItemID");
+					this.OnFoodPlanItemIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RecipeID", DbType="BigInt NOT NULL")]
+		public long RecipeID
+		{
+			get
+			{
+				return this._RecipeID;
+			}
+			set
+			{
+				if ((this._RecipeID != value))
+				{
+					if (this._Recipe.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnRecipeIDChanging(value);
+					this.SendPropertyChanging();
+					this._RecipeID = value;
+					this.SendPropertyChanged("RecipeID");
+					this.OnRecipeIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RecipeIngredientID", DbType="BigInt NOT NULL")]
+		public long RecipeIngredientID
+		{
+			get
+			{
+				return this._RecipeIngredientID;
+			}
+			set
+			{
+				if ((this._RecipeIngredientID != value))
+				{
+					if (this._RecipeIngredient.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnRecipeIngredientIDChanging(value);
+					this.SendPropertyChanging();
+					this._RecipeIngredientID = value;
+					this.SendPropertyChanged("RecipeIngredientID");
+					this.OnRecipeIngredientIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IngredientID", DbType="BigInt NOT NULL")]
+		public long IngredientID
+		{
+			get
+			{
+				return this._IngredientID;
+			}
+			set
+			{
+				if ((this._IngredientID != value))
+				{
+					if (this._Ingredient.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnIngredientIDChanging(value);
+					this.SendPropertyChanging();
+					this._IngredientID = value;
+					this.SendPropertyChanged("IngredientID");
+					this.OnIngredientIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_TargetUnitQuantity", DbType="Float")]
+		public System.Nullable<double> TargetUnitQuantity
+		{
+			get
+			{
+				return this._TargetUnitQuantity;
+			}
+			set
+			{
+				if ((this._TargetUnitQuantity != value))
+				{
+					this.OnTargetUnitQuantityChanging(value);
+					this.SendPropertyChanging();
+					this._TargetUnitQuantity = value;
+					this.SendPropertyChanged("TargetUnitQuantity");
+					this.OnTargetUnitQuantityChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FoodPlanItem_ShoppingListItem", Storage="_FoodPlanItem", ThisKey="FoodPlanItemID", OtherKey="Id", IsForeignKey=true)]
+		public FoodPlanItem FoodPlanItem
+		{
+			get
+			{
+				return this._FoodPlanItem.Entity;
+			}
+			set
+			{
+				FoodPlanItem previousValue = this._FoodPlanItem.Entity;
+				if (((previousValue != value) 
+							|| (this._FoodPlanItem.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._FoodPlanItem.Entity = null;
+						previousValue.ShoppingListItems.Remove(this);
+					}
+					this._FoodPlanItem.Entity = value;
+					if ((value != null))
+					{
+						value.ShoppingListItems.Add(this);
+						this._FoodPlanItemID = value.Id;
+					}
+					else
+					{
+						this._FoodPlanItemID = default(long);
+					}
+					this.SendPropertyChanged("FoodPlanItem");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Ingredient_ShoppingListItem", Storage="_Ingredient", ThisKey="IngredientID", OtherKey="Id", IsForeignKey=true)]
+		public Ingredient Ingredient
+		{
+			get
+			{
+				return this._Ingredient.Entity;
+			}
+			set
+			{
+				Ingredient previousValue = this._Ingredient.Entity;
+				if (((previousValue != value) 
+							|| (this._Ingredient.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Ingredient.Entity = null;
+						previousValue.ShoppingListItems.Remove(this);
+					}
+					this._Ingredient.Entity = value;
+					if ((value != null))
+					{
+						value.ShoppingListItems.Add(this);
+						this._IngredientID = value.Id;
+					}
+					else
+					{
+						this._IngredientID = default(long);
+					}
+					this.SendPropertyChanged("Ingredient");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="RecipeIngredient_ShoppingListItem", Storage="_RecipeIngredient", ThisKey="RecipeIngredientID", OtherKey="Id", IsForeignKey=true)]
+		public RecipeIngredient RecipeIngredient
+		{
+			get
+			{
+				return this._RecipeIngredient.Entity;
+			}
+			set
+			{
+				RecipeIngredient previousValue = this._RecipeIngredient.Entity;
+				if (((previousValue != value) 
+							|| (this._RecipeIngredient.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._RecipeIngredient.Entity = null;
+						previousValue.ShoppingListItems.Remove(this);
+					}
+					this._RecipeIngredient.Entity = value;
+					if ((value != null))
+					{
+						value.ShoppingListItems.Add(this);
+						this._RecipeIngredientID = value.Id;
+					}
+					else
+					{
+						this._RecipeIngredientID = default(long);
+					}
+					this.SendPropertyChanged("RecipeIngredient");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Recipe_ShoppingListItem", Storage="_Recipe", ThisKey="RecipeID", OtherKey="Id", IsForeignKey=true)]
+		public Recipe Recipe
+		{
+			get
+			{
+				return this._Recipe.Entity;
+			}
+			set
+			{
+				Recipe previousValue = this._Recipe.Entity;
+				if (((previousValue != value) 
+							|| (this._Recipe.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Recipe.Entity = null;
+						previousValue.ShoppingListItems.Remove(this);
+					}
+					this._Recipe.Entity = value;
+					if ((value != null))
+					{
+						value.ShoppingListItems.Add(this);
+						this._RecipeID = value.Id;
+					}
+					else
+					{
+						this._RecipeID = default(long);
+					}
+					this.SendPropertyChanged("Recipe");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ShoppingList_ShoppingListItem", Storage="_ShoppingList", ThisKey="ShoppingListID", OtherKey="Id", IsForeignKey=true)]
+		public ShoppingList ShoppingList
+		{
+			get
+			{
+				return this._ShoppingList.Entity;
+			}
+			set
+			{
+				ShoppingList previousValue = this._ShoppingList.Entity;
+				if (((previousValue != value) 
+							|| (this._ShoppingList.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ShoppingList.Entity = null;
+						previousValue.ShoppingListItems.Remove(this);
+					}
+					this._ShoppingList.Entity = value;
+					if ((value != null))
+					{
+						value.ShoppingListItems.Add(this);
+						this._ShoppingListID = value.Id;
+					}
+					else
+					{
+						this._ShoppingListID = default(long);
+					}
+					this.SendPropertyChanged("ShoppingList");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.FoodPlans")]
+	public partial class FoodPlan : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private long _Id;
+		
+		private string _Name;
+		
+		private string _Description;
+		
+		private System.DateTime _StartDate;
+		
+		private System.Nullable<long> _Owner;
+		
+		private System.Nullable<double> _DefaultPortions;
+		
+		private EntitySet<FoodPlanItem> _FoodPlanItems;
+		
+		private EntityRef<User> _User;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(long value);
+    partial void OnIdChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnDescriptionChanging(string value);
+    partial void OnDescriptionChanged();
+    partial void OnStartDateChanging(System.DateTime value);
+    partial void OnStartDateChanged();
+    partial void OnOwnerChanging(System.Nullable<long> value);
+    partial void OnOwnerChanged();
+    partial void OnDefaultPortionsChanging(System.Nullable<double> value);
+    partial void OnDefaultPortionsChanged();
+    #endregion
+		
+		public FoodPlan()
+		{
+			this._FoodPlanItems = new EntitySet<FoodPlanItem>(new Action<FoodPlanItem>(this.attach_FoodPlanItems), new Action<FoodPlanItem>(this.detach_FoodPlanItems));
+			this._User = default(EntityRef<User>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="BigInt NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public long Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Description", DbType="NVarChar(50)")]
+		public string Description
+		{
+			get
+			{
+				return this._Description;
+			}
+			set
+			{
+				if ((this._Description != value))
+				{
+					this.OnDescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._Description = value;
+					this.SendPropertyChanged("Description");
+					this.OnDescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StartDate", DbType="DateTime NOT NULL")]
+		public System.DateTime StartDate
+		{
+			get
+			{
+				return this._StartDate;
+			}
+			set
+			{
+				if ((this._StartDate != value))
+				{
+					this.OnStartDateChanging(value);
+					this.SendPropertyChanging();
+					this._StartDate = value;
+					this.SendPropertyChanged("StartDate");
+					this.OnStartDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Owner", DbType="BigInt")]
+		public System.Nullable<long> Owner
+		{
+			get
+			{
+				return this._Owner;
+			}
+			set
+			{
+				if ((this._Owner != value))
+				{
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnOwnerChanging(value);
+					this.SendPropertyChanging();
+					this._Owner = value;
+					this.SendPropertyChanged("Owner");
+					this.OnOwnerChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DefaultPortions", DbType="Float")]
+		public System.Nullable<double> DefaultPortions
+		{
+			get
+			{
+				return this._DefaultPortions;
+			}
+			set
+			{
+				if ((this._DefaultPortions != value))
+				{
+					this.OnDefaultPortionsChanging(value);
+					this.SendPropertyChanging();
+					this._DefaultPortions = value;
+					this.SendPropertyChanged("DefaultPortions");
+					this.OnDefaultPortionsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="FoodPlan_FoodPlanItem", Storage="_FoodPlanItems", ThisKey="Id", OtherKey="FoodPlanID")]
+		public EntitySet<FoodPlanItem> FoodPlanItems
+		{
+			get
+			{
+				return this._FoodPlanItems;
+			}
+			set
+			{
+				this._FoodPlanItems.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_FoodPlan", Storage="_User", ThisKey="Owner", OtherKey="Id", IsForeignKey=true)]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.FoodPlans.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.FoodPlans.Add(this);
+						this._Owner = value.Id;
+					}
+					else
+					{
+						this._Owner = default(Nullable<long>);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_FoodPlanItems(FoodPlanItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.FoodPlan = this;
+		}
+		
+		private void detach_FoodPlanItems(FoodPlanItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.FoodPlan = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Users")]
+	public partial class User : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private long _Id;
+		
+		private string _Name;
+		
+		private string _eMail;
+		
+		private EntitySet<FoodPlan> _FoodPlans;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(long value);
+    partial void OnIdChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OneMailChanging(string value);
+    partial void OneMailChanged();
+    #endregion
+		
+		public User()
+		{
+			this._FoodPlans = new EntitySet<FoodPlan>(new Action<FoodPlan>(this.attach_FoodPlans), new Action<FoodPlan>(this.detach_FoodPlans));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", DbType="BigInt NOT NULL", IsPrimaryKey=true)]
+		public long Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_eMail", DbType="NVarChar(50)")]
+		public string eMail
+		{
+			get
+			{
+				return this._eMail;
+			}
+			set
+			{
+				if ((this._eMail != value))
+				{
+					this.OneMailChanging(value);
+					this.SendPropertyChanging();
+					this._eMail = value;
+					this.SendPropertyChanged("eMail");
+					this.OneMailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_FoodPlan", Storage="_FoodPlans", ThisKey="Id", OtherKey="Owner")]
+		public EntitySet<FoodPlan> FoodPlans
+		{
+			get
+			{
+				return this._FoodPlans;
+			}
+			set
+			{
+				this._FoodPlans.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_FoodPlans(FoodPlan entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_FoodPlans(FoodPlan entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
 		}
 	}
 }

@@ -16,10 +16,10 @@ namespace JamieDB.ViewModel
         #region Attributes
         private ObservableCollection<Ingredient> _Ingredients;
         private ObservableCollection<IngredientType> _IngredientTypes;
-        private ObservableCollection<MissingTranslation> _RecipeTranslations;
+        private ObservableCollection<MissingTranslation> _IngredientTranslations;
         
         private Ingredient _SelectedIngredient;
-        private MissingTranslation _SelectedRecipeTranslation;
+        private MissingTranslation _SelectedIngredientTranslation;
         private UnitTranslation _SelectedUnitTranslation;
         private UnitTranslator _UnitTranslator;
         private ObservableCollection<UnitTranslation> _UnitTranslations;
@@ -77,12 +77,13 @@ namespace JamieDB.ViewModel
             {
                 if (e.OldItems != null)
                 {
-                    /*                  foreach (RecipeIngredient RI in e.OldItems)
-                                           {
-                                           _context.RecipeIngredients.DeleteOnSubmit(RI);
-                                           StatusBarMessage = "RecipeIngredient Deleted";
-                                           }
-                   */
+
+                    foreach (UnitTranslation RI in e.OldItems)
+                    {
+                        context.UnitTranslations.DeleteOnSubmit(RI);
+                        StatusBarMessage = "RecipeIngredient Deleted";
+                    }
+
                 }
             }
 
@@ -123,19 +124,19 @@ namespace JamieDB.ViewModel
                 }
             }
         }
-        public ObservableCollection<MissingTranslation> RecipeTranslations
+        public ObservableCollection<MissingTranslation> IngredientTranslations
         {
             get
             {
-                return _RecipeTranslations;
+                return _IngredientTranslations;
             }
 
             set
             {
-                if (_RecipeTranslations != value)
+                if (_IngredientTranslations != value)
                 {
-                    _RecipeTranslations = value;
-                    OnPropertyChanged("RecipeTranslations");
+                    _IngredientTranslations = value;
+                    OnPropertyChanged("IngredientTranslations");
                 }
             }
         }
@@ -153,24 +154,24 @@ namespace JamieDB.ViewModel
                     _SelectedIngredient = value;
                     OnPropertyChanged("SelectedIngredient");
                     OnPropertyChanged("IngredientUnitTranslations");
-                    RefreshMissingUnitTranslations();
+                    RefreshIngredientUnitTranslations();
                 }
             }
         }
-        public MissingTranslation SelectedMissingTranslation
+        public MissingTranslation SelectedIngredientTranslation
         {
             get
             {
-                return _SelectedRecipeTranslation;
+                return _SelectedIngredientTranslation;
             }
 
             set
             {
-                if (_SelectedRecipeTranslation != value)
+                if (_SelectedIngredientTranslation != value)
                 {
-                    _SelectedRecipeTranslation = value;
-                    OnPropertyChanged("SelectedRecipeTranslation");
-                    StatusBarMessage = "Selected Recipe Translation " + value;
+                    _SelectedIngredientTranslation = value;
+                    OnPropertyChanged("SelectedIngredientTranslation");
+                    StatusBarMessage = "Selected Ingredient Translation " + value;
                 }
             }
         }
@@ -246,21 +247,20 @@ namespace JamieDB.ViewModel
         #region Methods
         private void RefreshIngredients()
         {
-            var result = _context.Ingredients.OrderBy(i => i.Name);
+            var result = context.Ingredients.OrderBy(i => i.Name);
             Ingredients = new ObservableCollection<Ingredient>(result);
-
             SelectedIngredient = result.FirstOrDefault();
         }
         private void RefreshIngredientTypes()
         {
-            var result = _context.IngredientTypes.OrderBy(i => i.Name);
+            var result = context.IngredientTypes.OrderBy(i => i.Name);
             IngredientTypes = new ObservableCollection<IngredientType>(result);
         }
-        private void RefreshMissingUnitTranslations()
+        private void RefreshIngredientUnitTranslations()
         {
             var result = context.RecipeIngredients.Where(ri => ri.Ingredient == SelectedIngredient && (ri.UnitID != ri.Ingredient.TargetUnitID));
 
-            RecipeTranslations = new ObservableCollection<MissingTranslation>();
+            IngredientTranslations = new ObservableCollection<MissingTranslation>();
 
             foreach (var r in result)
             {
@@ -271,7 +271,7 @@ namespace JamieDB.ViewModel
                     x.TargetUnit = r.Ingredient.Unit;
                     x.Factor = _UnitTranslator.GetTranslationFactor(r.Ingredient,r.Unit, r.Ingredient.Unit);
                     x.RelatedRecipe = r.Recipe;
-                    RecipeTranslations.Add(x);
+                    IngredientTranslations.Add(x);
             }
         }
         private void RefreshUnitTranslations()
@@ -297,13 +297,13 @@ namespace JamieDB.ViewModel
                 MessageText = "Ingredient " + SelectedIngredient.Name + " deleted";
 
 
-                _context.Ingredients.DeleteOnSubmit(SelectedIngredient);
+                context.Ingredients.DeleteOnSubmit(SelectedIngredient);
 
                 // foreach () in Detailtable --> DeleteOnSubmit DetailEntry
 
                 try
                 {
-                    _context.SubmitChanges();
+                    context.SubmitChanges();
                 }
                 catch (Exception e)
                 {
@@ -312,7 +312,7 @@ namespace JamieDB.ViewModel
                     // Make some adjustments.
                     // ...
                     // Try again.
-                    //_context.SubmitChanges();
+                    //context.SubmitChanges();
                 }
 
                 RefreshIngredients();
@@ -329,11 +329,11 @@ namespace JamieDB.ViewModel
             NewIngredient.Name = "<Ingredient>";
             NewIngredient.IngredientType = IngredientTypes.FirstOrDefault();
 
-            _context.Ingredients.InsertOnSubmit(NewIngredient);
+            context.Ingredients.InsertOnSubmit(NewIngredient);
 
             try
             {
-                _context.SubmitChanges();
+                context.SubmitChanges();
             }
             catch (Exception e)
             {
@@ -341,7 +341,7 @@ namespace JamieDB.ViewModel
                 // Make some adjustments.
                 // ...
                 // Try again.
-                //_context.SubmitChanges();
+                //context.SubmitChanges();
             }
             RefreshIngredients();
             SelectedIngredient = NewIngredient;

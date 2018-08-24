@@ -27,7 +27,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>7</ApplicationRevision>
+    <ApplicationRevision>9</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -94,6 +94,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Visual Studio Help.cs" />
     <Page Include="View\MaintainanceRecipes.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -103,6 +104,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JamieDBDescription.cs" />
+    <Compile Include="Model\FoodPlan.cs" />
     <Compile Include="Model\Unit.cs" />
     <Compile Include="Model\JamieDBLinq.designer.cs">
       <AutoGen>True</AutoGen>
@@ -110,9 +112,11 @@
       <DependentUpon>JamieDBLinq.dbml</DependentUpon>
     </Compile>
     <Compile Include="Model\UnitTranslation.cs" />
+    <Compile Include="ViewModel\FoodPlansVMClass.cs" />
     <Compile Include="ViewModel\IngredientsVMClass.cs" />
     <Compile Include="ViewModel\JamieDBViewModelCommand.cs" />
     <Compile Include="ViewModel\MaintainanceRecipesViewModel.cs" />
+    <Compile Include="ViewModel\ShoppingListVMClass.cs" />
     <Compile Include="ViewModel\UnitsVMClass.cs" />
     <Compile Include="View\MaintainanceRecipes.xaml.cs">
       <DependentUpon>MaintainanceRecipes.xaml</DependentUpon>
@@ -141,6 +145,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Model\JamieDBLinq.dbml">
       <Generator>MSLinqToSQLGenerator</Generator>

@@ -24,6 +24,11 @@ namespace JamieDB.ViewModel
         JamieDBViewModelCommandCanExecute CanExecuteMethod;
         JamieDBViewModelCommandExecute ExecuteMethod;
 
+        public bool CanAllwaysExecute(object parameter)
+        {
+            return true;
+        }
+
         public bool CanExecute(object parameter)
         {
             if (CanExecuteMethod != null) { return CanExecuteMethod(parameter); }

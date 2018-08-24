@@ -772,128 +772,100 @@ namespace JamieDB.ViewModel
         public double GetTranslationFactor(Ingredient i, Unit BaseUnit, Unit TargetUnit)
         {
             double ReturnValue=0;
-            ObservableCollection<UnitTranslation> IngredientRelatedTranslations;
-            UnitTranslation[] WorkingTranslation = new UnitTranslation [2];
-            
-            int CaseSelector=0;
 
-            IngredientRelatedTranslations = IngredientUnitTranslations(i);
-
-            ReturnValue = GetSpecificTranslationFactor(BaseUnit, TargetUnit, IngredientRelatedTranslations); // Ein direkter Versuch....
-
-            if (ReturnValue == 0)
+            if (BaseUnit == TargetUnit) ReturnValue = 1; // Umrechnungsfaktor bei gleicher Einheit immer 1.
+            else 
             {
-                CaseSelector += (BaseUnit.TypeUniversal ? 0 : 1);
-                CaseSelector += (TargetUnit.TypeUniversal ? 0 : 2);
-                CaseSelector += (BaseUnit.UnitType == TargetUnit.UnitType ? 0 : 4);
+                ObservableCollection<UnitTranslation> IngredientRelatedTranslations;
+                UnitTranslation[] WorkingTranslation = new UnitTranslation[2];
 
-                switch (CaseSelector)
+                int CaseSelector = 0;
+
+                IngredientRelatedTranslations = IngredientUnitTranslations(i);
+
+                ReturnValue = GetSpecificTranslationFactor(BaseUnit, TargetUnit, IngredientRelatedTranslations); // Ein direkter Versuch....
+
+                if (ReturnValue == 0)
                 {
-                    case 0: // BaseUnit == universell, TargetUnit == universell, Type1 == Type2
-                        ReturnValue = BaseUnit.TypeFactor ?? 0;
-                        ReturnValue = (((TargetUnit.TypeFactor ?? 0) == 0) ? 0 : ReturnValue /= (TargetUnit.TypeFactor ?? 1));
-                        break;
-                    case 1: // BaseUnit != universell, TargetUnit == universell, Type1 == Type2
-                        WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations);
-                        if  (WorkingTranslation[0] != null ) ReturnValue = WorkingTranslation[0].Factor * GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
-                        break;
-                    case 2: // BaseUnit == universell, TargetUnit != universell, Type1 == Type2
-                        WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
-                        if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit1) / WorkingTranslation[0].Inverse().Factor;
-                        break;
-                    case 3: // BaseUnit != universell, TargetUnit != universell, Type1 == Type2
-                        WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
-                        WorkingTranslation[1] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
-                        if (WorkingTranslation[0]!= null && WorkingTranslation[1] != null)
-                        {
-                            ReturnValue = WorkingTranslation[0].Factor * 
-                                          GetTranslationFactor(i, WorkingTranslation[0].Unit1, WorkingTranslation[1].Unit1) * 
-                                          WorkingTranslation[1].Inverse().Factor;
-                        }
-                        break;
-                    case 4: // BaseUnit == universell, TargetUnit == universell, Type1 != Type2
-                        // Erster Versuch ...
-                        WorkingTranslation[0] = GetTranslationUniversalTypeToType(i, BaseUnit.UnitType, TargetUnit.UnitType, IngredientRelatedTranslations);
-                        if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit) *
-                                                                         WorkingTranslation[0].Factor *
-                                                                         GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
-                        if (ReturnValue == 0) // Zweiter Versuch durch Einbindung der Nichtuniversellen Translations.
-                        {
+                    CaseSelector += (BaseUnit.TypeUniversal ? 0 : 1);
+                    CaseSelector += (TargetUnit.TypeUniversal ? 0 : 2);
+                    CaseSelector += (BaseUnit.UnitType == TargetUnit.UnitType ? 0 : 4);
 
-                        }
-                        break;
-                    case 5: // BaseUnit != universell, TargetUnit == universell, Type1 != Type2
-                            // Getestet Butter EL --> g --> kg OK
-                        WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations);   // Erster Versuch
-                        if (WorkingTranslation[0] == null) WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations); // Zweiter Versuch
-                        if (WorkingTranslation[0] != null) ReturnValue = WorkingTranslation[0].Factor * GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
-                        break;
-                    case 6: // BaseUnit == universell, TargetUnit != universell, Type1 != Type2
-                        WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);   // Erster Versuch
-                        if (WorkingTranslation[0] == null) WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations); // Zweiter Versuch
-                        if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit1) * WorkingTranslation[0].Inverse().Factor;
-                        break;
-                    case 7: // BaseUnit != universell, TargetUnit != universell, Type1 != Type2
-                        WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations); // Erster Versuch
-                        WorkingTranslation[1] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
-                        if (WorkingTranslation[0] == null || WorkingTranslation[1] == null) // Zweiter Versuch
-                        {
+                    switch (CaseSelector)
+                    {
+                        case 0: // BaseUnit == universell, TargetUnit == universell, Type1 == Type2
+                                // Getestet OK: allgemein EL- --> ml / TL- --> ml / Dsh --> ml / l --> ml / kg --> g / g --> kg 
+                            ReturnValue = BaseUnit.TypeFactor ?? 0;
+                            ReturnValue = (((TargetUnit.TypeFactor ?? 0) == 0) ? 0 : ReturnValue /= (TargetUnit.TypeFactor ?? 1));
+                            break;
+                        case 1: // BaseUnit != universell, TargetUnit == universell, Type1 == Type2
+                                // noch nicht getestet
+                            WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations);
+                            if (WorkingTranslation[0] != null) ReturnValue = WorkingTranslation[0].Factor * GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
+                            break;
+                        case 2: // BaseUnit == universell, TargetUnit != universell, Type1 == Type2
+                                // noch nicht getestet
+                            WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                            if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit1) / WorkingTranslation[0].Inverse().Factor;
+                            break;
+                        case 3: // BaseUnit != universell, TargetUnit != universell, Type1 == Type2
+                                // noch nicht getestet
                             WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
                             WorkingTranslation[1] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
-                        }
-                        if (WorkingTranslation[0] != null && WorkingTranslation[1] != null) ReturnValue = WorkingTranslation[0].Factor *
-                                                                                                          GetTranslationFactor(i, WorkingTranslation[0].Unit1, WorkingTranslation[1].Unit) *
-                                                                                                          WorkingTranslation[1].Inverse().Factor;
-                        break;
-                    default:
-                        ReturnValue = 0;
-                        break;
+                            if (WorkingTranslation[0] != null && WorkingTranslation[1] != null)
+                            {
+                                ReturnValue = WorkingTranslation[0].Factor *
+                                              GetTranslationFactor(i, WorkingTranslation[0].Unit1, WorkingTranslation[1].Unit1) *
+                                              WorkingTranslation[1].Inverse().Factor;
+                            }
+                            break;
+                        case 4: // BaseUnit == universell, TargetUnit == universell, Type1 != Type2
+                                // Erster Versuch ...
+                                // noch nicht getestet
+                            WorkingTranslation[0] = GetTranslationUniversalTypeToType(i, BaseUnit.UnitType, TargetUnit.UnitType, IngredientRelatedTranslations);
+                            if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit) *
+                                                                             WorkingTranslation[0].Factor *
+                                                                             GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
+                            if (ReturnValue == 0) // Zweiter Versuch durch Einbindung der Nichtuniversellen Translations.
+                            {
+
+                            }
+                            break;
+                        case 5: // BaseUnit != universell, TargetUnit == universell, Type1 != Type2
+                                // Getestet OK: Butter EL --> g --> kg
+                            WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations);   // Erster Versuch
+                            if (WorkingTranslation[0] == null) WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations); // Zweiter Versuch
+                            if (WorkingTranslation[0] != null) ReturnValue = WorkingTranslation[0].Factor * GetTranslationFactor(i, WorkingTranslation[0].Unit1, TargetUnit);
+                            break;
+                        case 6: // BaseUnit == universell, TargetUnit != universell, Type1 != Type2
+                                // noch nicht getestet
+                            WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);   // Erster Versuch
+                            if (WorkingTranslation[0] == null) WorkingTranslation[0] = GetTranslationToType(i, TargetUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations); // Zweiter Versuch
+                            if (WorkingTranslation[0] != null) ReturnValue = GetTranslationFactor(i, BaseUnit, WorkingTranslation[0].Unit1) * WorkingTranslation[0].Inverse().Factor;
+                            break;
+                        case 7: // BaseUnit != universell, TargetUnit != universell, Type1 != Type2
+                                // noch nicht getestet
+                            WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, BaseUnit.UnitType, true, IngredientRelatedTranslations); // Erster Versuch
+                            WorkingTranslation[1] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                            if (WorkingTranslation[0] == null || WorkingTranslation[1] == null) // Zweiter Versuch
+                            {
+                                WorkingTranslation[0] = GetTranslationToType(i, BaseUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                                WorkingTranslation[1] = GetTranslationToType(i, TargetUnit, TargetUnit.UnitType, true, IngredientRelatedTranslations);
+                            }
+                            if (WorkingTranslation[0] != null && WorkingTranslation[1] != null) ReturnValue = WorkingTranslation[0].Factor *
+                                                                                                              GetTranslationFactor(i, WorkingTranslation[0].Unit1, WorkingTranslation[1].Unit) *
+                                                                                                              WorkingTranslation[1].Inverse().Factor;
+                            break;
+                        default:
+                            ReturnValue = 0;
+                            break;
+                    }
+
                 }
 
             }
             return ReturnValue;
         }
-
-
-
-        /*            if (Unit1 != null && Unit2 != null)
-                    {
-                        if (Unit1.UnitType == Unit2.UnitType)
-                        {
-                            if (Unit1.TypeUniversal && Unit2.TypeUniversal)
-                            {
-                                ReturnValue = Unit1.TypeFactor ?? 0;
-                                ReturnValue = (((Unit2.TypeFactor ?? 0) == 0) ? 0 : ReturnValue /= (Unit2.TypeFactor ?? 1));
-                            }
-                            else // Unit1 oder Unit2 (oder beide) sind nicht Universal - aber gleichen Typs
-                            {
-                                IngredientRelatedTranslations = IngredientUnitTranslations(i);
-                            }
-                        }
-                        else  
-                        {
-                            if (Unit1.TypeUniversal && Unit2.TypeUniversal) // Unit1 und Unit2 sind universal aber unterschiedliche Typen
-                            {
-                                IngredientRelatedTranslations = IngredientUnitTranslations(i);
-                            }
-                            else // Unit1 oder Unit2 (oder beide) sind nicht universal - und unterschiedliche Typen
-                            {
-                                IngredientRelatedTranslations = IngredientUnitTranslations(i);
-                                WorkingTranslation = IngredientRelatedTranslations.Where(it => it.Factor!=0 && ((it.Unit == Unit1) && (it.Unit1 == Unit2) || (it.Unit1 == Unit1) && (it.Unit == Unit2))).FirstOrDefault();
-                                if (WorkingTranslation  == null)
-                                {
-
-                                }
-                                else
-                                {
-                                    ReturnValue = (WorkingTranslation.Unit == Unit1 ? WorkingTranslation.Factor : 1/ WorkingTranslation.Factor);
-                                }
-                            }
-                        }
-                    }
-
-            */
-
         public UnitTranslation GetTranslationToType(Ingredient i, Unit BaseUnit, UnitType TargetType, bool isUniversal, ObservableCollection<UnitTranslation> RelevantTranslations)
         {
             UnitTranslation ReturnValue = null;
